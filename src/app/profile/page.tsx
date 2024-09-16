@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { auth } from '../../lib/firebaseConfig';
-import AddTripModal from './AddTripModal';
+import AddNewTripModal from './AddNewTripModal';
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -37,7 +37,7 @@ const ProfilePage = () => {
           <Button onClick={handleAddClick}>Add</Button>
         </MainContent>
       </Container>
-      {isModalOpen && <AddTripModal onClose={handleModalClose}></AddTripModal>}
+      {isModalOpen && <AddNewTripModal onClose={handleModalClose}></AddNewTripModal>}
     </>
   );
 };

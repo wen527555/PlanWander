@@ -23,7 +23,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideHeader = pathname === '/trips';
+  const hideHeader = /^\/trips(\/[a-zA-Z0-9]+)?$/.test(pathname);
   return (
     <QueryProvider>
       <html lang="en">

@@ -50,7 +50,6 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
               <ItemTitle>
                 {new Date(day.date).toLocaleDateString('en-US', {
                   weekday: 'long',
-                  year: 'numeric',
                   month: 'long',
                   day: 'numeric',
                 })}
@@ -59,7 +58,7 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
             <ItemContent isOpen={isOpen}>
               {day.places?.map((place, index) => (
                 <PlaceContainer key={place.id}>
-                  <Marker index={index} dayId={day.date} dateIndex={dateIndex} />
+                  <Marker index={index} dateIndex={dateIndex} />
                   <PlaceBlock>{place.name}</PlaceBlock>
                 </PlaceContainer>
               ))}
@@ -116,31 +115,3 @@ const PlaceBlock = styled.div`
   cursor: pointer;
   margin-bottom: 10px;
 `;
-
-// const SuggestionList = styled.ul`
-//   position: absolute;
-//   width: 100%;
-//   background-color: #ffff;
-//   border-radius: 5px;
-//   max-height: 200px;
-//   overflow-y: auto;
-//   z-index: 100;
-//   list-style-type: none;
-//   padding: 0;
-//   margin: 0;
-// `;
-
-// const SuggestionItem = styled.li`
-//   padding: 10px;
-//   cursor: pointer;
-//   display: flex;
-//   align-items: center;
-
-//   &:hover {
-//     background: #f0f0f0;
-//   }
-// `;
-
-// const SearchIcon = styled(FaMapMarkerAlt)`
-//   margin-right: 10px;
-// `;

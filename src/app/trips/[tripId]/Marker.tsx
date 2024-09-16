@@ -22,7 +22,7 @@ const getRandomLightColor = () => {
   return color;
 };
 
-const getColorForDate = (dayId: string, dateIndex: number) => {
+const getColorForDate = (dateIndex: number) => {
   if (dateIndex < 10) {
     return colors[dateIndex];
   } else {
@@ -30,8 +30,8 @@ const getColorForDate = (dayId: string, dateIndex: number) => {
   }
 };
 
-const Marker: React.FC<{ index: number; dayId: string; dateIndex: number }> = ({ index, dayId, dateIndex }) => {
-  const color = getColorForDate(dayId, dateIndex);
+const Marker: React.FC<{ index: number; dateIndex: number }> = ({ index, dateIndex }) => {
+  const color = getColorForDate(dateIndex);
 
   return (
     <MarkerContainer>

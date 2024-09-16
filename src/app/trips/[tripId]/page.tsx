@@ -7,10 +7,13 @@ import styled from 'styled-components';
 
 import { addPlaceToDay, fetchTripData } from '../../../lib/firebaseApi';
 import List from './List';
+import { processDays } from './processDays';
 
 interface Place {
   id: string;
   name: string;
+  lat: number;
+  lng: number;
 }
 
 interface AddLocationParams {
@@ -18,7 +21,7 @@ interface AddLocationParams {
   dayId: string;
 }
 
-const Map = dynamic(() => import('../../../components/Map'), {
+const MapComponent = dynamic(() => import('../../../components/Map'), {
   ssr: false,
 });
 
@@ -52,7 +55,6 @@ const TripPage: React.FC = () => {
   });
 
   const handlePlaceSelected = (place: Place, dayId: string) => {
-    console.log('place', place, dayId);
     mutation.mutate({ place, dayId });
   };
 
@@ -60,6 +62,7 @@ const TripPage: React.FC = () => {
     return <div>Loading...</div>;
   }
   const { tripTitle, days } = tripData;
+  const placeWithMarkerAndRoutes = processDays(days);
 
   return (
     <Container>
@@ -68,7 +71,7 @@ const TripPage: React.FC = () => {
         <List days={days} onPlaceSelected={handlePlaceSelected} />
       </ListContainer>
       <MapContainer>
-        <Map />
+        <MapComponent placesWithMarkerAndRoutes={placeWithMarkerAndRoutes} />
       </MapContainer>
     </Container>
   );
@@ -83,8 +86,11 @@ const Container = styled.div`
 
 const ListContainer = styled.div`
   width: 50%;
+  height: 100vh;
 `;
 
 const MapContainer = styled.div`
   width: 50%;
+  height: 100vh;
+  position: relative;
 `;

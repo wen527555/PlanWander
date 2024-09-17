@@ -36,6 +36,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceSelected, dayId 
           lng: lng,
         };
         onPlaceSelected(newPlace, dayId);
+        setInputValue('');
       }
     }
   };
@@ -48,7 +49,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceSelected, dayId 
           value={inputValue}
           onChange={(e) => setInputValue(e.target.value)}
           placeholder="Add a place"
-          style={{ width: '100%', padding: '8px' }}
         />
       </Autocomplete>
     </LoadScript>
@@ -58,12 +58,13 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceSelected, dayId 
 export default LocationSearch;
 
 const SearchInput = styled.input`
-  width: 90%;
+  width: 100%;
   padding: 10px;
   background-color: #f3f4f5;
   border: none;
   border-radius: 5px;
   height: 40px;
   font-size: 16px;
+  margin: 10px 0px 0px 21px;
   cursor: pointer;
 `;

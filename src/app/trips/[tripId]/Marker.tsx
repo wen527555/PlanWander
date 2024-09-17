@@ -1,17 +1,18 @@
 import { FaMapMarker } from 'react-icons/fa';
 import styled from 'styled-components';
 
+//!要和processDay共用
 const colors = [
-  '#00c8ffe2',
-  '#a5e7b7',
-  '#b3b3eb',
-  '#c3e5e6c6',
-  '#eef3ac',
-  '#D3D3D3',
-  '#E0FFFF',
-  '#FFE4E1',
-  '#FFDAB9',
-  '#FFF0F5',
+  '#00c8ff',
+  '#8e8ee0',
+  '#ed7fcc',
+  '#f1a731',
+  '#41e26c',
+  '#2ddde3',
+  '#2c4ae0',
+  '#83d685',
+  '#dc9a61',
+  '#dc618a',
 ];
 const getRandomLightColor = () => {
   const letters = 'BCDEF';
@@ -59,9 +60,9 @@ const MarkerIcon = styled(FaMapMarker)`
 const MarkerNumber = styled.div`
   position: absolute;
   top: 40%;
-  left: 50%;
+  left: 47%;
   transform: translate(-50%, -50%);
   color: white;
-  font-size: 18px;
+  font-size: 15px;
   font-weight: bold;
 `;

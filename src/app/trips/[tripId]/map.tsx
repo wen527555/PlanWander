@@ -1,8 +1,6 @@
 import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
-import { Map, Marker, ViewStateChangeEvent } from 'react-map-gl';
-
-import RouteLayer from '@/app/trips/[tripId]/Routes';
+import { Layer, Map, Marker, Popup, Source, ViewStateChangeEvent } from 'react-map-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -29,32 +27,36 @@ interface Route {
 interface MapComponentProps {
   placesWithMarkerAndRoutes: {
     places: Place[];
+    routes: Route[];
   };
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ placesWithMarkerAndRoutes }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ places, routes }) => {
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  // const [isStyleLoaded, setIsStyleLoaded] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [viewState, setViewState] = useState({
     longitude: 0,
     latitude: 0,
     zoom: 1.5,
   });
 
-  const { places } = placesWithMarkerAndRoutes;
-
   useEffect(() => {
     if (mapRef.current && isMapLoaded && places.length > 0) {
-      setTimeout(() => {
-        const bounds = new LngLatBounds();
-        places.forEach((place) => bounds.extend([place.lng, place.lat]));
+      const checkIfStyleLoaded = () => {
+        if (mapRef.current.isStyleLoaded()) {
+          const bounds = new LngLatBounds();
+          places.forEach((place) => bounds.extend([place.lng, place.lat]));
+          mapRef.current.fitBounds(bounds, {
+            padding: 50,
+            maxZoom: 15,
+          });
+        } else {
+          setTimeout(checkIfStyleLoaded, 1000);
+        }
+      };
 
-        mapRef.current.fitBounds(bounds, {
-          padding: 50,
-          maxZoom: 15,
-        });
-      }, 300);
+      checkIfStyleLoaded();
     }
   }, [places, isMapLoaded]);
 
@@ -64,6 +66,15 @@ const MapComponent: React.FC<MapComponentProps> = ({ placesWithMarkerAndRoutes }
 
   const handleViewStateChange = (evt: ViewStateChangeEvent) => {
     setViewState(evt.viewState);
+  };
+
+  const handleMarkerClick = (place: Place) => {
+    setSelectedPlace(place);
+    setViewState({
+      longitude: place.lng,
+      latitude: place.lat,
+      zoom: viewState.zoom,
+    });
   };
 
   return (
@@ -95,11 +106,50 @@ const MapComponent: React.FC<MapComponentProps> = ({ placesWithMarkerAndRoutes }
               fontWeight: 'bold',
               fontSize: '15px',
             }}
+            onClick={() => handleMarkerClick(place)}
           >
             {place.number}
           </Marker>
         ))}
-        <RouteLayer places={places} />
+        {selectedPlace && (
+          <Popup
+            longitude={selectedPlace.lng}
+            latitude={selectedPlace.lat}
+            onClose={() => setSelectedPlace(null)}
+            closeOnClick={false}
+          >
+            <div>
+              <h3>{selectedPlace.name}</h3>
+            </div>
+          </Popup>
+        )}
+        {/* <RouteLayer places={places} /> */}
+        {routes?.map((route, index) => (
+          <Source
+            key={`route-${index}`}
+            id={`route-${index}`}
+            type="geojson"
+            data={{
+              type: 'Feature',
+              geometry: {
+                type: route.type,
+                coordinates: route.coordinates,
+              },
+            }}
+          >
+            <Layer
+              key={`route-${index}`}
+              id={`route-${index}`}
+              type="line"
+              paint={{
+                'line-color': route.color,
+                'line-width': 5,
+                //   'line-opacity': 0.9,
+                // 'line-dasharray': [3, 3],
+              }}
+            />
+          </Source>
+        ))}
       </Map>
     </div>
   );

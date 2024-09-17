@@ -1,36 +1,34 @@
-interface Places {
+interface Place {
   name: string;
   latitude: number;
   longitude: number;
   color: string;
   number: number;
+  route?: Route;
 }
 
 interface Route {
-  start: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  };
-  end: {
-    name: string;
-    latitude: number;
-    longitude: number;
-  };
-  color: string;
+  type: string;
+  coordinates: [number, number][];
+  color?: string;
+}
+
+interface Day {
+  places: Place[];
+  route?: Route;
 }
 
 const colors = [
   '#00c8ff',
-  '#a5e7b7',
-  '#b3b3eb',
-  '#c3e5e6',
-  '#eef3ac',
-  '#D3D3D3',
-  '#E0FFFF',
-  '#FFE4E1',
-  '#FFDAB9',
-  '#FFF0F5',
+  '#8e8ee0',
+  '#ed7fcc',
+  '#f1a731',
+  '#41e26c',
+  '#2ddde3',
+  '#2c4ae0',
+  '#83d685',
+  '#dc9a61',
+  '#dc618a',
 ];
 const getRandomLightColor = () => {
   const letters = 'BCDEF';
@@ -49,8 +47,9 @@ export const getColorForDate = (dateIndex: number) => {
   }
 };
 
-export const processDays = (days: Day[]): { markers: Places[]; routes: Route[] } => {
-  const places: Places[] = [];
+export const processDays = (days: Day[]): { places: Place[]; route: Route[] } => {
+  const places: Place[] = [];
+  const routes: Route[] = [];
   days.forEach((day, dayIndex) => {
     const color = getColorForDate(dayIndex);
     day.places?.forEach((place, index) => {
@@ -59,8 +58,15 @@ export const processDays = (days: Day[]): { markers: Places[]; routes: Route[] }
         color,
         number: index + 1,
       });
+
+      if (place.route) {
+        routes.push({
+          type: place.route.type,
+          coordinates: place.route.coordinates.map((coord: { lat: number; lng: number }) => [coord.lng, coord.lat]),
+          color: color,
+        });
+      }
     });
   });
-
-  return { places };
+  return { places, routes };
 };

@@ -126,17 +126,52 @@ export const fetchTripData = async (tripId: string) => {
   }
 };
 
-export const addPlaceToDay = async (tripId: string, dayId: string, newPlace: any) => {
+export const addPlaceToDay = async (tripId: string, dayId: string, newPlace: any, newRoute: any) => {
   try {
     const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
     const dayDoc = await getDoc(dayDocRef);
     if (!dayDoc.exists()) {
       throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
     }
+    console.log('newRoute', newRoute);
+    const placeWithRoute = {
+      ...newPlace,
+      route: newRoute
+        ? {
+            type: newRoute.type,
+            coordinates: newRoute.coordinates.map((coord: [number, number]) => ({
+              lat: coord[1],
+              lng: coord[0],
+            })),
+            duration: newRoute.duration,
+          }
+        : null,
+    };
+    console.log('placeWithRoute', placeWithRoute);
     await updateDoc(dayDocRef, {
-      places: arrayUnion(newPlace),
+      places: arrayUnion(placeWithRoute),
     });
   } catch (error) {
     console.error('Error adding location to Firestore:', error);
+  }
+};
+
+export const getLastPlaceOfDay = async (tripId: string, dayId: string) => {
+  try {
+    const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
+    const dayDoc = await getDoc(dayDocRef);
+    if (!dayDoc.exists()) {
+      throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
+    }
+
+    const places = dayDoc.data().places;
+    if (places && places.length > 0) {
+      return places[places.length - 1];
+    } else {
+      return null;
+    }
+  } catch (error) {
+    console.error('Error getting last place from Firestore:', error);
+    return null;
   }
 };

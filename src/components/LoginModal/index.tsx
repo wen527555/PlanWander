@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useEffect, useState } from 'react';
+import { FormEvent, useState } from 'react';
 // import { createPortal } from 'react-dom';
 import { IoMdClose } from 'react-icons/io';
 import styled from 'styled-components';
@@ -60,6 +60,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onLoginSuccess, onClose
       try {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
+        console.log('user', user);
         // !user應該要記錄到哪裡 store或是統一firebase管理
         onLoginSuccess();
       } catch (error) {

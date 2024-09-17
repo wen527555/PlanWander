@@ -2,6 +2,8 @@
 'use client';
 
 //! layout應該是不能用use client的
+import { usePathname } from 'next/navigation';
+
 import StyledComponentsRegistry from '../lib/registry';
 
 import './globals.css';
@@ -20,12 +22,14 @@ const inter = Inter({ subsets: ['latin'] });
 // };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+  const hideHeader = /^\/trips(\/[a-zA-Z0-9]+)?$/.test(pathname);
   return (
     <QueryProvider>
       <html lang="en">
         <body className={inter.className}>
           <StyledComponentsRegistry>
-            <Header />
+            {!hideHeader && <Header />}
             {children}
             <ReactQueryDevtools initialIsOpen={false} />
           </StyledComponentsRegistry>

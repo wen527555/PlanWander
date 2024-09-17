@@ -1,5 +1,6 @@
 'use client';
 
+import { User } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -9,12 +10,15 @@ import LoginModal from '../LoginModal';
 
 const Header = () => {
   const [isLoginModalOpen, setIsModalOpen] = useState(false);
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
-
+  console.log('user', user);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
+      if (user) {
+        setUser(user);
+      } else {
+        setUser(null);
         router.push('/');
       }
     });
@@ -26,10 +30,6 @@ const Header = () => {
     setIsModalOpen(true);
   };
 
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
-
   const handleLoginSuccess = () => {
     setIsModalOpen(false);
     router.push('/profile');
@@ -39,11 +39,9 @@ const Header = () => {
     try {
       await auth.signOut();
       setUser(null);
-      //   logout();
       router.push('/');
     } catch (error) {
       console.error('Error during logout: ', error);
-      //   alert('Logout failed: ' + error.message);
     }
   };
 

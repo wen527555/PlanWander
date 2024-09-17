@@ -25,10 +25,10 @@ interface Day {
   date: string;
 }
 
-interface TripData {
-  tripTitle: string;
-  day: Day[];
-}
+// interface TripData {
+//   tripTitle: string;
+//   day: Day[];
+// }
 
 export const saveUserData = async (userInfo: UserInfo | null): Promise<void> => {
   if (!userInfo || !userInfo.uid) {
@@ -176,7 +176,7 @@ export const getLastPlaceOfDay = async (tripId: string, dayId: string) => {
   }
 };
 
-export const updatePlaces = async (tripId: string, dayId: string, updatedPlaces: any[]) => {
+export const updatePlaces = async (tripId: string, dayId: string) => {
   try {
     const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
     const dayDoc = await getDoc(dayDocRef);

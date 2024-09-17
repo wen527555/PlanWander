@@ -3,7 +3,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
-import { useEffect } from 'react';
 import styled from 'styled-components';
 
 // import useStore from '@/lib/store';

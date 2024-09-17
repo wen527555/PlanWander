@@ -25,6 +25,8 @@ const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(({ value, on
   </button>
 ));
 
+CustomInput.displayName = 'CustomInput';
+
 const AddNewTripModal: React.FC<AddTripModalProps> = ({ onClose }) => {
   const [startDate, setStartDate] = useState<Date | undefined>(undefined);
   const [endDate, setEndDate] = useState<Date | undefined>(undefined);
@@ -82,7 +84,7 @@ const AddNewTripModal: React.FC<AddTripModalProps> = ({ onClose }) => {
     </Overlay>
   );
 };
-
+AddNewTripModal.displayName = 'AddNewTripModal';
 export default AddNewTripModal;
 
 const Overlay = styled.div`

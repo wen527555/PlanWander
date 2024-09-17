@@ -32,6 +32,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {!hideHeader && <Header />}
             {children}
             <ReactQueryDevtools initialIsOpen={false} />
+            <div id="modal-root"></div>
           </StyledComponentsRegistry>
         </body>
       </html>

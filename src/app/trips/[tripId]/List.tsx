@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaCar } from 'react-icons/fa';
-import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
+// import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import styled from 'styled-components';
 
 // import updatePlaces from '../../../lib/firebaseApi';
@@ -35,14 +35,14 @@ interface ListProps {
 }
 
 const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
-  const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
+  // const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
   // const [days,setDays]=useState([]);
-  const handleToggleOpen = (day: string) => {
-    setOpenItems((prev) => ({
-      ...prev,
-      [day]: !prev[day],
-    }));
-  };
+  // const handleToggleOpen = (day: string) => {
+  //   setOpenItems((prev) => ({
+  //     ...prev,
+  //     [day]: !prev[day],
+  //   }));
+  // };
 
   const onDragEnd = async (result: any) => {
     console.log('result', result);
@@ -69,7 +69,7 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
         <Droppable droppableId={`${day.date}-${dateIndex}`} key={`${day.date}-${dateIndex}`}>
           {(provided) => (
             <ItemContainer ref={provided.innerRef} {...provided.droppableProps}>
-              <ItemHeader onClick={() => handleToggleOpen(day.date)}>
+              <ItemHeader>
                 {/* <ToggleIcon>{isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}</ToggleIcon> */}
                 <ItemDate>
                   {new Date(day.date).toLocaleDateString('en-US', {
@@ -132,10 +132,10 @@ const ItemDate = styled.h3`
   font-size: 20px;
 `;
 
-const ToggleIcon = styled.span`
-  font-size: 16px;
-  margin-right: 10px;
-`;
+// const ToggleIcon = styled.span`
+//   font-size: 16px;
+//   margin-right: 10px;
+// `;
 
 // const ItemContent = styled.div<ItemContentProps>`
 const ItemContent = styled.div`

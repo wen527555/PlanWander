@@ -58,7 +58,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceSelected, dayId 
 export default LocationSearch;
 
 const SearchInput = styled.input`
-  width: 100%;
+  width: 90%;
   padding: 10px;
   background-color: #f3f4f5;
   border: none;

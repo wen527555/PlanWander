@@ -1,4 +1,4 @@
-// import { create } from 'zustand';
+import { create } from 'zustand';
 
 // const useAuthStore = create((set) => ({
 //   user: null,
@@ -8,3 +8,10 @@
 // }));
 
 // export default useAuthStore;
+
+const useStore = create((set) => ({
+  days: [],
+  setDays: (newDays) => set({ days: newDays }),
+}));
+
+export default useStore;

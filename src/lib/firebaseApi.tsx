@@ -175,3 +175,18 @@ export const getLastPlaceOfDay = async (tripId: string, dayId: string) => {
     return null;
   }
 };
+
+export const updatePlaces = async (tripId: string, dayId: string, updatedPlaces: any[]) => {
+  try {
+    const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
+    const dayDoc = await getDoc(dayDocRef);
+    if (!dayDoc.exists()) {
+      throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
+    }
+    await updateDoc(dayDocRef, {
+      places: updatePlaces,
+    });
+  } catch (error) {
+    console.error('Error updating places', error);
+  }
+};

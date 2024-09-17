@@ -3,9 +3,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useParams } from 'next/navigation';
-import { useState } from 'react';
+import { useEffect } from 'react';
 import styled from 'styled-components';
 
+// import useStore from '@/lib/store';
 import { addPlaceToDay, fetchTripData, getLastPlaceOfDay } from '../../../lib/firebaseApi';
 import List from './List';
 import { processDays } from './processDays';
@@ -36,6 +37,7 @@ const formatDuration = (duration) => {
   }
 };
 
+//move to api file
 const getRoute = async (start: any, end: any) => {
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
   const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${start.lng},${start.lat};${end.lng},${end.lat}?geometries=geojson&access_token=${accessToken}`;
@@ -65,19 +67,18 @@ const TripPage: React.FC = () => {
     queryFn: () => fetchTripData(tripId as string),
     staleTime: 5000,
   });
-
+  // const { days, setDays } = useStore();
+  //*要再研究是否有必要用到zustand
   console.log('tripData', tripData);
 
-  const mutation = useMutation({
+  const addMutation = useMutation({
     mutationFn: async ({ place, dayId }: AddLocationParams) => {
       if (tripId) {
         const prevPlace = await getLastPlaceOfDay(tripId, dayId);
         let route = null;
         if (prevPlace) {
-          console.log('prevPlace', prevPlace);
           route = await getRoute(prevPlace, place);
         }
-        console.log('prevPlace', prevPlace);
         await addPlaceToDay(tripId, dayId, place, route);
       }
     },
@@ -93,20 +94,25 @@ const TripPage: React.FC = () => {
   });
 
   const handlePlaceSelected = (place: Place, dayId: string) => {
-    mutation.mutate({ place, dayId });
+    addMutation.mutate({ place, dayId });
   };
+
+  // useEffect(() => {
+  //   if (days) {
+  //     setDays(days);
+  //   }
+  // }, [days]);
 
   if (isLoading || !tripData) {
     return <div>Loading...</div>;
   }
-  const { tripTitle, days } = tripData;
-  const { places, routes } = processDays(days);
+  const { places, routes } = processDays(tripData.days);
 
   return (
     <Container>
       <ListContainer>
-        <TripName>{tripTitle}</TripName>
-        <List days={days} onPlaceSelected={handlePlaceSelected} />
+        <TripName>{tripData.tripTitle}</TripName>
+        <List days={tripData.days} onPlaceSelected={handlePlaceSelected} />
       </ListContainer>
       <MapContainer>
         <MapComponent places={places} routes={routes} />
@@ -119,7 +125,6 @@ export default TripPage;
 
 const Container = styled.div`
   display: flex;
-  height: 100vh;
 `;
 
 const TripName = styled.h1`
@@ -131,6 +136,7 @@ const TripName = styled.h1`
 const ListContainer = styled.div`
   width: 50%;
   height: 100vh;
+  overflow-y: auto;
 `;
 
 const MapContainer = styled.div`

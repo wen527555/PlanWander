@@ -1,17 +1,18 @@
 'use client';
 
-// mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || '';
 import React, { useState } from 'react';
+import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaCar } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import styled from 'styled-components';
 
+import updatePlaces from '../../../lib/firebaseApi';
 import LocationSearch from './LocationSearch';
 import Marker from './Marker';
 
-interface ItemContentProps {
-  isOpen: boolean;
-}
+// interface ItemContentProps {
+//   isOpen: boolean;
+// }
 
 interface Place {
   id: string;
@@ -32,7 +33,7 @@ interface ListProps {
 
 const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
   const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
-
+  // const [days,setDays]=useState([]);
   const handleToggleOpen = (day: string) => {
     setOpenItems((prev) => ({
       ...prev,
@@ -40,48 +41,69 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
     }));
   };
 
+  const onDragEnd = async (result) => {
+    console.log('result', result);
+    const { source, destination } = result;
+    if (!destination) return;
+    const updatedDays = [...days];
+    if (source.droppableId === destination.droppableId) {
+      console.log('updatedDays', updatedDays);
+      console.log('updatedDays[source.droppableId]', updatedDays[source.droppableId]);
+      const [movedPlace] = updatedDays[source.droppableId].places.splice(source.index, 1);
+      updatedDays[destination.droppableId].places.splice(destination.index, 0, movedPlace);
+    } else {
+      const [movedPlace] = updatedDays[source.droppableId].places.splice(source.index, 1);
+      updatedDays[destination.droppableId].places.splice(destination.index, 0, movedPlace);
+    }
+    await updatePlaces(updatedDays);
+  };
+
   console.log('days', days);
 
   return (
-    <>
-      {days.map((day, dateIndex) => {
-        // const isOpen = openItems[day.date] || false;
-        return (
-          <ItemContainer key={day.date}>
-            <ItemHeader onClick={() => handleToggleOpen(day.date)}>
-              {/* <ToggleIcon>{isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}</ToggleIcon> */}
-              <ItemDate>
-                {new Date(day.date).toLocaleDateString('en-US', {
-                  weekday: 'long',
-
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </ItemDate>
-            </ItemHeader>
-            {/* <ItemContent isOpen={isOpen}> */}
-            <ItemContent>
-              {day.places?.map((place, index) => (
-                <React.Fragment key={place.id}>
-                  {index > 0 && day.places[index]?.route && (
-                    <RouteInfo>
-                      <RouteLine />
-                      <CarIcon />
-                      <RouteDetail>{day.places[index].route.duration}</RouteDetail>
-                    </RouteInfo>
-                  )}
-                  <PlaceContainer>
-                    <Marker index={index} dateIndex={dateIndex} />
-                    <PlaceBlock>{place.name}</PlaceBlock>
-                  </PlaceContainer>
-                </React.Fragment>
-              ))}
+    <DragDropContext onDragEnd={onDragEnd}>
+      {days.map((day, dateIndex) => (
+        <Droppable droppableId={`${day.date}-${dateIndex}`} key={`${day.date}-${dateIndex}`}>
+          {(provided) => (
+            <ItemContainer ref={provided.innerRef} {...provided.droppableProps}>
+              <ItemHeader onClick={() => handleToggleOpen(day.date)}>
+                {/* <ToggleIcon>{isOpen ? <IoIosArrowDown /> : <IoIosArrowForward />}</ToggleIcon> */}
+                <ItemDate>
+                  {new Date(day.date).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    month: 'long',
+                    day: 'numeric',
+                  })}
+                </ItemDate>
+              </ItemHeader>
+              <ItemContent>
+                {day.places?.map((place, index) => (
+                  <Draggable key={`${place.id}-${index}`} draggableId={`${place.id}-${index}`} index={index}>
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                        {index > 0 && day.places[index]?.route && (
+                          <RouteInfo>
+                            <RouteLine />
+                            <CarIcon />
+                            <RouteDetail>{day.places[index].route.duration}</RouteDetail>
+                          </RouteInfo>
+                        )}
+                        <PlaceContainer>
+                          <Marker index={index} dateIndex={dateIndex} />
+                          <PlaceBlock>{place.name}</PlaceBlock>
+                        </PlaceContainer>
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
+                {provided.placeholder}
+              </ItemContent>
               <LocationSearch onPlaceSelected={onPlaceSelected} dayId={day.date} />
-            </ItemContent>
-          </ItemContainer>
-        );
-      })}
-    </>
+            </ItemContainer>
+          )}
+        </Droppable>
+      ))}
+    </DragDropContext>
   );
 };
 

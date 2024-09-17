@@ -9,9 +9,9 @@ import { create } from 'zustand';
 
 // export default useAuthStore;
 
-const useStore = create((set) => ({
-  days: [],
-  setDays: (newDays) => set({ days: newDays }),
-}));
+// const useStore = create((set) => ({
+//   days: [],
+//   setDays: (newDays) => set({ days: newDays }),
+// }));
 
-export default useStore;
+// export default useStore;

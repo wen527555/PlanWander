@@ -13,25 +13,17 @@ interface Place {
 }
 
 interface Route {
-  start: {
-    lat: number;
-    lng: number;
-  };
-  end: {
-    lat: number;
-    lng: number;
-  };
   color: string;
+  type: string;
+  coordinates: [number, number][];
 }
 
 interface MapComponentProps {
-  placesWithMarkerAndRoutes: {
-    places: Place[];
-    routes: Route[];
-  };
+  places: Place[];
+  routes: Route[];
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places, routes }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [] }) => {
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);

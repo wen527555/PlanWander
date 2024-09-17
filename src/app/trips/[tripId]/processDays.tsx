@@ -9,7 +9,7 @@ interface Place {
 
 interface Route {
   type: string;
-  coordinates: [number, number][];
+  coordinates: any;
   color?: string;
 }
 
@@ -49,7 +49,7 @@ export const getColorForDate = (dateIndex: number) => {
 
 export const processDays = (days: Day[]): { places: Place[]; route: Route[] } => {
   const places: Place[] = [];
-  const routes: Route[] = [];
+  const route: Route[] = [];
   days.forEach((day, dayIndex) => {
     const color = getColorForDate(dayIndex);
     day.places?.forEach((place, index) => {
@@ -60,7 +60,7 @@ export const processDays = (days: Day[]): { places: Place[]; route: Route[] } =>
       });
 
       if (place.route) {
-        routes.push({
+        route.push({
           type: place.route.type,
           coordinates: place.route.coordinates.map((coord: { lat: number; lng: number }) => [coord.lng, coord.lat]),
           color: color,
@@ -68,5 +68,5 @@ export const processDays = (days: Day[]): { places: Place[]; route: Route[] } =>
       }
     });
   });
-  return { places, routes };
+  return { places, route };
 };

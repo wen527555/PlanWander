@@ -27,7 +27,7 @@ const MapComponent = dynamic(() => import('./map'), {
   ssr: false,
 });
 
-const formatDuration = (duration) => {
+const formatDuration = (duration: any) => {
   const hours = Math.floor(duration / 3600);
   const min = Math.floor((duration % 3600) / 60);
   if (hours > 0) {
@@ -106,16 +106,16 @@ const TripPage: React.FC = () => {
   if (isLoading || !tripData) {
     return <div>Loading...</div>;
   }
-  const { places, routes } = processDays(tripData.days);
+  const { places, route } = processDays(tripData.days as any);
 
   return (
     <Container>
       <ListContainer>
         <TripName>{tripData.tripTitle}</TripName>
-        <List days={tripData.days} onPlaceSelected={handlePlaceSelected} />
+        <List days={tripData.days as any} onPlaceSelected={handlePlaceSelected} />
       </ListContainer>
       <MapContainer>
-        <MapComponent places={places} routes={routes} />
+        <MapComponent places={places as any} routes={route as any} />
       </MapContainer>
     </Container>
   );

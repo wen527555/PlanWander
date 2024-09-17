@@ -6,7 +6,7 @@ import { FaCar } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import styled from 'styled-components';
 
-import updatePlaces from '../../../lib/firebaseApi';
+// import updatePlaces from '../../../lib/firebaseApi';
 import LocationSearch from './LocationSearch';
 import Marker from './Marker';
 
@@ -19,6 +19,9 @@ interface Place {
   name: string;
   lat: number;
   lng: number;
+  route?: {
+    duration: string;
+  };
 }
 
 interface Day {
@@ -41,7 +44,7 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
     }));
   };
 
-  const onDragEnd = async (result) => {
+  const onDragEnd = async (result: any) => {
     console.log('result', result);
     const { source, destination } = result;
     if (!destination) return;
@@ -55,7 +58,7 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
       const [movedPlace] = updatedDays[source.droppableId].places.splice(source.index, 1);
       updatedDays[destination.droppableId].places.splice(destination.index, 0, movedPlace);
     }
-    await updatePlaces(updatedDays);
+    // await updatePlaces(updatedDays);
   };
 
   console.log('days', days);
@@ -136,9 +139,6 @@ const ToggleIcon = styled.span`
 
 // const ItemContent = styled.div<ItemContentProps>`
 const ItemContent = styled.div`
-  /* display: ${(props) => (props.isOpen ? 'block' : 'none')};
-  overflow: hidden;
-  transition: transform 0.3s ease; */
   width: 90%;
 `;
 

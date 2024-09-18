@@ -3,9 +3,9 @@ import styled from 'styled-components';
 
 //!要和processDay共用
 const colors = [
-  '#00c8ff',
   '#8e8ee0',
   '#4b61cf',
+  '#00c8ff',
   '#f1a731',
   '#ed7fcc',
   '#41e26c',

@@ -19,13 +19,13 @@ interface Day {
 }
 
 const colors = [
-  '#00c8ff',
   '#8e8ee0',
+  '#00adb0',
+  '#00c8ff',
   '#4b61cf',
   '#f1a731',
   '#ed7fcc',
   '#41e26c',
-  '#2ddde3',
   '#83d685',
   '#dc9a61',
   '#dc618a',

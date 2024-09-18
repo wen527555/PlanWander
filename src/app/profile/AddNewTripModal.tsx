@@ -49,38 +49,42 @@ const AddNewTripModal: React.FC<AddTripModalProps> = ({ onClose }) => {
 
   return (
     <Overlay>
-      <Content>
+      <Modal>
         <CloseBtnWrapper onClick={onClose}>
           <CloseBtn />
         </CloseBtnWrapper>
-        <Title>Trip name</Title>
-        <NameInput type="text" value={tripTitle} onChange={(e) => setTripTitle(e.target.value)} />
-        <StyledDatePickerWrapper>
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date ?? undefined)}
-            startDate={startDate}
-            endDate={endDate}
-            selectsStart
-            dateFormat="d MMMM yyyy"
-            customInput={<CustomInput />}
-            placeholderText="Start date"
-          />
-          <span className="separator">→</span>
-          <DatePicker
-            selected={endDate}
-            onChange={(date) => setEndDate(date ?? undefined)}
-            startDate={startDate}
-            endDate={endDate}
-            selectsEnd
-            minDate={startDate}
-            dateFormat="d MMMM yyyy"
-            customInput={<CustomInput />}
-            placeholderText="End date"
-          />
-        </StyledDatePickerWrapper>
-        <CreateButton onClick={handleCreateTrip}>Start Planning</CreateButton>
-      </Content>
+        <Content>
+          <Title>Trip name</Title>
+          <NameInput type="text" value={tripTitle} onChange={(e) => setTripTitle(e.target.value)} />
+          <StyledDatePickerWrapper>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date ?? undefined)}
+              startDate={startDate}
+              endDate={endDate}
+              selectsStart
+              dateFormat="d MMMM yyyy"
+              customInput={<CustomInput />}
+              placeholderText="Start date"
+            />
+            <span className="separator">→</span>
+            <DatePicker
+              selected={endDate}
+              onChange={(date) => setEndDate(date ?? undefined)}
+              startDate={startDate}
+              endDate={endDate}
+              selectsEnd
+              minDate={startDate}
+              dateFormat="d MMMM yyyy"
+              customInput={<CustomInput />}
+              placeholderText="End date"
+            />
+          </StyledDatePickerWrapper>
+          <CreateButtonWrapper>
+            <CreateButton onClick={handleCreateTrip}>Start Planning</CreateButton>
+          </CreateButtonWrapper>
+        </Content>
+      </Modal>
     </Overlay>
   );
 };
@@ -100,14 +104,18 @@ const Overlay = styled.div`
   z-index: 10;
 `;
 
-const Content = styled.div`
+const Modal = styled.div`
   background-color: white;
   padding: 10px;
   border-radius: 25px;
   width: 450px;
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  height: 450px;
+  height: 320px;
+`;
+
+const Content = styled.div`
+  padding: 30px 20px;
 `;
 
 const CloseBtn = styled(IoMdClose)`
@@ -131,18 +139,25 @@ const CloseBtnWrapper = styled.button`
 const Title = styled.h2`
   font-size: 24px;
   font-weight: 600;
+  margin-bottom: 10px;
 `;
 
 const NameInput = styled.input`
   width: 80%;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
   font-size: 24px;
   border: 1px solid #ddd;
   border-radius: 8px;
   outline: none;
 `;
 
+const CreateButtonWrapper = styled.div`
+  display: flex;
+  justify-content: end;
+`;
+
 const CreateButton = styled.button`
+  margin-top: 70px;
   width: 150px;
   border-radius: 25px;
   padding: 10px;

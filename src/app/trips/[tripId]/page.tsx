@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import styled from 'styled-components';
 
 // import useStore from '@/lib/store';
-import { addPlaceToDay, fetchTripData, getLastPlaceOfDay } from '../../../lib/firebaseApi';
+import { addPlaceToDay, fetchTripData, getLastPlaceOfDay, updatePlacesForDay } from '../../../lib/firebaseApi';
 import List from './List';
 import { processDays } from './processDays';
 
@@ -96,11 +96,43 @@ const TripPage: React.FC = () => {
     addMutation.mutate({ place, dayId });
   };
 
-  // useEffect(() => {
-  //   if (days) {
-  //     setDays(days);
-  //   }
-  // }, [days]);
+  const updateMutation = useMutation({
+    mutationFn: async ({ dayId, places }: { dayId: string; places: Place[] }) => {
+      const updatedPlaces = await Promise.all(
+        places.map(async (place, index) => {
+          if (index === 0) {
+            return { ...place, route: null };
+          }
+          const prevPlace = places[index - 1];
+          const route = await getRoute(prevPlace, place);
+          return {
+            ...place,
+            route: route
+              ? {
+                  type: route.type,
+                  coordinates: route.coordinates.map((coord: [number, number]) => ({
+                    lat: coord[1],
+                    lng: coord[0],
+                  })),
+                  duration: route.duration,
+                }
+              : null,
+          };
+        })
+      );
+      await updatePlacesForDay(tripId, dayId, updatedPlaces);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tripData', tripId as string] });
+    },
+    onError: (error) => {
+      console.error('更新時發生錯誤:', error);
+    },
+  });
+
+  const handleDaysUpdate = async (dayId: string, places: any) => {
+    updateMutation.mutate({ dayId, places });
+  };
 
   if (isLoading || !tripData) {
     return <div>Loading...</div>;
@@ -111,7 +143,7 @@ const TripPage: React.FC = () => {
     <Container>
       <ListContainer>
         <TripName>{tripData.tripTitle}</TripName>
-        <List days={tripData.days as any} onPlaceSelected={handlePlaceSelected} />
+        <List days={tripData.days as any} onPlaceSelected={handlePlaceSelected} onDaysUpdate={handleDaysUpdate} />
       </ListContainer>
       <MapContainer>
         <MapComponent places={places as any} routes={route as any} />
@@ -133,13 +165,13 @@ const TripName = styled.h1`
 `;
 
 const ListContainer = styled.div`
-  width: 50%;
+  width: 45%;
   height: 100vh;
   overflow-y: auto;
 `;
 
 const MapContainer = styled.div`
-  width: 50%;
+  width: 55%;
   height: 100vh;
   position: relative;
 `;

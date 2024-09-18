@@ -5,11 +5,11 @@ import styled from 'styled-components';
 const colors = [
   '#00c8ff',
   '#8e8ee0',
-  '#ed7fcc',
+  '#4b61cf',
   '#f1a731',
+  '#ed7fcc',
   '#41e26c',
   '#2ddde3',
-  '#2c4ae0',
   '#83d685',
   '#dc9a61',
   '#dc618a',
@@ -54,6 +54,7 @@ const MarkerContainer = styled.div`
 const MarkerIcon = styled(FaMapMarker)`
   width: 100%;
   height: 100%;
+  /* border: 1px solid #ffff; */
   color: ${(props) => props.color};
 `;
 

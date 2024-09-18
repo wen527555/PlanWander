@@ -35,7 +35,6 @@ export const saveUserData = async (userInfo: UserInfo | null): Promise<void> => 
     console.error('User info is invalid:', userInfo);
     return;
   }
-  console.log('userInfo', userInfo);
   const userData = {
     uid: userInfo.uid,
     userName: userInfo.displayName ?? '',
@@ -133,7 +132,6 @@ export const addPlaceToDay = async (tripId: string, dayId: string, newPlace: any
     if (!dayDoc.exists()) {
       throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
     }
-    console.log('newRoute', newRoute);
     const placeWithRoute = {
       ...newPlace,
       route: newRoute
@@ -147,7 +145,6 @@ export const addPlaceToDay = async (tripId: string, dayId: string, newPlace: any
           }
         : null,
     };
-    console.log('placeWithRoute', placeWithRoute);
     await updateDoc(dayDocRef, {
       places: arrayUnion(placeWithRoute),
     });
@@ -176,7 +173,7 @@ export const getLastPlaceOfDay = async (tripId: string, dayId: string) => {
   }
 };
 
-export const updatePlaces = async (tripId: string, dayId: string) => {
+export const updatePlacesForDay = async (tripId: string, dayId: string, updatePlaces: any) => {
   try {
     const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
     const dayDoc = await getDoc(dayDocRef);
@@ -186,6 +183,7 @@ export const updatePlaces = async (tripId: string, dayId: string) => {
     await updateDoc(dayDocRef, {
       places: updatePlaces,
     });
+    console.log('updatePlacesForDay sucessfully');
   } catch (error) {
     console.error('Error updating places', error);
   }

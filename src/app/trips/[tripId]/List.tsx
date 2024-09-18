@@ -6,7 +6,6 @@ import { FaCar } from 'react-icons/fa';
 // import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import styled from 'styled-components';
 
-// import updatePlaces from '../../../lib/firebaseApi';
 import LocationSearch from './LocationSearch';
 import Marker from './Marker';
 
@@ -32,9 +31,10 @@ interface Day {
 interface ListProps {
   days: Day[];
   onPlaceSelected: (place: Place, dayId: string) => void;
+  onDaysUpdate: (dayId: string, places: any) => void;
 }
 
-const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
+const List: React.FC<ListProps> = ({ days, onPlaceSelected, onDaysUpdate }) => {
   // const [openItems, setOpenItems] = useState<{ [key: string]: boolean }>({});
   // const [days,setDays]=useState([]);
   // const handleToggleOpen = (day: string) => {
@@ -48,17 +48,18 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
     console.log('result', result);
     const { source, destination } = result;
     if (!destination) return;
-    const updatedDays = [...days];
-    if (source.droppableId === destination.droppableId) {
-      console.log('updatedDays', updatedDays);
-      console.log('updatedDays[source.droppableId]', updatedDays[source.droppableId]);
-      const [movedPlace] = updatedDays[source.droppableId].places.splice(source.index, 1);
-      updatedDays[destination.droppableId].places.splice(destination.index, 0, movedPlace);
-    } else {
-      const [movedPlace] = updatedDays[source.droppableId].places.splice(source.index, 1);
-      updatedDays[destination.droppableId].places.splice(destination.index, 0, movedPlace);
+    const dayDate = source.droppableId;
+    const dayIndex = days.findIndex((day) => day.date === dayDate);
+    if (dayIndex === -1) {
+      console.error('找不到對應的 day');
+      return;
     }
-    // await updatePlaces(updatedDays);
+    const newDays = [...days];
+    const currentDay = { ...newDays[dayIndex] };
+    const [movedPlace] = currentDay.places.splice(source.index, 1);
+    currentDay.places.splice(destination.index, 0, movedPlace);
+    newDays[dayIndex] = currentDay;
+    onDaysUpdate(currentDay.date, currentDay.places);
   };
 
   console.log('days', days);
@@ -66,7 +67,7 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected }) => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       {days.map((day, dateIndex) => (
-        <Droppable droppableId={`${day.date}-${dateIndex}`} key={`${day.date}-${dateIndex}`}>
+        <Droppable droppableId={`${day.date}`} key={`${day.date}-${dateIndex}`}>
           {(provided) => (
             <ItemContainer ref={provided.innerRef} {...provided.droppableProps}>
               <ItemHeader>

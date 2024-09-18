@@ -31,7 +31,7 @@ interface Day {
 interface ListProps {
   days: Day[];
   onPlaceSelected: (place: Place, dayId: string) => void;
-  onDaysUpdate: (dayId: string, places: any) => void;
+  onDaysUpdate: (updates: { dayId: string; places: any }[]) => void;
 }
 
 const List: React.FC<ListProps> = ({ days, onPlaceSelected, onDaysUpdate }) => {
@@ -45,21 +45,42 @@ const List: React.FC<ListProps> = ({ days, onPlaceSelected, onDaysUpdate }) => {
   // };
 
   const onDragEnd = async (result: any) => {
-    console.log('result', result);
     const { source, destination } = result;
     if (!destination) return;
-    const dayDate = source.droppableId;
-    const dayIndex = days.findIndex((day) => day.date === dayDate);
-    if (dayIndex === -1) {
+    const sourceDayId = source.droppableId;
+    const destinationDayId = destination.droppableId;
+    const soureDayIndex = days.findIndex((day) => day.date === sourceDayId);
+    const destinationDayIndex = days.findIndex((day) => day.date == destinationDayId);
+    // const dayDate = source.droppableId;
+    // const dayIndex = days.findIndex((day) => day.date === dayDate);
+    if (soureDayIndex === -1 || destinationDayIndex === -1) {
       console.error('找不到對應的 day');
       return;
     }
     const newDays = [...days];
-    const currentDay = { ...newDays[dayIndex] };
-    const [movedPlace] = currentDay.places.splice(source.index, 1);
-    currentDay.places.splice(destination.index, 0, movedPlace);
-    newDays[dayIndex] = currentDay;
-    onDaysUpdate(currentDay.date, currentDay.places);
+    // const currentDay = { ...newDays[dayIndex] };
+    // const [movedPlace] = currentDay.places.splice(source.index, 1);
+    // currentDay.places.splice(destination.index, 0, movedPlace);
+    // newDays[dayIndex] = currentDay;
+    // onDaysUpdate(currentDay.date, currentDay.places);
+    const sourceDay = { ...newDays[soureDayIndex] };
+    if (sourceDayId === destinationDayId) {
+      const [movePlace] = sourceDay.places.splice(source.index, 1);
+      sourceDay.places.splice(destination.index, 0, movePlace);
+      newDays[soureDayIndex] = sourceDay;
+      onDaysUpdate([{ dayId: sourceDayId, places: sourceDay.places }]);
+    } else {
+      const destinationDay = { ...newDays[destinationDayIndex] };
+      const [movedPlace] = sourceDay.places.splice(source.index, 1);
+
+      destinationDay.places.splice(destination.index, 0, movedPlace);
+      newDays[soureDayIndex] = sourceDay;
+      newDays[destinationDayIndex] = destinationDay;
+      onDaysUpdate([
+        { dayId: sourceDayId, places: sourceDay.places },
+        { dayId: destinationDayId, places: destinationDay.places },
+      ]);
+    }
   };
 
   console.log('days', days);

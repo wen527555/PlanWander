@@ -130,8 +130,10 @@ const TripPage: React.FC = () => {
     },
   });
 
-  const handleDaysUpdate = async (dayId: string, places: any) => {
-    updateMutation.mutate({ dayId, places });
+  const handleDaysUpdate = (updates: { dayId: string; places: any }[]) => {
+    updates.forEach(({ dayId, places }) => {
+      updateMutation.mutate({ dayId, places });
+    });
   };
 
   if (isLoading || !tripData) {

@@ -2,6 +2,7 @@
 'use client';
 
 //! layout應該是不能用use client的
+import { createTheme, ThemeProvider } from '@mui/material';
 import { usePathname } from 'next/navigation';
 
 import StyledComponentsRegistry from '../lib/registry';
@@ -16,6 +17,16 @@ import QueryProvider from '../lib/queryProvider';
 
 const inter = Inter({ subsets: ['latin'] });
 
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#F9FCFD',
+    },
+    secondary: {
+      main: '#e3e1e7',
+    },
+  },
+});
 // export const metadata: Metadata = {
 //   title: `planwander`,
 //   description: `planwander`,
@@ -28,12 +39,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <QueryProvider>
       <html lang="en">
         <body className={inter.className}>
-          <StyledComponentsRegistry>
-            {!hideHeader && <Header />}
-            {children}
-            <ReactQueryDevtools initialIsOpen={false} />
-            <div id="modal-root"></div>
-          </StyledComponentsRegistry>
+          <ThemeProvider theme={theme}>
+            <StyledComponentsRegistry>
+              {!hideHeader && <Header />}
+              {children}
+              <ReactQueryDevtools initialIsOpen={false} />
+              <div id="modal-root"></div>
+            </StyledComponentsRegistry>
+          </ThemeProvider>
         </body>
       </html>
     </QueryProvider>

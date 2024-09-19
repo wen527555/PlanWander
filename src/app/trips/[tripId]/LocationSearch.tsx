@@ -10,11 +10,11 @@ interface Place {
 }
 
 interface LocationSearchProps {
-  onPlaceSelected: (place: Place, dayId: string) => void;
+  onPlaceAdded: (place: Place, dayId: string) => void;
   dayId: string;
 }
 
-const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceSelected, dayId }) => {
+const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceAdded, dayId }) => {
   const [inputValue, setInputValue] = useState('');
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
 
@@ -25,6 +25,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceSelected, dayId 
   const onPlaceChanged = async () => {
     if (autocomplete) {
       const place = autocomplete.getPlace();
+      // console.log('place', place);
       if (place.geometry?.location && place.name) {
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
@@ -34,8 +35,14 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceSelected, dayId 
           name: place.name || '',
           lat: lat,
           lng: lng,
+          address: place.formatted_address,
+          phone: place.international_phone_number || '',
+          website: place.website || '',
+          googleUrl: place.url || '',
+          rating: place.rating || 0,
+          openTime: place.opening_hours?.weekday_text || [],
         };
-        onPlaceSelected(newPlace, dayId);
+        onPlaceAdded(newPlace, dayId);
         setInputValue('');
       }
     }

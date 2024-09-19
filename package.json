@@ -39,7 +39,7 @@
     "firebase": "10.13.1",
     "lodash.debounce": "4.0.8",
     "mapbox-gl": "3.6.0",
-    "next": "14.2.8",
+    "next": "14.2.13",
     "react": "18.3.1",
     "react-beautiful-dnd": "13.1.1",
     "react-datepicker": "7.3.0",

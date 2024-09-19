@@ -1,12 +1,15 @@
 'use client';
 
 import { User } from 'firebase/auth';
+import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
 import LoginModal from '../LoginModal';
+import placeWanderLogo from './PlanwanderLogo.png';
 
 const Header = () => {
   const [isLoginModalOpen, setIsModalOpen] = useState(false);
@@ -46,6 +49,9 @@ const Header = () => {
 
   return (
     <Container>
+      <Link href="/" passHref>
+        <Image src={placeWanderLogo} alt="Logo" width={120} height={20} style={{ cursor: 'pointer' }} />
+      </Link>
       {user ? (
         <>
           <Button onClick={handleLogout}>Logout</Button>
@@ -71,9 +77,15 @@ const Container = styled.div`
   height: 60px;
   border-bottom: 1px solid #e9ecef;
   display: flex;
-  justify-content: end;
+  justify-content: space-between;
   padding: 5px 50px;
   align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: #fff;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 `;
 
 const Button = styled.button`

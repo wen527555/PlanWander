@@ -2,6 +2,8 @@ import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Map, Marker, Popup, Source, ViewStateChangeEvent } from 'react-map-gl';
 
+import usePlaceStore from '@/lib/store';
+
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Place {
@@ -23,10 +25,10 @@ interface MapComponentProps {
   routes: Route[];
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [] }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], onPlaceClick }) => {
+  const { selectedPlace, setSelectedPlace } = usePlaceStore();
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
-  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [viewState, setViewState] = useState({
     longitude: 0,
     latitude: 0,
@@ -61,12 +63,12 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [] })
   };
 
   const handleMarkerClick = (place: Place) => {
-    setSelectedPlace(place);
-    setViewState({
-      longitude: place.lng,
-      latitude: place.lat,
-      zoom: viewState.zoom,
-    });
+    onPlaceClick(place);
+    // setViewState({
+    //   longitude: place.lng,
+    //   latitude: place.lat,
+    //   zoom: viewState.zoom,
+    // });
   };
 
   return (

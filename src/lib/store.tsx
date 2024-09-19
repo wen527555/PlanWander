@@ -1,17 +1,17 @@
-// import { create } from 'zustand';
+import { create } from 'zustand';
 
-// const useAuthStore = create((set) => ({
-//   user: null,
-//   isLoggedIn: false,
-//   setUser: (user) => set({ user, isLoggedIn: !!user }),
-//   logout: () => set({ user: null, isLoggedIn: false }),
-// }));
+interface PlaceStore {
+  selectedPlace: { lat: number; lng: number } | null;
+  placeDetail: any[] | null;
+  setSelectedPlace: (place: { lat: number; lng: number }) => void;
+  setPlaceDetail: (places: any[]) => void;
+}
 
-// export default useAuthStore;
+const usePlaceStore = create<PlaceStore>((set) => ({
+  selectedPlace: null,
+  placeDetail: null,
+  setSelectedPlace: (place) => set({ selectedPlace: place }),
+  setPlaceDetail: (placeDetail) => set({ placeDetail }),
+}));
 
-// const useStore = create((set) => ({
-//   days: [],
-//   setDays: (newDays) => set({ days: newDays }),
-// }));
-
-// export default useStore;
+export default usePlaceStore;

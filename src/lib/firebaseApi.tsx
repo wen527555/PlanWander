@@ -125,7 +125,13 @@ export const fetchTripData = async (tripId: string) => {
   }
 };
 
-export const addPlaceToDay = async (tripId: string, dayId: string, newPlace: any, newRoute: any) => {
+export const addPlaceToDay = async (
+  tripId: string,
+  dayId: string,
+  newPlace: any,
+  newRoute: any,
+  transportMode: string = 'driving'
+) => {
   try {
     const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
     const dayDoc = await getDoc(dayDocRef);
@@ -134,9 +140,11 @@ export const addPlaceToDay = async (tripId: string, dayId: string, newPlace: any
     }
     const placeWithRoute = {
       ...newPlace,
+
       route: newRoute
         ? {
             type: newRoute.type,
+            transportMode,
             coordinates: newRoute.coordinates.map((coord: [number, number]) => ({
               lat: coord[1],
               lng: coord[0],
@@ -183,8 +191,101 @@ export const updatePlacesForDay = async (tripId: string, dayId: string, updatePl
     await updateDoc(dayDocRef, {
       places: updatePlaces,
     });
-    console.log('updatePlacesForDay sucessfully');
+    console.log('updatePlacesForDay successfully');
   } catch (error) {
     console.error('Error updating places', error);
+  }
+};
+
+export const updatePlaceRoute = async (
+  tripId: string,
+  dayId: string,
+  placeId: string,
+  newRoute: any,
+  transportMode: string
+) => {
+  try {
+    const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
+    const dayDoc = await getDoc(dayDocRef);
+    if (!dayDoc.exists()) {
+      throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
+    }
+    const places = dayDoc.data()?.places || [];
+    const updatedPlaces = places.map((place: any) => {
+      if (place.id === placeId) {
+        return {
+          ...place,
+          route: {
+            type: newRoute.type,
+            transportMode,
+            coordinates: newRoute.coordinates.map((coord: [number, number]) => ({
+              lat: coord[1],
+              lng: coord[0],
+            })),
+            duration: newRoute.duration,
+          },
+        };
+      }
+      return place;
+    });
+
+    await updateDoc(dayDocRef, {
+      places: updatedPlaces,
+    });
+
+    console.log('update successfully');
+  } catch (error) {
+    console.error('Error updating Routes', error);
+  }
+};
+
+export const deletePlace = async (tripId: string, dayId: string, placeId: any) => {
+  const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
+  const dayDoc = await getDoc(dayDocRef);
+  if (!dayDoc.exists()) {
+    throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
+  }
+  const places = dayDoc.data()?.places || [];
+  const updatedPlaces = places.filter((p: any) => p.id !== placeId);
+  try {
+    await updateDoc(dayDocRef, {
+      places: updatedPlaces,
+    });
+    console.log('Place removed successfully');
+  } catch (error) {
+    console.error('Error removing place:', error);
+  }
+};
+
+export const updatePlaceStayTime = async (
+  tripId: string,
+  dayId: string,
+  placeId: any,
+  startTime: string,
+  endTime: string
+) => {
+  const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
+  const dayDoc = await getDoc(dayDocRef);
+  if (!dayDoc.exists()) {
+    throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
+  }
+  const places = dayDoc.data()?.places || [];
+  const updatedPlaces = places.map((place: any) => {
+    if (place.id === placeId) {
+      return {
+        ...place,
+        startTime: startTime,
+        endTime: endTime,
+      };
+    }
+    return place;
+  });
+  try {
+    await updateDoc(dayDocRef, {
+      places: updatedPlaces,
+    });
+    console.log('Place removed successfully');
+  } catch (error) {
+    console.error('Error removing place:', error);
   }
 };

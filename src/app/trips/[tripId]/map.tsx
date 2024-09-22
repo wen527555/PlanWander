@@ -2,8 +2,7 @@ import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Map, Marker, Source, ViewStateChangeEvent } from 'react-map-gl';
 
-// import usePlaceStore from '@/lib/store';
-
+// import usePlaceStore from '@/lib/store'
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Place {

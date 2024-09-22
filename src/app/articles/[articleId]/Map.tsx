@@ -1,12 +1,11 @@
 import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
-import { Map, Marker, ViewStateChangeEvent } from 'react-map-gl';
-
-// import usePlaceStore from '@/lib/store';
+import { Layer, Map, Marker, Source, ViewStateChangeEvent } from 'react-map-gl';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Place {
+  id: string;
   name: string;
   lat: number;
   lng: number;
@@ -14,18 +13,19 @@ interface Place {
   number: number;
 }
 
-// interface Route {
-//   color: string;
-//   type: string;
-//   coordinates: [number, number][];
-// }
+interface Route {
+  color: string;
+  type: string;
+  coordinates: [number, number][];
+}
 
 interface MapComponentProps {
   places: Place[];
-  //   routes: Route[];
+  routes: Route[];
+  visiblePlace: string | null;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places = [], visiblePlace }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], visiblePlace }) => {
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [viewState, setViewState] = useState({
@@ -112,7 +112,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], visiblePlace }
             {place.number}
           </Marker>
         ))}
-        {/* {routes?.map((route, index) => (
+        {routes?.map((route, index) => (
           <Source
             key={`route-${index}`}
             id={`route-${index}`}
@@ -135,7 +135,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], visiblePlace }
               }}
             />
           </Source>
-        ))} */}
+        ))}
       </Map>
     </div>
   );

@@ -8,10 +8,10 @@ import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import { fetchArticleData } from '@/lib/firebaseApi';
-import { processDays } from '../../../lib/processDays';
-import EditList from './EditList';
+import { processDays } from '@/lib/processDays';
+import ViewList from '../ViewList';
 
-const MapComponent = dynamic(() => import('./Map'), {
+const MapComponent = dynamic(() => import('../Map'), {
   ssr: false,
 });
 
@@ -23,6 +23,8 @@ const ArticlesPage = () => {
     queryFn: () => fetchArticleData(articleId as string),
     enabled: !!articleId,
   });
+  // const pathname = usePathname();
+  // const isViewMode = pathname.includes('/view');
   const router = useRouter();
   const handleBackProfile = () => {
     router.push('/profile');
@@ -40,7 +42,7 @@ const ArticlesPage = () => {
         <ListHeader>
           <HomeIcon onClick={handleBackProfile} />
         </ListHeader>
-        <EditList articleData={articleData} articleId={articleId} onPlaceVisible={handlePlaceVisible} />
+        <ViewList articleData={articleData} articleId={articleId} onPlaceVisible={handlePlaceVisible} />
       </ListContainer>
       <MapContainer>
         <MapComponent places={places as any} routes={route as any} visiblePlace={visiblePlace} />

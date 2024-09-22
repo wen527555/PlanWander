@@ -56,6 +56,7 @@ const ProfilePage = () => {
   };
 
   const handleArticleClick = (articleId: string) => {
+    // router.push(`articles/${articleId}`);
     router.push(`articles/${articleId}`);
   };
 

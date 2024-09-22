@@ -28,6 +28,17 @@ interface Day {
   date: string;
 }
 
+interface Article {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: {
+    seconds: number;
+    nanoseconds: number;
+  };
+  coverImage?: string;
+}
+
 const auth = getAuth();
 
 // interface TripData {
@@ -468,5 +479,22 @@ export const fetchUserAllArticles = async () => {
         resolve([]);
       }
     });
+  });
+};
+
+export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
+  const q = query(collection(db, 'articles'));
+  const querySnapshot = await getDocs(q);
+
+  return querySnapshot.docs.map((doc) => {
+    const data = doc.data();
+
+    return {
+      id: doc.id,
+      title: data.title || '',
+      description: data.description || '',
+      createdAt: data.createdAt || { seconds: 0, nanoseconds: 0 },
+      coverImage: data.coverImage || '',
+    };
   });
 };

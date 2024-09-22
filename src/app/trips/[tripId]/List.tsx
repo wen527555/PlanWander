@@ -22,9 +22,7 @@ interface Place {
   name: string;
   lat: number;
   lng: number;
-  route?: {
-    duration: string;
-  };
+  route?: any;
 }
 
 interface Day {
@@ -33,12 +31,20 @@ interface Day {
 }
 
 interface ListProps {
+  tripId: string;
   days: Day[];
   onPlaceAdded: (place: Place, dayId: string) => void;
-  onDaysUpdate: (updates: { dayId: string; places: any }[]) => void;
-  onModeUpdate: (dayId: string, placeId: string, newMode: string) => void;
+  onDaysUpdate: (updates: any[]) => void;
+  onModeUpdate: (dayId: string, placeId: string, newRoute: any, newMode: any) => void;
   onPlaceDelete: (dayId: string, placeId: string) => void;
   onPlaceClick: (place: Place) => void;
+}
+
+interface SelectedTime {
+  [key: string]: {
+    startTime: string;
+    endTime: string;
+  };
 }
 
 const List: React.FC<ListProps> = ({
@@ -50,8 +56,8 @@ const List: React.FC<ListProps> = ({
   onPlaceDelete,
   onPlaceClick,
 }) => {
-  const [selectedTime, setSelectedTime] = useState({});
-  const [activePlaceId, setActivePlaceId] = useState(null);
+  const [selectedTime, setSelectedTime] = useState<SelectedTime>({});
+  const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
   const onDragEnd = async (result: any) => {
     const { source, destination } = result;
     if (!destination) return;
@@ -84,7 +90,12 @@ const List: React.FC<ListProps> = ({
     }
   };
 
-  const handleSaveTimePicker = async (placeId, dayId, startTime, endTime) => {
+  const handleSaveTimePicker = async (
+    placeId: string,
+    dayId: string,
+    startTime: string,
+    endTime: string
+  ): Promise<void> => {
     setSelectedTime((prev) => ({
       ...prev,
       [placeId]: { startTime, endTime },
@@ -98,11 +109,11 @@ const List: React.FC<ListProps> = ({
     }
   };
 
-  const handleCloseTimePicker = (placeId) => {
+  const handleCloseTimePicker = (placeId: string): void => {
     setActivePlaceId(placeId);
   };
 
-  const handleTimeCardClick = (placeId) => {
+  const handleTimeCardClick = (placeId: string): void => {
     setActivePlaceId(placeId);
   };
 

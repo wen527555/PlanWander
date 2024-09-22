@@ -2,9 +2,6 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-// import Image from 'next/image';
-
-// import logo from './logo.png';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { FaStar } from 'react-icons/fa';
@@ -12,6 +9,7 @@ import { FaMapPin } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 
+import { processDays } from '@/lib/processDays';
 import usePlaceStore from '@/lib/store';
 import {
   addPlaceToDay,
@@ -22,7 +20,6 @@ import {
   updatePlacesForDay,
 } from '../../../lib/firebaseApi';
 import { getRoute } from '../../../lib/mapApi';
-import { processDays } from '../../../lib/processDays';
 // import useStore from '../../../lib/store';
 import List from './List';
 
@@ -31,10 +28,11 @@ interface Place {
   name: string;
   lat: number;
   lng: number;
+  route?: any;
 }
 
 interface AddLocationParams {
-  placeId: Place;
+  place: any;
   dayId: string;
   newRoute: Route | null;
   transportMode: string;
@@ -46,15 +44,16 @@ interface Route {
   duration: string;
 }
 
-const MapComponent = dynamic(() => import('./Map'), {
+type TransportMode = 'driving' | 'walking' | 'cycling';
+
+const MapComponent = dynamic(() => import('@/components/Map'), {
   ssr: false,
 });
 
 const TripPage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const queryClient = useQueryClient();
-  const modalRef = useRef(null);
-  const router = useRouter();
+  const modalRef = useRef<HTMLDivElement | null>(null);
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
@@ -64,6 +63,7 @@ const TripPage: React.FC = () => {
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
   // const [placeDetail, setPlaceDetail] = useState('');
   // console.log('placeDetail', placeDetail);
+  const router = useRouter();
   const addMutation = useMutation({
     mutationFn: async ({ place, dayId, transportMode = 'driving' }: AddLocationParams) => {
       if (tripId) {
@@ -99,12 +99,13 @@ const TripPage: React.FC = () => {
     };
   }, []);
 
-  const handleBackProfile = () => {
-    router.push('/profile');
-  };
-
   const handleAddPlace = (place: Place, dayId: string) => {
-    addMutation.mutate({ place, dayId });
+    addMutation.mutate({
+      place,
+      dayId,
+      newRoute: null,
+      transportMode: '',
+    });
   };
 
   const updateMutation = useMutation({
@@ -143,7 +144,7 @@ const TripPage: React.FC = () => {
     },
   });
 
-  const handleDaysUpdate = (updates: { dayId: string; places: any }[]) => {
+  const handleDaysUpdate = (updates: any[]) => {
     updates.forEach(({ dayId, places }) => {
       updateMutation.mutate({ dayId, places });
     });
@@ -151,8 +152,8 @@ const TripPage: React.FC = () => {
 
   //應該用zustand減少不必要的重複炫染
   const transportModeUpdateMutation = useMutation({
-    mutationFn: async ({ dayId, placeId, newRoute, transportMode }: AddLocationParams) => {
-      await updatePlaceRoute(tripId, dayId, placeId, newRoute, transportMode);
+    mutationFn: async ({ dayId, place, newRoute, transportMode }: AddLocationParams) => {
+      await updatePlaceRoute(tripId, dayId, place, newRoute, transportMode);
     },
     onSuccess: () => {
       if (tripId) {
@@ -163,8 +164,8 @@ const TripPage: React.FC = () => {
       console.error(error.message);
     },
   });
-  const handleModeChange = async (dayId: string, placeId: string, newRoute: Route | null, newMode: string) => {
-    await transportModeUpdateMutation.mutateAsync({ dayId, placeId, newRoute, transportMode: newMode });
+  const handleModeChange = async (dayId: string, place: string, newRoute: Route | null, newMode: TransportMode) => {
+    await transportModeUpdateMutation.mutateAsync({ dayId, place, newRoute, transportMode: newMode });
   };
 
   const deletePlaceMutation = useMutation({
@@ -186,6 +187,10 @@ const TripPage: React.FC = () => {
   // console.log('selectedPlace', selectedPlace);
   const handlePlaceClick = async (place: Place) => {
     setSelectedPlace(place);
+  };
+
+  const handleBackProfile = () => {
+    router.push('/profile');
   };
 
   if (isLoading || !tripData) {

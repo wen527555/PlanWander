@@ -1,10 +1,19 @@
 import { create } from 'zustand';
 
+interface Place {
+  id: string;
+  name: string;
+  lat: number;
+  lng: number;
+  rating?: number;
+  address?: string;
+}
+
 interface PlaceStore {
-  selectedPlace: { lat: number; lng: number } | null;
-  placeDetail: any[] | null;
-  setSelectedPlace: (place: { lat: number; lng: number }) => void;
-  setPlaceDetail: (places: any[]) => void;
+  selectedPlace: Place | null;
+  placeDetail: Place[] | null;
+  setSelectedPlace: (place: Place | null) => void;
+  setPlaceDetail: (places: Place[]) => void;
 }
 
 const usePlaceStore = create<PlaceStore>((set) => ({

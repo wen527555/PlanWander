@@ -2,10 +2,14 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { useParams } from 'next/navigation';
+// import Image from 'next/image';
+
+// import logo from './logo.png';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { FaStar } from 'react-icons/fa';
 import { FaMapPin } from 'react-icons/fa6';
+import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import usePlaceStore from '@/lib/store';
@@ -18,9 +22,9 @@ import {
   updatePlacesForDay,
 } from '../../../lib/firebaseApi';
 import { getRoute } from '../../../lib/mapApi';
+import { processDays } from '../../../lib/processDays';
 // import useStore from '../../../lib/store';
 import List from './List';
-import { processDays } from './processDays';
 
 interface Place {
   id: string;
@@ -50,6 +54,7 @@ const TripPage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const queryClient = useQueryClient();
   const modalRef = useRef(null);
+  const router = useRouter();
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
@@ -93,6 +98,10 @@ const TripPage: React.FC = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  const handleBackProfile = () => {
+    router.push('/profile');
+  };
 
   const handleAddPlace = (place: Place, dayId: string) => {
     addMutation.mutate({ place, dayId });
@@ -188,7 +197,10 @@ const TripPage: React.FC = () => {
   return (
     <Container>
       <ListContainer>
-        <TripName>{tripData.tripTitle}</TripName>
+        <ListHeader>
+          <HomeIcon onClick={handleBackProfile} />
+          <TripName>{tripData.tripTitle}</TripName>
+        </ListHeader>
         <List
           days={tripData.days as any}
           onPlaceAdded={handleAddPlace}
@@ -223,6 +235,17 @@ export default TripPage;
 
 const Container = styled.div`
   display: flex;
+`;
+
+const ListHeader = styled.div`
+  margin: 10px 20px;
+  display: flex;
+  align-items: center;
+`;
+
+const HomeIcon = styled(IoArrowBackCircleOutline)`
+  cursor: pointer;
+  font-size: 30px;
 `;
 
 const TripName = styled.h1`

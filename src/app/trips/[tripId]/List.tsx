@@ -5,14 +5,15 @@
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import { FaMapMarker } from 'react-icons/fa';
 // import Time from 'react-datepicker/dist/time';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
+import { getColorForDate } from '@/lib/colors';
 import { updatePlaceStayTime } from '../../../lib/firebaseApi';
 // import usePlaceStore from '@/lib/store';
 import LocationSearch from './LocationSearch';
-import Marker from './Marker';
 import TimePicker from './TimePicker';
 import TransportModeSelector from './TransportSelector';
 
@@ -138,7 +139,10 @@ const List: React.FC<ListProps> = ({
                           </RouteInfo>
                         )}
                         <PlaceContainer>
-                          <Marker index={index} dateIndex={dateIndex} />
+                          <MarkerContainer>
+                            <MarkerIcon color={getColorForDate(dateIndex)} />
+                            <MarkerNumber>{index + 1}</MarkerNumber>
+                          </MarkerContainer>
                           <BlockWrapper>
                             <PlaceBlock onClick={() => onPlaceClick(place)}>
                               <PlaceName>{place.name}</PlaceName>
@@ -274,4 +278,28 @@ const TimeLabel = styled.div`
   padding: 5px;
   font-weight: bold;
   font-size: 12px;
+`;
+
+const MarkerContainer = styled.div`
+  position: relative;
+  display: inline-block;
+  width: 24px;
+  height: 36px;
+`;
+
+const MarkerIcon = styled(FaMapMarker)`
+  width: 100%;
+  height: 100%;
+  /* border: 1px solid #ffff; */
+  color: ${(props) => props.color};
+`;
+
+const MarkerNumber = styled.div`
+  position: absolute;
+  top: 40%;
+  left: 47%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
 `;

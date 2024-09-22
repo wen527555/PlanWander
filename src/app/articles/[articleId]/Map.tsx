@@ -1,8 +1,9 @@
 import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
-import { Layer, Map, Marker, Source, ViewStateChangeEvent } from 'react-map-gl';
+import { Map, Marker, ViewStateChangeEvent } from 'react-map-gl';
 
-// import usePlaceStore from '@/lib/store'
+// import usePlaceStore from '@/lib/store';
+
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Place {
@@ -13,19 +14,18 @@ interface Place {
   number: number;
 }
 
-interface Route {
-  color: string;
-  type: string;
-  coordinates: [number, number][];
-}
+// interface Route {
+//   color: string;
+//   type: string;
+//   coordinates: [number, number][];
+// }
 
 interface MapComponentProps {
   places: Place[];
-  routes: Route[];
+  //   routes: Route[];
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], onPlaceClick }) => {
-  // const { selectedPlace, setSelectedPlace } = usePlaceStore();
+const MapComponent: React.FC<MapComponentProps> = ({ places = [], visiblePlace }) => {
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [viewState, setViewState] = useState({
@@ -52,6 +52,21 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
       checkIfStyleLoaded();
     }
   }, [places, isMapLoaded]);
+  //   console.log('visiblePlace', visiblePlace);
+  useEffect(() => {
+    if (visiblePlace && isMapLoaded && mapRef.current) {
+      const place = places.find((p) => p.id === visiblePlace);
+      if (place) {
+        // console.log('place', place);
+        mapRef.current.flyTo({
+          center: [place.lng, place.lat],
+          zoom: 14,
+          speed: 1.2,
+          curve: 1,
+        });
+      }
+    }
+  }, [visiblePlace, places, isMapLoaded]);
 
   const handleMapLoad = () => {
     setIsMapLoaded(true);
@@ -59,15 +74,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
 
   const handleViewStateChange = (evt: ViewStateChangeEvent) => {
     setViewState(evt.viewState);
-  };
-
-  const handleMarkerClick = (place: Place) => {
-    onPlaceClick(place);
-    // setViewState({
-    //   longitude: place.lng,
-    //   latitude: place.lat,
-    //   zoom: viewState.zoom,
-    // });
   };
 
   return (
@@ -91,33 +97,22 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
               justifyContent: 'center',
               alignItems: 'center',
               backgroundColor: `${place.color}`,
+              //   backgroundColor: visiblePlace === place.id ? '#ff0000' : `${place.color}`, // 放大時變為紅色
+              width: visiblePlace === place.id ? '50px' : '32px',
+              height: visiblePlace === place.id ? '50px' : '32px',
               borderRadius: '50%',
               border: `2px solid #ffff`,
-              width: '32px',
-              height: '32px',
+              //   width: '32px',
+              //   height: '32px',
               color: 'white',
               fontWeight: 'bold',
               fontSize: '15px',
             }}
-            onClick={() => handleMarkerClick(place)}
           >
             {place.number}
           </Marker>
         ))}
-        {/* {selectedPlace && (
-          <Popup
-            longitude={selectedPlace.lng}
-            latitude={selectedPlace.lat}
-            onClose={() => setSelectedPlace(null)}
-            closeOnClick={false}
-          >
-            <div>
-              <h3>{selectedPlace.name}</h3>
-            </div>
-          </Popup>
-        )} */}
-        {/* <RouteLayer places={places} /> */}
-        {routes?.map((route, index) => (
+        {/* {routes?.map((route, index) => (
           <Source
             key={`route-${index}`}
             id={`route-${index}`}
@@ -137,12 +132,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
               paint={{
                 'line-color': route.color,
                 'line-width': 5,
-                //   'line-opacity': 0.9,
-                // 'line-dasharray': [3, 3],
               }}
             />
           </Source>
-        ))}
+        ))} */}
       </Map>
     </div>
   );

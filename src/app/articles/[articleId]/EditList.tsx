@@ -283,6 +283,7 @@ const ItemHeader = styled.div`
   display: flex;
   align-items: center;
   margin: 15px 0px;
+  gap: 10px;
 `;
 
 // const MarkerIcon = styled(MdPlace)`

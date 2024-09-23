@@ -122,22 +122,22 @@ const ArticleHeader = styled.div`
 `;
 
 const ArticleTitleInput = styled.div`
-  font-size: 16px;
   padding: 10px;
-  background-color: #ececec;
+  font-size: 20px;
   border-radius: 5px;
   height: auto;
   width: 100%;
+  font-weight: 500;
 `;
 
 const DescriptionInput = styled.div`
   font-size: 14px;
-  padding: 10px;
+  padding: 2cqb;
   height: auto;
   width: 100%;
-
   background-color: #ececec;
-  height: 50px;
+  height: auto;
+  border-radius: 5px;
 `;
 
 const ItemContainer = styled.div`
@@ -149,6 +149,7 @@ const ItemHeader = styled.div`
   display: flex;
   align-items: center;
   margin: 15px 0px;
+  gap: 10px;
 `;
 
 const ItemTitle = styled.h3`
@@ -169,7 +170,7 @@ const ItemName = styled.h3`
 
 const ImageUploadWrapper = styled.div`
   /* background-color: #f3f3f3; */
-  height: 200px;
+  height: 250px;
   margin-bottom: 10px;
   border-radius: 8px;
   display: flex;
@@ -180,19 +181,21 @@ const ImageUploadWrapper = styled.div`
 `;
 
 const Image = styled.img`
-  width: 100%;
+  width: 90%;
   height: 100%;
   object-fit: cover;
+  border-radius: 5px;
 `;
 
 const Description = styled.div`
   font-size: 14px;
   color: #888;
-  margin-top: 10px;
+  margin: 20px 0px 30px 0px;
   border: none;
   width: 100%;
   outline: none;
   height: auto;
+  padding: 0px 40px;
 `;
 
 const MarkerContainer = styled.div`

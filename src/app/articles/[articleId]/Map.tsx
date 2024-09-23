@@ -97,7 +97,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
         onMove={handleViewStateChange}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_KEY}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/wen527555/cm14ozgao042001pqbf590bfy"
+        mapStyle="mapbox://styles/wen527555/cm1em7bjb03te01rbf9st4jza"
         onLoad={handleMapLoad}
         ref={mapRef}
       >

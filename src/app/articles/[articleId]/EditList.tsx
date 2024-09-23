@@ -26,6 +26,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const [descriptions, setDescriptions] = useState<{ [key: string]: string }>({});
   const [images, setImages] = useState<{ [key: string]: any }>({});
   const [coverImage, setCoverImage] = useState<string | null>(null);
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -33,16 +34,16 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
           if (entry.isIntersecting) {
             const placeId = entry.target.getAttribute('data-place-id');
             if (placeId) {
-              console.log('placeId', placeId);
               onPlaceVisible(placeId);
             }
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.8 }
     );
 
     const placeItems = document.querySelectorAll('.place-item');
+    observer.observe(placeItems[0]);
     placeItems.forEach((item) => observer.observe(item));
 
     return () => {
@@ -58,7 +59,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       setCoverImage(imageUrl);
     } catch (error) {
       console.error('Error uploading cover image:', error);
-      alert('Failed to upload cover image. Please try again.');
+      alert('上傳圖片失敗，請重新上傳');
     }
   };
   const handleDescriptionChange = (placeId: string, value: string) => {
@@ -67,9 +68,11 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       [placeId]: value,
     }));
   };
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setArticleTitle(e.target.value);
   };
+
   useEffect(() => {
     if (articleData) {
       setArticleTitle(articleData.title);

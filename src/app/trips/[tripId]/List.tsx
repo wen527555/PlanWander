@@ -6,7 +6,6 @@
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaMapMarker } from 'react-icons/fa';
-// import Time from 'react-datepicker/dist/time';
 import { RiDeleteBinLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
@@ -109,8 +108,8 @@ const List: React.FC<ListProps> = ({
     }
   };
 
-  const handleCloseTimePicker = (placeId: string): void => {
-    setActivePlaceId(placeId);
+  const handleCloseTimePicker = (): void => {
+    setActivePlaceId(null);
   };
 
   const handleTimeCardClick = (placeId: string): void => {

@@ -9,15 +9,24 @@ import { SlOptionsVertical } from 'react-icons/sl';
 import styled from 'styled-components';
 
 import { createArticleFromTrip, fetchUserAllArticles, fetchUserAllTrips } from '@/lib/firebaseApi';
+import Carousel from '../../components/Carousel';
 import { auth } from '../../lib/firebaseConfig';
 import AddNewTripModal from './AddNewTripModal';
-import Carousel from './Carousel';
 
-// interface Trip {
-//   tripTitle: string;
-//   startDate: string;
-//   endDate: string;
-// }
+interface Trip {
+  id: string;
+  tripTitle: string;
+  startDate: string;
+  endDate: string;
+}
+
+interface Article {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  coverImage: string;
+}
 
 const ProfilePage = () => {
   const router = useRouter();
@@ -40,14 +49,14 @@ const ProfilePage = () => {
     return () => unsubscribe();
   }, []);
 
-  const { data: trips, isLoading } = useQuery({
+  const { data: trips = [], isLoading: loadingTrips } = useQuery<any>({
     queryKey: ['userTrips'],
-    queryFn: () => fetchUserAllTrips(),
+    queryFn: fetchUserAllTrips,
   });
 
-  const { data: articles } = useQuery({
+  const { data: articles = [] } = useQuery<any>({
     queryKey: ['userArticles'],
-    queryFn: () => fetchUserAllArticles(),
+    queryFn: fetchUserAllArticles,
   });
 
   console.log('articles', articles);
@@ -68,7 +77,7 @@ const ProfilePage = () => {
     }
   };
 
-  if (isLoading) {
+  if (loadingTrips) {
     return <p>Loading</p>;
   }
 
@@ -83,7 +92,7 @@ const ProfilePage = () => {
           <TripContainer>
             <Title>Trips</Title>
             {trips?.length > 0 ? (
-              <Carousel
+              <Carousel<Trip>
                 item={trips}
                 renderItem={(trip) => (
                   <CardWrapper>
@@ -114,7 +123,7 @@ const ProfilePage = () => {
           <ArticleContainer>
             <Title>Articles</Title>
             {articles?.length > 0 ? (
-              <Carousel
+              <Carousel<Article>
                 item={articles}
                 renderItem={(article) => (
                   <ArticleWrapper onClick={() => handleArticleClick(article.id)}>

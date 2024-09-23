@@ -9,31 +9,22 @@ import styled from 'styled-components';
 import { getColorForDate } from '@/lib/colors';
 import { saveArticle, saveImageToStorage } from '@/lib/firebaseApi';
 
-interface Place {
-  id: string;
-  name: string;
-  lat: number;
-  lng: number;
-  route?: {
-    duration: string;
-  };
-}
-
-interface Day {
-  date: string;
-  places: Place[];
-}
-
 interface ListProps {
-  days: Day[];
-  articleId: string;
+  articleData: {
+    coverImage: string;
+    title: string;
+    description: string;
+    days: any;
+  };
+  articleId: any;
+  onPlaceVisible: (placeId: string) => void;
 }
 
 const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible }) => {
   const [articleTitle, setArticleTitle] = useState('');
   const [articleDescription, setArticleDescription] = useState('');
   const [descriptions, setDescriptions] = useState<{ [key: string]: string }>({});
-  const [images, setImages] = useState<{ [key: string]: string | File }>({});
+  const [images, setImages] = useState<{ [key: string]: any }>({});
   const [coverImage, setCoverImage] = useState<string | null>(null);
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -41,8 +32,10 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             const placeId = entry.target.getAttribute('data-place-id');
-            console.log('placeId', placeId);
-            onPlaceVisible(placeId);
+            if (placeId) {
+              console.log('placeId', placeId);
+              onPlaceVisible(placeId);
+            }
           }
         });
       },
@@ -52,7 +45,6 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
     const placeItems = document.querySelectorAll('.place-item');
     placeItems.forEach((item) => observer.observe(item));
 
-    // 清除 observer，避免內存泄漏
     return () => {
       placeItems.forEach((item) => observer.unobserve(item));
     };
@@ -78,7 +70,6 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setArticleTitle(e.target.value);
   };
-  console.log('articleData', articleData);
   useEffect(() => {
     if (articleData) {
       setArticleTitle(articleData.title);
@@ -138,7 +129,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       );
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(['articleData', articleId]);
+      queryClient.invalidateQueries({ queryKey: ['articleData', articleId as string] });
       alert('Article saved successfully!');
     },
     onError: (error: Error) => {
@@ -164,7 +155,15 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
           {coverImage ? (
             <Image src={coverImage} alt="Cover Image" />
           ) : (
-            <input type="file" onChange={(e) => handleCoverImageUpload(e.target.files[0])} />
+            <input
+              type="file"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleCoverImageUpload(file);
+                }
+              }}
+            />
           )}
         </ImageUploadWrapper>
         <ArticleTitleInput value={articleTitle} onChange={handleTitleChange} placeholder="Enter article title..." />
@@ -175,11 +174,11 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
         />
       </ArticleHeader>
       {articleData.days?.length > 0 ? (
-        articleData.days.map((day, dateIndex) => (
+        articleData.days.map((day: any, dateIndex: number) => (
           <ItemContainer key={dateIndex}>
             <ItemTitle>DAY {dateIndex + 1}</ItemTitle>
             {Array.isArray(day.places) &&
-              day.places.map((place, index) => (
+              day.places.map((place: any, index: string) => (
                 <div key={index} data-place-id={place.id} className="place-item">
                   <ItemHeader>
                     <MarkerContainer>
@@ -192,7 +191,15 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
                     {images[place.id] ? (
                       <Image src={`${images[place.id]}`} alt={place.name} />
                     ) : (
-                      <input type="file" onChange={(e) => handleImageUpload(place.id, e.target.files[0])} />
+                      <input
+                        type="file"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleImageUpload(place.id, file);
+                          }
+                        }}
+                      />
                     )}
                   </ImageUploadWrapper>
                   <Description
@@ -266,6 +273,7 @@ const DescriptionInput = styled.textarea`
 
 const ItemContainer = styled.div`
   width: 100%;
+  margin: 10px 0px;
 `;
 
 const ItemHeader = styled.div`

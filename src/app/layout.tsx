@@ -34,7 +34,8 @@ const theme = createTheme({
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const hideHeader = /^\/trips(\/[a-zA-Z0-9]+)?$/.test(pathname);
+  //*隱藏header的方式可以再研究
+  const hideHeader = /^(?:\/trips(?:\/[a-zA-Z0-9\-]+)?|\/articles\/[a-zA-Z0-9\-]+(?:\/view)?)$/.test(pathname);
   return (
     <QueryProvider>
       <html lang="en">

@@ -2,6 +2,7 @@ import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Map, Marker, Source, ViewStateChangeEvent } from 'react-map-gl';
 
+// import usePlaceStore from '@/lib/store'
 import 'mapbox-gl/dist/mapbox-gl.css';
 
 interface Place {
@@ -22,10 +23,11 @@ interface Route {
 interface MapComponentProps {
   places: Place[];
   routes: Route[];
-  visiblePlace: string | null;
+  onPlaceClick?: (place: Place) => void;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], visiblePlace }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], onPlaceClick }) => {
+  // const { selectedPlace, setSelectedPlace } = usePlaceStore();
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [viewState, setViewState] = useState({
@@ -74,21 +76,18 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
     setViewState(evt.viewState);
   };
 
-  //   console.log('visiblePlace', visiblePlace);
-  useEffect(() => {
-    if (visiblePlace && isMapLoaded && mapRef.current) {
-      const place = places.find((p) => p.id === visiblePlace);
-      if (place) {
-        // console.log('place', place);
-        mapRef.current.flyTo({
-          center: [place.lng, place.lat],
-          zoom: 14,
-          speed: 1.2,
-          curve: 1,
-        });
-      }
+  const handleMarkerClick = (place: Place) => {
+    if (onPlaceClick) {
+      onPlaceClick(place);
+    } else {
+      console.warn('onPlaceClick 回調函數未傳遞');
     }
-  }, [visiblePlace, places, isMapLoaded]);
+    // setViewState({
+    //   longitude: place.lng,
+    //   latitude: place.lat,
+    //   zoom: viewState.zoom,
+    // });
+  };
 
   return (
     <div style={{ width: '100%', height: '100vh' }}>
@@ -112,21 +111,21 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
                 justifyContent: 'center',
                 alignItems: 'center',
                 backgroundColor: `${place.color}`,
-                //   backgroundColor: visiblePlace === place.id ? '#ff0000' : `${place.color}`, // 放大時變為紅色
-                width: visiblePlace === place.id ? '50px' : '32px',
-                height: visiblePlace === place.id ? '50px' : '32px',
                 borderRadius: '50%',
                 border: `2px solid #ffff`,
-                //   width: '32px',
-                //   height: '32px',
+                width: '32px',
+                height: '32px',
                 color: 'white',
                 fontWeight: 'bold',
                 fontSize: '15px',
+                cursor: 'pointer',
               }}
+              onClick={() => handleMarkerClick(place)}
             >
               {place.number}
             </Marker>
           ))}
+
         {isMapLoaded &&
           routes?.map((route, index) => (
             <Source
@@ -148,6 +147,8 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
                 paint={{
                   'line-color': route.color,
                   'line-width': 5,
+                  //   'line-opacity': 0.9,
+                  // 'line-dasharray': [3, 3],
                 }}
               />
             </Source>

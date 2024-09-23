@@ -6,7 +6,6 @@ interface CarouselProp<T> {
 }
 
 const Carousel = <T,>({ item, renderItem }: CarouselProp<T>): React.ReactElement => {
-  console.log('item', item);
   return (
     <CarouselContainer>
       {item.map((item, index) => (

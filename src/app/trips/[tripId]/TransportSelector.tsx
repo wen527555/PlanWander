@@ -7,20 +7,29 @@ import styled from 'styled-components';
 
 import { getRoute } from '@/lib/mapApi';
 
+type TransportMode = 'driving' | 'walking' | 'cycling';
+
 interface Route {
   type: string;
   coordinates: [number, number][];
   duration: string;
-  transportMode: string;
+  distance: string;
+  transportMode: TransportMode;
 }
 
 interface TransportModeSelectorProps {
-  onModeUpdate: (dayId: string, placeId: string, newMode: string) => void;
+  onModeUpdate: (dayId: string, placeId: string, newRoute: Route | null, newMode: TransportMode) => void;
   start: { lat: number; lng: number };
   end: { lat: number; lng: number };
   dayId: string;
   placeId: string;
   route: Route | null;
+}
+
+interface TransportOption {
+  mode: TransportMode;
+  label: string;
+  icon: JSX.Element;
 }
 
 const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
@@ -31,20 +40,25 @@ const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
   placeId,
   route,
 }) => {
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedMode, setSelectedMode] = useState(route?.transportMode || 'driving');
+  const [showDropdown, setShowDropdown] = useState<boolean>(false);
+  const [selectedMode, setSelectedMode] = useState<TransportMode>(route?.transportMode || 'driving');
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown);
   };
 
-  const handleModeChange = async (newMode) => {
+  const handleModeChange = async (newMode: TransportMode) => {
     setSelectedMode(newMode);
     setShowDropdown(false);
-    const route = await getRoute(start, end, newMode);
-    await onModeUpdate(dayId, placeId, route, newMode);
+    try {
+      const routeFromGetRoute = await getRoute(start, end, newMode);
+      const newRoute: Route | null = routeFromGetRoute ? { ...routeFromGetRoute, transportMode: newMode } : null;
+      await onModeUpdate(dayId, placeId, newRoute, newMode);
+    } catch (error) {
+      console.error('Error updating mode:', error);
+    }
   };
 
-  const transportModes = [
+  const transportModes: TransportOption[] = [
     { mode: 'driving', label: '駕車', icon: <CarIcon /> },
     { mode: 'walking', label: '步行', icon: <WalkIcon /> },
     { mode: 'cycling', label: '騎行', icon: <BikeIcon /> },

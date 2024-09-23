@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 
+interface ButtonProps {
+  variant: 'clear' | 'save';
+}
+
+interface TimePickerProps {
+  place: { id: string };
+  dayId: string;
+  onSave: (placeId: string, dayId: string, startTime: string, endTime: string) => void;
+  onClear: () => void;
+}
+
 const generateTimeSlots = () => {
   const times = [];
   let startTime = 0;
@@ -44,7 +55,7 @@ const ButtonGroup = styled.div`
   justify-content: space-between;
 `;
 
-const Button = styled.button`
+const Button = styled.button<ButtonProps>`
   padding: 8px 16px;
   border: none;
   border-radius: 5px;
@@ -62,8 +73,7 @@ const Button = styled.button`
     `}
 `;
 
-// TimePicker and TimeDisplayCard component
-const TimePicker = ({ place, dayId, onSave, onClear }) => {
+const TimePicker: React.FC<TimePickerProps> = ({ place, dayId, onSave, onClear }) => {
   const [startTime, setStartTime] = useState('');
   const [endTime, setEndTime] = useState('');
   const timeSlots = generateTimeSlots();

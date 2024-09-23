@@ -59,7 +59,6 @@ const ProfilePage = () => {
     queryFn: fetchUserAllArticles,
   });
 
-  console.log('articles', articles);
   const handleTripClick = (tripId: string) => {
     router.push(`trips/${tripId}`);
   };

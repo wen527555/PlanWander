@@ -66,7 +66,7 @@ const List: React.FC<ListProps> = ({
       const initialSelectedTime: SelectedTime = {};
 
       days.forEach((day) => {
-        day.places.forEach((place) => {
+        day.places?.forEach((place) => {
           if (place.startTime && place.endTime) {
             initialSelectedTime[place.id] = {
               startTime: place.startTime,

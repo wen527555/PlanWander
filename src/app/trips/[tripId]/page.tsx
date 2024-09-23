@@ -4,8 +4,8 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import { FaStar } from 'react-icons/fa';
-import { FaMapPin } from 'react-icons/fa6';
+import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
+import { FaClock, FaMapPin } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 
@@ -29,6 +29,9 @@ interface Place {
   lat: number;
   lng: number;
   route?: any;
+  openingHours?: any;
+  phone?: string;
+  website?: string;
 }
 
 interface AddLocationParams {
@@ -182,7 +185,7 @@ const TripPage: React.FC = () => {
     deletePlaceMutation.mutate({ tripId, dayId, placeId });
   };
 
-  // console.log('selectedPlace', selectedPlace);
+  console.log('selectedPlace', selectedPlace);
   const handlePlaceClick = async (place: Place) => {
     setSelectedPlace(place);
   };
@@ -218,15 +221,46 @@ const TripPage: React.FC = () => {
         <MapComponent places={places as any} routes={route as any} onPlaceClick={handlePlaceClick} />
         {selectedPlace && (
           <PlaceInfoModal ref={modalRef}>
-            <PlaceName>{selectedPlace.name}</PlaceName>
-            <PlaceRating>
-              <FaStar />
-              {selectedPlace.rating}
-            </PlaceRating>
-            <PlaceAddress>
-              <FaMapPin />
-              {selectedPlace.address}
-            </PlaceAddress>
+            <ModalHeader>
+              <PlaceName>{selectedPlace.name}</PlaceName>
+            </ModalHeader>
+
+            {selectedPlace.rating && (
+              <RatingWrapper>
+                <RatingIcon />
+                <Rating>{selectedPlace.rating}</Rating>
+              </RatingWrapper>
+            )}
+
+            {selectedPlace.address && (
+              <Wrapper>
+                <AddressIcon />
+                <PlaceAddress>{selectedPlace.address}</PlaceAddress>
+              </Wrapper>
+            )}
+
+            {selectedPlace.openingHours && (
+              <HoursWrapper>
+                <FaClock />
+                {selectedPlace.openingHours}
+              </HoursWrapper>
+            )}
+
+            {selectedPlace.phone && (
+              <Wrapper>
+                <FaPhoneAlt />
+                {selectedPlace.phone}
+              </Wrapper>
+            )}
+
+            {selectedPlace.website && (
+              <Wrapper>
+                <FaGlobe />
+                <a href={selectedPlace.website} target="_blank" rel="noopener noreferrer">
+                  {selectedPlace.website}
+                </a>
+              </Wrapper>
+            )}
           </PlaceInfoModal>
         )}
       </MapContainer>
@@ -272,24 +306,76 @@ const MapContainer = styled.div`
 const PlaceInfoModal = styled.div`
   background-color: #fff;
   position: absolute;
-  bottom: 20px;
+  bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 15px;
-  border-radius: 8px;
+  padding: 20px;
+  border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 80%;
-  height: 300px;
+  height: auto;
+`;
+
+const ModalHeader = styled.div`
+  display: flex;
+  align-items: center;
 `;
 
 const PlaceName = styled.h1`
   font-size: 20px;
   font-weight: 600;
 `;
-const PlaceRating = styled.div`
-  font-size: 16px;
+
+const RatingWrapper = styled.div`
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+`;
+
+const Rating = styled.div`
+  font-size: 14px;
+  color: #ff9800;
+  display: flex;
+  align-items: center;
+  font-weight: 700;
+`;
+
+const Wrapper = styled.div`
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  color: #333;
+  svg {
+    margin-right: 8px;
+  }
+  a {
+    color: #1e88e5;
+    text-decoration: none;
+    margin-left: 5px;
+  }
 `;
 
 const PlaceAddress = styled.div`
   font-size: 16px;
+`;
+
+const AddressIcon = styled(FaMapPin)`
+  font-size: 16px;
+  margin-right: 10px;
+`;
+
+const RatingIcon = styled(FaStar)`
+  font-size: 14px;
+  color: #ff9800;
+  margin-right: 10px;
+`;
+
+const HoursWrapper = styled.div`
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  color: #555;
+  svg {
+    margin-right: 10px;
+  }
 `;

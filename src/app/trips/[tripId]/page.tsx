@@ -61,8 +61,6 @@ const TripPage: React.FC = () => {
   });
   //*要再研究是否有必要用到zustand
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
-  // const [placeDetail, setPlaceDetail] = useState('');
-  // console.log('placeDetail', placeDetail);
   const router = useRouter();
   const addMutation = useMutation({
     mutationFn: async ({ place, dayId, transportMode = 'driving' }: AddLocationParams) => {
@@ -104,7 +102,7 @@ const TripPage: React.FC = () => {
       place,
       dayId,
       newRoute: null,
-      transportMode: '',
+      transportMode: 'driving',
     });
   };
 

@@ -3,7 +3,7 @@
 // import { TextField } from '@mui/material';
 // import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
 // import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaMapMarker } from 'react-icons/fa';
 import { RiDeleteBinLine } from 'react-icons/ri';
@@ -22,6 +22,8 @@ interface Place {
   lat: number;
   lng: number;
   route?: any;
+  startTime?: string;
+  endTime?: string;
 }
 
 interface Day {
@@ -57,6 +59,30 @@ const List: React.FC<ListProps> = ({
 }) => {
   const [selectedTime, setSelectedTime] = useState<SelectedTime>({});
   const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
+
+  //state應該要統一處理
+  useEffect(() => {
+    const initializeSelectedTime = () => {
+      const initialSelectedTime: SelectedTime = {};
+
+      days.forEach((day) => {
+        day.places.forEach((place) => {
+          if (place.startTime && place.endTime) {
+            initialSelectedTime[place.id] = {
+              startTime: place.startTime,
+              endTime: place.endTime,
+            };
+          }
+        });
+      });
+      console.log('initialSelectedTime', initialSelectedTime);
+      setSelectedTime(initialSelectedTime);
+    };
+
+    if (days.length > 0) {
+      initializeSelectedTime();
+    }
+  }, [days]);
   const onDragEnd = async (result: any) => {
     const { source, destination } = result;
     if (!destination) return;

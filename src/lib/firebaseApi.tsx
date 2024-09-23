@@ -297,7 +297,7 @@ export const updatePlaceStayTime = async (
     await updateDoc(dayDocRef, {
       places: updatedPlaces,
     });
-    console.log('Place removed successfully');
+    console.log('Place stayTime update successfully');
   } catch (error) {
     console.error('Error removing place:', error);
   }

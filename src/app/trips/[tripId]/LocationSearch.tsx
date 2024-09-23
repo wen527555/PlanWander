@@ -25,11 +25,10 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceAdded, dayId }) 
   const onPlaceChanged = async () => {
     if (autocomplete) {
       const place = autocomplete.getPlace();
-      // console.log('place', place);
       if (place.geometry?.location && place.name) {
         const lat = place.geometry.location.lat();
         const lng = place.geometry.location.lng();
-
+        const photoUrl = place.photos && place.photos.length > 0 ? place.photos[0].getUrl({ maxWidth: 400 }) : '';
         const newPlace = {
           id: place.place_id || '',
           name: place.name || '',
@@ -41,6 +40,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceAdded, dayId }) 
           googleUrl: place.url || '',
           rating: place.rating || 0,
           openTime: place.opening_hours?.weekday_text || [],
+          photo: photoUrl,
         };
         onPlaceAdded(newPlace, dayId);
         setInputValue('');

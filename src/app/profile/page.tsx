@@ -14,6 +14,7 @@ import { auth } from '../../lib/firebaseConfig';
 import AddNewTripModal from './AddNewTripModal';
 
 interface Trip {
+  photo: string | undefined;
   id: string;
   tripTitle: string;
   startDate: string;
@@ -59,7 +60,6 @@ const ProfilePage = () => {
     queryFn: fetchUserAllArticles,
   });
 
-  console.log('articles', articles);
   const handleTripClick = (tripId: string) => {
     router.push(`trips/${tripId}`);
   };
@@ -106,7 +106,8 @@ const ProfilePage = () => {
                       </IconWrapper>
                     </CardHeader>
                     <CardContent onClick={() => handleTripClick(trip.id)}>
-                      <TripImg />
+                      {/* <TripImg /> */}
+                      <TripImg src={trip.photo} />
                       <CardDetails>
                         <TripName>{trip.tripTitle}</TripName>
                         <TripDate>{trip.startDate}</TripDate>
@@ -165,6 +166,7 @@ const MainContent = styled.div`
   flex: 1;
   padding: 20px;
   overflow-x: hidden;
+  margin: 0px 60px;
 `;
 
 const ButtonWrapper = styled.div`
@@ -194,16 +196,16 @@ const Title = styled.div`
   margin-left: 30px;
 `;
 
-const TripImg = styled.div`
+const TripImg = styled.img`
   background-color: #efefef;
   width: 100%;
-  height: 200px;
+  height: 250px;
   object-fit: cover;
   border-radius: 10px;
 `;
 
 const CardWrapper = styled.div`
-  min-width: 300px;
+  width: 700px;
   cursor: pointer;
 `;
 
@@ -226,8 +228,9 @@ const CardContent = styled.div`
 
 const TripName = styled.h3`
   color: #0f3e4a;
-  font-size: 16px;
+  font-size: 20px;
   font-weight: 700;
+  margin-bottom: 10px;
 `;
 
 const TripDate = styled.div`
@@ -261,7 +264,7 @@ const OptionIcon = styled(SlOptionsVertical)`
 `;
 
 const TripContainer = styled.div`
-  margin: 10px 0px;
+  margin: 0;
 `;
 
 const ArticleContainer = styled.div`
@@ -272,7 +275,9 @@ const ArticleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 20px;
+  height: 250px;
   cursor: pointer;
+  align-items: center;
 `;
 
 const ArticleContent = styled.div`
@@ -306,9 +311,9 @@ const PublishedDate = styled.p`
 `;
 
 const ArticleImage = styled.img`
-  width: 150px;
+  width: 250px;
   height: auto;
   object-fit: cover;
-  height: 100px;
+  height: 90%;
   border-radius: 10px;
 `;

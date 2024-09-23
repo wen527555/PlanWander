@@ -78,7 +78,9 @@ const ArticleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 20px;
+  height: 250px;
   cursor: pointer;
+  align-items: center;
 `;
 
 const ArticleContent = styled.div`
@@ -112,9 +114,9 @@ const PublishedDate = styled.p`
 `;
 
 const ArticleImage = styled.img`
-  width: 150px;
+  width: 250px;
   height: auto;
   object-fit: cover;
-  height: 100px;
+  height: 90%;
   border-radius: 10px;
 `;

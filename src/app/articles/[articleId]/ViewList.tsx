@@ -34,10 +34,11 @@ const EditList: React.FC<ListProps> = ({ articleData, onPlaceVisible }) => {
           }
         });
       },
-      { threshold: 0.5 }
+      { threshold: 0.8 }
     );
 
     const placeItems = document.querySelectorAll('.place-item');
+    observer.observe(placeItems[0]);
     placeItems.forEach((item) => observer.observe(item));
 
     return () => {
@@ -181,6 +182,7 @@ const ImageUploadWrapper = styled.div`
 const Image = styled.img`
   width: 100%;
   height: 100%;
+  object-fit: cover;
 `;
 
 const Description = styled.div`

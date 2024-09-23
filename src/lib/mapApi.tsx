@@ -62,22 +62,3 @@ const formatDuration = (duration: any) => {
     return `${min}min`;
   }
 };
-
-export const fetchPlaceDetail = async (lat: number, lng: number) => {
-  // const hereApiKey = process.env.NEXT_PUBLIC_HERE_API_KEY;
-  // const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-  // const url = `https://places.ls.hereapi.com/places/v1/discover/explore?at=${lat},${lng}&apiKey=${hereApiKey}`;
-  // const url = `/api/here/v1/discover/explore?at=${lat},${lng}&apiKey=${hereApiKey}`;
-  const res = await fetch(`/api/map?lat=${lat}&lng=${lng}`);
-
-  // const url = `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${lat},${lng}&radius=1500&type=restaurant&language=zh-CN&key=${googleApiKey}`;
-  // const res = await fetch(url);
-
-  if (!res.ok) {
-    throw new Error('Failed to fetch places');
-  }
-  const data = await res.json();
-  console.log('data', data);
-  // return data.results.item;
-  return data.results;
-};

@@ -15,7 +15,20 @@ import {
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
+//移至另一個api檔
+// import { createApi } from 'unsplash-js';
+
 import { db, storage } from '../lib/firebaseConfig';
+
+// const unsplashAccessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
+
+// if (!unsplashAccessKey) {
+//   throw new Error('Unsplash Access Key is missing. Please define it in your .env.local file');
+// }
+
+// const unsplash = createApi({
+//   accessKey: unsplashAccessKey,
+// });
 
 interface UserInfo {
   uid: string;
@@ -78,12 +91,24 @@ export const createNewTrip = async (tripTitle: string, startDate: Date, endDate:
       throw new Error('Missing required trip data');
     }
 
+    // const countryName = tripTitle.split(' ')[0];
+    // const response = await unsplash.search.getPhotos({
+    //   query: countryName,
+    //   perPage: 1,
+    // });
+    // console.log('countryName', countryName);
+    // console.log('response', response);
+    // const imageUrl = response?.response?.results?.[0]?.urls?.small || '';
+
+    // console.log('mageUrl', imageUrl);
+
     const tripData = {
       tripTitle,
       startDate: dayjs(startDate).format('YYYY-MM-DD'),
       endDate: dayjs(endDate).format('YYYY-MM-DD'),
       createdAt: new Date(),
       uid: userId,
+      // imageUrl,
     };
 
     const tripRef = await addDoc(collection(db, 'trips'), tripData);
@@ -297,11 +322,37 @@ export const updatePlaceStayTime = async (
     await updateDoc(dayDocRef, {
       places: updatedPlaces,
     });
-    console.log('Place removed successfully');
+    console.log('Place stayTime update successfully');
   } catch (error) {
     console.error('Error removing place:', error);
   }
 };
+
+// export const fetchUserAllTrips = async () => {
+//   return new Promise((resolve, reject) => {
+//     onAuthStateChanged(auth, async (user) => {
+//       if (user) {
+//         try {
+//           const userId = user.uid;
+//           const tripRef = collection(db, 'trips');
+//           const q = query(tripRef, where('uid', '==', userId));
+//           const querySnapshot = await getDocs(q);
+//           const userTrips = querySnapshot.docs.map((doc) => ({
+//             id: doc.id,
+//             ...doc.data(),
+//           }));
+//           resolve(userTrips);
+//         } catch (error) {
+//           console.error('Error fetching user trips:', error);
+//           reject([]);
+//         }
+//       } else {
+//         console.log('No user is logged in');
+//         resolve([]);
+//       }
+//     });
+//   });
+// };
 
 export const fetchUserAllTrips = async () => {
   return new Promise((resolve, reject) => {
@@ -312,10 +363,31 @@ export const fetchUserAllTrips = async () => {
           const tripRef = collection(db, 'trips');
           const q = query(tripRef, where('uid', '==', userId));
           const querySnapshot = await getDocs(q);
-          const userTrips = querySnapshot.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-          }));
+
+          const userTrips = await Promise.all(
+            querySnapshot.docs.map(async (doc) => {
+              const tripData = doc.data();
+              let photo = null;
+              const daysRef = collection(db, 'trips', doc.id, 'days');
+              const daysSnapshot = await getDocs(daysRef);
+
+              if (!daysSnapshot.empty) {
+                const firstDayDoc = daysSnapshot.docs[0];
+                const firstDayData = firstDayDoc.data();
+                if (Array.isArray(firstDayData.places) && firstDayData.places.length > 0) {
+                  const firstPlace = firstDayData.places[0];
+                  photo = firstPlace.photo || null;
+                }
+              }
+
+              return {
+                id: doc.id,
+                photo: photo,
+                ...tripData,
+              };
+            })
+          );
+
           resolve(userTrips);
         } catch (error) {
           console.error('Error fetching user trips:', error);

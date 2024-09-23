@@ -32,7 +32,7 @@ const ArticlesPage = () => {
     setVisiblePlace(placeId);
   };
 
-  if (isLoading || !articleData) return <p>Loading trip places</p>;
+  if (isLoading || !articleData) return;
   const { places, route } = processDays(articleData?.days as any);
   return (
     <Container>
@@ -67,14 +67,14 @@ const HomeIcon = styled(IoArrowBackCircleOutline)`
 `;
 
 const ListContainer = styled.div`
-  width: 55%;
+  width: 50%;
   height: 100vh;
   overflow-y: auto;
   padding: 0px 20px;
 `;
 
 const MapContainer = styled.div`
-  width: 45%;
+  width: 50%;
   height: 100vh;
   position: relative;
 `;

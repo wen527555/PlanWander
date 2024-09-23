@@ -283,7 +283,8 @@ const ArticleWrapper = styled.div`
 const ArticleContent = styled.div`
   display: flex;
   flex-direction: column;
-  width: 400px;
+  width: 350px;
+  margin: 10px 15px;
   justify-content: space-between;
   height: 100%;
 `;
@@ -302,6 +303,7 @@ const ArticleDescription = styled.p`
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: auto;
+  margin-top: 15px;
 `;
 
 const PublishedDate = styled.p`

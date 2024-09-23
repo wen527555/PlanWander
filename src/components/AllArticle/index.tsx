@@ -86,9 +86,10 @@ const ArticleWrapper = styled.div`
 const ArticleContent = styled.div`
   display: flex;
   flex-direction: column;
-  width: 400px;
+  width: 600px;
   justify-content: space-between;
   height: 100%;
+  margin: 20px;
 `;
 
 const ArticleTitle = styled.h2`

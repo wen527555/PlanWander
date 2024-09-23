@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { BsPersonCircle } from 'react-icons/bs';
 import styled from 'styled-components';
 
 import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
@@ -47,15 +48,20 @@ const Header = () => {
     }
   };
 
+  const handleToProfile = () => {
+    router.push('/profile');
+  };
+
   return (
     <Container>
       <Link href="/" passHref>
         <Image src={placeWanderLogo} alt="Logo" width={120} height={20} style={{ cursor: 'pointer' }} />
       </Link>
       {user ? (
-        <>
+        <IconWrapper>
+          <ProfileIcon onClick={handleToProfile} />
           <Button onClick={handleLogout}>Logout</Button>
-        </>
+        </IconWrapper>
       ) : (
         <>
           <Button onClick={handleLoginClick}>LogIn</Button>
@@ -101,4 +107,17 @@ const Button = styled.button`
   &hover {
     background-color: #dde9ed;
   }
+`;
+
+const ProfileIcon = styled(BsPersonCircle)`
+  cursor: pointer;
+  font-size: 22px;
+`;
+
+const IconWrapper = styled.div`
+  width: auto;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 `;

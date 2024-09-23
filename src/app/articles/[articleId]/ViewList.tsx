@@ -29,7 +29,6 @@ const EditList: React.FC<ListProps> = ({ articleData, onPlaceVisible }) => {
           if (entry.isIntersecting) {
             const placeId = entry.target.getAttribute('data-place-id');
             if (placeId) {
-              console.log('placeId', placeId);
               onPlaceVisible(placeId);
             }
           }

@@ -52,7 +52,7 @@ export default function ArticleList() {
             </ArticleWrapper>
           ))
         ) : (
-          <p>No articles found.</p>
+          <p></p>
         )}
       </ArticleContainer>
     </Container>

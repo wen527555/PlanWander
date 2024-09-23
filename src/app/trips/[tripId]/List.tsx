@@ -236,6 +236,7 @@ const ItemHeader = styled.div`
   cursor: pointer;
   /* padding: 10px 0px; */
   margin: 10px 20px 15px 20px;
+  gap: 10px;
 `;
 
 const ItemDate = styled.h3`

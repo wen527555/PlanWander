@@ -72,7 +72,7 @@ const ListContainer = styled.div`
   width: 55%;
   height: 100vh;
   overflow-y: auto;
-  padding: 0px 20px;
+  padding: 0px 30px;
 `;
 
 const MapContainer = styled.div`

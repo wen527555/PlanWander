@@ -1,6 +1,9 @@
 import { create } from 'zustand';
 
 interface Place {
+  website?: any;
+  phone?: any;
+  openingHours?: any;
   id: string;
   name: string;
   lat: number;

@@ -225,14 +225,14 @@ const TripPage: React.FC = () => {
               <PlaceName>{selectedPlace.name}</PlaceName>
             </ModalHeader>
 
-            {selectedPlace.rating && (
+            {selectedPlace?.rating && (
               <RatingWrapper>
                 <RatingIcon />
                 <Rating>{selectedPlace.rating}</Rating>
               </RatingWrapper>
             )}
 
-            {selectedPlace.address && (
+            {selectedPlace?.address && (
               <Wrapper>
                 <AddressIcon />
                 <PlaceAddress>{selectedPlace.address}</PlaceAddress>

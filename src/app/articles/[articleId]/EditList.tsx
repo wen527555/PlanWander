@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 import { getColorForDate } from '@/lib/colors';
 import { saveArticle, saveImageToStorage } from '@/lib/firebaseApi';
+import { useUserStore } from '@/lib/store';
 
 interface ListProps {
   articleData: {
@@ -26,7 +27,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const [descriptions, setDescriptions] = useState<{ [key: string]: string }>({});
   const [images, setImages] = useState<{ [key: string]: any }>({});
   const [coverImage, setCoverImage] = useState<string | null>(null);
-
+  const { photoURL, userName } = useUserStore();
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -128,7 +129,9 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
         articleData.days,
         descriptions,
         images,
-        coverImage
+        coverImage,
+        photoURL,
+        userName
       );
     },
     onSuccess: () => {
@@ -270,7 +273,7 @@ const DescriptionInput = styled.textarea`
   border-radius: 5px;
   outline: none;
   resize: none;
-  height: auto;
+  height: 100px;
   border: none;
 `;
 

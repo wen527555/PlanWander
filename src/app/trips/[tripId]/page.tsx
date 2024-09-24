@@ -10,7 +10,7 @@ import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import { processDays } from '@/lib/processDays';
-import usePlaceStore from '@/lib/store';
+import { usePlaceStore } from '@/lib/store';
 import {
   addPlaceToDay,
   deletePlace,

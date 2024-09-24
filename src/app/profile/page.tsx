@@ -9,6 +9,8 @@ import { SlOptionsVertical } from 'react-icons/sl';
 import styled from 'styled-components';
 
 import { createArticleFromTrip, fetchUserAllArticles, fetchUserAllTrips } from '@/lib/firebaseApi';
+import { useUserStore } from '@/lib/store';
+import defaultProfileImg from '@/public/earth-profile.png';
 import Carousel from '../../components/Carousel';
 import { auth } from '../../lib/firebaseConfig';
 import AddNewTripModal from './AddNewTripModal';
@@ -32,6 +34,8 @@ interface Article {
 const ProfilePage = () => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { photoURL, userName } = useUserStore();
+  // console.log('photoURL', photoURL);
 
   const handleAddClick = () => {
     setIsModalOpen(true);
@@ -84,7 +88,10 @@ const ProfilePage = () => {
   return (
     <>
       <Container>
-        <Sidebar></Sidebar>
+        <Sidebar>
+          <ProfileImg src={photoURL || defaultProfileImg.src} />
+          {userName && <UserName>{userName}</UserName>}
+        </Sidebar>
         <MainContent>
           <ButtonWrapper>
             <Button onClick={handleAddClick}>Add</Button>
@@ -160,6 +167,24 @@ const Container = styled.div`
 const Sidebar = styled.div`
   width: 250px;
   background-color: #f1f1f1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+
+const UserName = styled.div`
+  margin-top: 25px;
+  font-weight: 700;
+  font-size: 20px;
+`;
+
+const ProfileImg = styled.img`
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  margin-top: 30px;
+  /* border: 2px solid #a19a9a; */
+  background-color: white;
 `;
 
 const MainContent = styled.div`

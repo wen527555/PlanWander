@@ -34,7 +34,7 @@ const ArticlesPage = () => {
     setVisiblePlace(placeId);
   };
 
-  if (isLoading || !articleData) return <p>Loading trip places</p>;
+  if (isLoading || !articleData) return <p></p>;
   const { places, route } = processDays(articleData?.days as any);
   return (
     <Container>

@@ -19,6 +19,7 @@ import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 // import { createApi } from 'unsplash-js';
 
 import { db, storage } from '../lib/firebaseConfig';
+import { useUserStore } from './store';
 
 // const unsplashAccessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
 
@@ -76,6 +77,23 @@ export const saveUserData = async (userInfo: UserInfo | null): Promise<void> => 
     await setDoc(doc(db, 'users', userInfo.uid), userData, { merge: true });
   } catch (error) {
     console.log('error', error);
+  }
+};
+
+export const fetchUserData = async () => {
+  const user = auth.currentUser;
+  if (user) {
+    const uid = user.uid;
+    const userDocRef = doc(db, 'users', uid);
+    const userDocSnap = await getDoc(userDocRef);
+    if (userDocSnap.exists()) {
+      const userData = userDocSnap.data();
+      console.log('userData', userData);
+      const { photoURL, userName } = userData;
+      useUserStore.getState().setUserData({ photoURL, userName });
+    } else {
+      console.log('No such document!');
+    }
   }
 };
 
@@ -481,14 +499,19 @@ export const saveArticle = async (
   days: any[],
   descriptions: { [key: string]: string },
   images: { [key: string]: string },
-  coverImage: string | null
+  coverImage: string | null,
+  photoURL: string | null,
+  userName: string | null
 ) => {
   try {
     const articleRef = doc(db, `articles/${articleId}`);
+    console.log('photoURL', photoURL);
     await updateDoc(articleRef, {
       title: articleTitle,
       description: articleDescription,
       coverImage,
+      photoURL,
+      userName,
     });
 
     for (const day of days) {
@@ -560,13 +583,15 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
 
   return querySnapshot.docs.map((doc) => {
     const data = doc.data();
-
+    console.log('data', data);
     return {
       id: doc.id,
       title: data.title || '',
       description: data.description || '',
       createdAt: data.createdAt || { seconds: 0, nanoseconds: 0 },
       coverImage: data.coverImage || '',
+      photoURL: data.photoURL,
+      userName: data.userName,
     };
   });
 };

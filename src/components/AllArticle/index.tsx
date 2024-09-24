@@ -15,12 +15,14 @@ interface Article {
     nanoseconds: number;
   };
   coverImage?: string;
+  photoURL?: string;
+  userName?: string;
 }
 
 export default function ArticleList() {
   const [articles, setArticles] = useState<Article[]>([]);
   const router = useRouter();
-  // console.log('articles', articles);
+  console.log('articles', articles);
   useEffect(() => {
     const fetchArticles = async () => {
       const data = await fetchAllPublishedArticles();
@@ -40,6 +42,10 @@ export default function ArticleList() {
           articles.map((article) => (
             <ArticleWrapper key={article.id} onClick={() => handleArticleClick(article.id)}>
               <ArticleContent>
+                <PublishUserWrapper>
+                  <UserImg src={article?.photoURL} />
+                  <UserName>{article?.userName} </UserName>
+                </PublishUserWrapper>
                 <ArticleTitle>{article.title}</ArticleTitle>
                 <ArticleDescription>{article.description}</ArticleDescription>
                 <PublishedDate>
@@ -69,6 +75,25 @@ const Container = styled.div`
   align-items: center;
 `;
 
+const PublishUserWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+`;
+
+const UserImg = styled.img`
+  cursor: pointer;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+`;
+
+const UserName = styled.h3`
+  margin: 0;
+  font-size: 16px;
+`;
+
 const ArticleContainer = styled.div`
   margin: 10px 50px;
   width: 70%;
@@ -89,7 +114,7 @@ const ArticleContent = styled.div`
   width: 600px;
   justify-content: space-between;
   height: 100%;
-  margin: 20px;
+  padding: 20px;
 `;
 
 const ArticleTitle = styled.h2`

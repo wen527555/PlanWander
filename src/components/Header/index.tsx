@@ -5,9 +5,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { BsPersonCircle } from 'react-icons/bs';
 import styled from 'styled-components';
 
+import { fetchUserData } from '@/lib/firebaseApi';
+import { useUserStore } from '@/lib/store';
+// import { BsPersonCircle } from 'react-icons/bs';
+import defaultProfileImg from '@/public/earth-profile.png';
 import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
 import LoginModal from '../LoginModal';
 import placeWanderLogo from './PlanwanderLogo.png';
@@ -15,11 +18,13 @@ import placeWanderLogo from './PlanwanderLogo.png';
 const Header = () => {
   const [isLoginModalOpen, setIsModalOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const { photoURL } = useUserStore();
   const router = useRouter();
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setUser(user);
+        fetchUserData();
       } else {
         setUser(null);
         router.push('/');
@@ -59,7 +64,7 @@ const Header = () => {
       </Link>
       {user ? (
         <IconWrapper>
-          <ProfileIcon onClick={handleToProfile} />
+          <ProfileIcon src={photoURL || defaultProfileImg.src} onClick={handleToProfile} />
           <Button onClick={handleLogout}>Logout</Button>
         </IconWrapper>
       ) : (
@@ -109,9 +114,18 @@ const Button = styled.button`
   }
 `;
 
-const ProfileIcon = styled(BsPersonCircle)`
+// const ProfileIcon = styled(BsPersonCircle)`
+//   cursor: pointer;
+//   font-size: 30px;
+// `;
+
+const ProfileIcon = styled.img`
   cursor: pointer;
-  font-size: 22px;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  /* border: 2px solid #403d3d; */
+  /* background-color: white; */
 `;
 
 const IconWrapper = styled.div`

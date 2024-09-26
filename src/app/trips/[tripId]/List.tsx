@@ -1,9 +1,7 @@
 'use client';
 
-// import { TextField } from '@mui/material';
-// import { LocalizationProvider, TimePicker } from '@mui/x-date-pickers';
-// import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import React, { useEffect, useState } from 'react';
+// import { useMutation } from '@tanstack/react-query';
+import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaMapMarker } from 'react-icons/fa';
 import { RiDeleteBinLine } from 'react-icons/ri';
@@ -59,54 +57,63 @@ const List: React.FC<ListProps> = ({
 }) => {
   const [selectedTime, setSelectedTime] = useState<SelectedTime>({});
   const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
-
+  // const [placeDescr]
+  // const [expandedPlaceId, setExpanderPlace] = useState(null);
   //state應該要統一處理
-  useEffect(() => {
-    const initializeSelectedTime = () => {
-      const initialSelectedTime: SelectedTime = {};
+  // useEffect(() => {
+  //   const initializeSelectedTime = () => {
+  //     const initialSelectedTime: SelectedTime = {};
 
-      days.forEach((day) => {
-        day.places?.forEach((place) => {
-          if (place.startTime && place.endTime) {
-            initialSelectedTime[place.id] = {
-              startTime: place.startTime,
-              endTime: place.endTime,
-            };
-          }
-        });
-      });
-      console.log('initialSelectedTime', initialSelectedTime);
-      setSelectedTime(initialSelectedTime);
-    };
+  //     days.forEach((day) => {
+  //       day.places?.forEach((place) => {
+  //         if (place.startTime && place.endTime) {
+  //           initialSelectedTime[place.id] = {
+  //             startTime: place.startTime,
+  //             endTime: place.endTime,
+  //           };
+  //         }
+  //       });
+  //     });
+  //     console.log('initialSelectedTime', initialSelectedTime);
+  //     setSelectedTime(initialSelectedTime);
+  //   };
 
-    if (days.length > 0) {
-      initializeSelectedTime();
-    }
-  }, [days]);
+  //   if (days.length > 0) {
+  //     initializeSelectedTime();
+  //   }
+  // }, [days]);
+
+  // const handlePlaceClick = (palceId) => {
+  //   if (expandedPlaceId === placeId) {
+  //     setExpanderPlace(null);
+  //   }else{
+  //     setExpanderPlace(placeId)
+  //   }
+  // };
+
   const onDragEnd = async (result: any) => {
     const { source, destination } = result;
     if (!destination) return;
     const sourceDayId = source.droppableId;
     const destinationDayId = destination.droppableId;
-    const soureDayIndex = days.findIndex((day) => day.date === sourceDayId);
+    const sourceDayIndex = days.findIndex((day) => day.date === sourceDayId);
     const destinationDayIndex = days.findIndex((day) => day.date == destinationDayId);
-    if (soureDayIndex === -1 || destinationDayIndex === -1) {
+    if (sourceDayIndex === -1 || destinationDayIndex === -1) {
       console.error('找不到對應的 day');
       return;
     }
     const newDays = [...days];
-    const sourceDay = { ...newDays[soureDayIndex] };
+    const sourceDay = { ...newDays[sourceDayIndex], places: newDays[sourceDayIndex].places || [] };
     if (sourceDayId === destinationDayId) {
       const [movePlace] = sourceDay.places.splice(source.index, 1);
       sourceDay.places.splice(destination.index, 0, movePlace);
-      newDays[soureDayIndex] = sourceDay;
+      newDays[sourceDayIndex] = sourceDay;
       onDaysUpdate([{ dayId: sourceDayId, places: sourceDay.places }]);
     } else {
-      const destinationDay = { ...newDays[destinationDayIndex] };
+      const destinationDay = { ...newDays[destinationDayIndex], places: newDays[destinationDayIndex].places || [] };
       const [movedPlace] = sourceDay.places.splice(source.index, 1);
-
       destinationDay.places.splice(destination.index, 0, movedPlace);
-      newDays[soureDayIndex] = sourceDay;
+      newDays[sourceDayIndex] = sourceDay;
       newDays[destinationDayIndex] = destinationDay;
       onDaysUpdate([
         { dayId: sourceDayId, places: sourceDay.places },
@@ -114,6 +121,29 @@ const List: React.FC<ListProps> = ({
       ]);
     }
   };
+
+  // const updateMutation = useMutation({
+  //   mutationFn: (updatedTime: { placeId: string; dayId: string; startTime: string; endTime: string }) => {
+  //     const { placeId, dayId, startTime, endTime } = updatedTime;
+  //     return updatePlaceStayTime(tripId, dayId, placeId, startTime, endTime);
+  //   },
+  //   onMutate: async (updatedTime) => {
+  //     setSelectedTime((prev) => ({
+  //       ...prev,
+  //       [updatedTime.placeId]: {
+  //         startTime: updatedTime.startTime,
+  //         endTime: updatedTime.endTime,
+  //       },
+  //     }));
+  //   },
+  //   onError: (error) => {
+  //     console.error('Error updating stay time:', error);
+  //   },
+  //   onSuccess: () => {
+  //     console.log('Updated stay time successfully');
+  //     setActivePlaceId(null);
+  //   },
+  // });
 
   const handleSaveTimePicker = async (
     placeId: string,
@@ -189,11 +219,9 @@ const List: React.FC<ListProps> = ({
                                   <TimeLabel>{`${selectedTime[place.id].startTime} - ${selectedTime[place.id].endTime}`}</TimeLabel>
                                 </TimeDisplayCard>
                               ) : (
-                                <div onClick={() => handleTimeCardClick(place.id)}>
-                                  <TimeDisplayCard>
-                                    <TimeLabel>Add Time</TimeLabel>
-                                  </TimeDisplayCard>
-                                </div>
+                                <TimeDisplayCard onClick={() => handleTimeCardClick(place.id)}>
+                                  <TimeLabel>Add Time</TimeLabel>
+                                </TimeDisplayCard>
                               )}
                               {activePlaceId === place.id && (
                                 <TimePicker

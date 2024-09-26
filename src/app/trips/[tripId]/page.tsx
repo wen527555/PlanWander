@@ -16,6 +16,7 @@ import {
   deletePlace,
   fetchTripData,
   getLastPlaceOfDay,
+  getPlaceForDay,
   updatePlaceRoute,
   updatePlacesForDay,
 } from '../../../lib/firebaseApi';
@@ -62,6 +63,8 @@ const TripPage: React.FC = () => {
     queryFn: () => fetchTripData(tripId as string),
     staleTime: 5000,
   });
+
+  console.log('tripData', tripData);
   //*要再研究是否有必要用到zustand
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
   const router = useRouter();
@@ -117,6 +120,7 @@ const TripPage: React.FC = () => {
             return { ...place, route: null };
           }
           const prevPlace = places[index - 1];
+          // const prevPlace =places[index+1];
           const transportMode = place.route?.transportMode || 'driving';
           const route = await getRoute(prevPlace, place, transportMode);
           return {
@@ -170,8 +174,17 @@ const TripPage: React.FC = () => {
   };
 
   const deletePlaceMutation = useMutation({
-    mutationFn: async ({ tripId, dayId, placeId }: { tripId: string; dayId: string; placeId: any }) => {
+    mutationFn: async ({ tripId, dayId, placeId }: { tripId: string; dayId: string; placeId: string }) => {
       await deletePlace(tripId, dayId, placeId);
+      const remainingPlaces: Place[] = await getPlaceForDay(tripId, dayId);
+      const placeIndex = remainingPlaces.findIndex((place: { id: string }) => place.id === placeId);
+      const prevPlace = placeIndex > 0 ? remainingPlaces[placeIndex - 1] : null;
+      const nextPlace = placeIndex < remainingPlaces.length ? remainingPlaces[placeIndex + 1] : null;
+      if (prevPlace && nextPlace) {
+        const newRoute = await getRoute(prevPlace, nextPlace, 'driving');
+        console.log('newRoute', newRoute);
+        await updatePlaceRoute(tripId, dayId, nextPlace.id, newRoute, 'driving');
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tripData', tripId as string] });

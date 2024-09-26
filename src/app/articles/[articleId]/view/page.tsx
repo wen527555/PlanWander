@@ -23,8 +23,6 @@ const ArticlesPage = () => {
     queryFn: () => fetchArticleData(articleId as string),
     enabled: !!articleId,
   });
-  // const pathname = usePathname();
-  // const isViewMode = pathname.includes('/view');
   const router = useRouter();
   const handleBackProfile = () => {
     router.push('/profile');

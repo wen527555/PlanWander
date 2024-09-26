@@ -295,7 +295,13 @@ export const updatePlaceRoute = async (
   }
 };
 
-export const deletePlace = async (tripId: string, dayId: string, placeId: any) => {
+export const deletePlace = async (
+  tripId: string,
+  dayId: string,
+  placeId: any
+  // newRoute: any,
+  // transportMode: string = 'driving'
+) => {
   const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
   const dayDoc = await getDoc(dayDocRef);
   if (!dayDoc.exists()) {
@@ -346,31 +352,19 @@ export const updatePlaceStayTime = async (
   }
 };
 
-// export const fetchUserAllTrips = async () => {
-//   return new Promise((resolve, reject) => {
-//     onAuthStateChanged(auth, async (user) => {
-//       if (user) {
-//         try {
-//           const userId = user.uid;
-//           const tripRef = collection(db, 'trips');
-//           const q = query(tripRef, where('uid', '==', userId));
-//           const querySnapshot = await getDocs(q);
-//           const userTrips = querySnapshot.docs.map((doc) => ({
-//             id: doc.id,
-//             ...doc.data(),
-//           }));
-//           resolve(userTrips);
-//         } catch (error) {
-//           console.error('Error fetching user trips:', error);
-//           reject([]);
-//         }
-//       } else {
-//         console.log('No user is logged in');
-//         resolve([]);
-//       }
-//     });
-//   });
-// };
+export const getPlaceForDay = async (tripId: string, dayId: string) => {
+  try {
+    const datDocRef = doc(db, 'trips', tripId, 'days', dayId);
+    const dayDoc = await getDoc(datDocRef);
+    if (!dayDoc.exists()) {
+      throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
+    }
+    const places = dayDoc.data()?.places || [];
+    return places;
+  } catch (error) {
+    console.error('Error getting places ', error);
+  }
+};
 
 export const fetchUserAllTrips = async () => {
   return new Promise((resolve, reject) => {

@@ -1,14 +1,21 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { AiOutlineDelete } from 'react-icons/ai';
 import { GoShare } from 'react-icons/go';
-import { SlOptionsVertical } from 'react-icons/sl';
+import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
-import { createArticleFromTrip, fetchUserAllArticles, fetchUserAllTrips } from '@/lib/firebaseApi';
+import {
+  createArticleFromTrip,
+  fetchDeleteArticle,
+  fetchDeleteTrip,
+  fetchUserAllArticles,
+  fetchUserAllTrips,
+} from '@/lib/firebaseApi';
 import { useUserStore } from '@/lib/store';
 import defaultProfileImg from '@/public/earth-profile.png';
 import Carousel from '../../components/Carousel';
@@ -16,7 +23,7 @@ import { auth } from '../../lib/firebaseConfig';
 import AddNewTripModal from './AddNewTripModal';
 
 interface Trip {
-  photo: string | undefined;
+  imageUrl: string | undefined;
   id: string;
   tripTitle: string;
   startDate: string;
@@ -34,15 +41,67 @@ interface Article {
 const ProfilePage = () => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
+  const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);
   const { photoURL, userName } = useUserStore();
   // console.log('photoURL', photoURL);
-
+  const queryClient = useQueryClient();
   const handleAddClick = () => {
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
+  };
+
+  const handleTripOptionClick = (tripId: string) => {
+    if (openMenuTripId === tripId) {
+      setOpenTripId(null);
+    } else {
+      setOpenTripId(tripId);
+    }
+  };
+
+  const handleArticleOptionClick = (ArticleId: string) => {
+    if (openMenuArticleId === ArticleId) {
+      setOpenArticleId(null);
+    } else {
+      setOpenArticleId(ArticleId);
+    }
+  };
+
+  const deleteTripMutation = useMutation({
+    mutationFn: fetchDeleteTrip,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userTrips'] });
+      alert('delete trip successfully!');
+    },
+    onError: (error) => {
+      console.error('Error deleting trip:', error);
+    },
+  });
+
+  const handleDeleteTripClick = (tripId: string) => {
+    if (window.confirm('Are you sure you want to delete this trip?')) {
+      deleteTripMutation.mutate(tripId);
+    }
+  };
+
+  const deleteArticleMutation = useMutation({
+    mutationFn: fetchDeleteArticle,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['userArticles'] });
+      alert('delete article successfully!');
+    },
+    onError: (error) => {
+      console.error('Error deleting trip:', error);
+    },
+  });
+
+  const handleDeleteArticleClick = (articleId: string) => {
+    if (window.confirm('Are you sure you want to delete this article?')) {
+      deleteArticleMutation.mutate(articleId);
+    }
   };
 
   useEffect(() => {
@@ -109,12 +168,19 @@ const ProfilePage = () => {
                           <PublishIcon />
                           Publish
                         </PublishWrapper>
-                        <OptionIcon />
+                        <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
+                        {openMenuTripId === trip.id && (
+                          <Menu>
+                            <MenuItem>
+                              <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
+                              Delete
+                            </MenuItem>
+                          </Menu>
+                        )}
                       </IconWrapper>
                     </CardHeader>
                     <CardContent onClick={() => handleTripClick(trip.id)}>
-                      {/* <TripImg /> */}
-                      <TripImg src={trip.photo} />
+                      <TripImg src={trip.imageUrl} />
                       <CardDetails>
                         <TripName>{trip.tripTitle}</TripName>
                         <TripDate>{trip.startDate}</TripDate>
@@ -134,14 +200,27 @@ const ProfilePage = () => {
               <Carousel<Article>
                 item={articles}
                 renderItem={(article) => (
-                  <ArticleWrapper onClick={() => handleArticleClick(article.id)}>
-                    <ArticleContent>
-                      <ArticleTitle>{article.title}</ArticleTitle>
-                      <ArticleDescription>{article.description}</ArticleDescription>
-                      <PublishedDate>Published on {article.createdAt}</PublishedDate>
-                    </ArticleContent>
-                    <ArticleImage src={article.coverImage} alt={article.title} />
-                  </ArticleWrapper>
+                  <CardWrapper>
+                    <CardHeader>
+                      <OptionIcon onClick={() => handleArticleOptionClick(article.id)} />
+                      {openMenuArticleId === article.id && (
+                        <Menu>
+                          <MenuItem>
+                            <DeleteIcon onClick={() => handleDeleteArticleClick(article.id)} />
+                            Delete
+                          </MenuItem>
+                        </Menu>
+                      )}
+                    </CardHeader>
+                    <ArticleWrapper onClick={() => handleArticleClick(article.id)}>
+                      <ArticleContent>
+                        <ArticleTitle>{article.title}</ArticleTitle>
+                        <ArticleDescription>{article.description}</ArticleDescription>
+                        <PublishedDate>Published on {article.createdAt}</PublishedDate>
+                      </ArticleContent>
+                      <ArticleImage src={article.coverImage} alt={article.title} />
+                    </ArticleWrapper>
+                  </CardWrapper>
                 )}
               />
             ) : (
@@ -282,10 +361,39 @@ const PublishIcon = styled(GoShare)`
   margin-right: 5px;
 `;
 
-const OptionIcon = styled(SlOptionsVertical)`
+const DeleteIcon = styled(AiOutlineDelete)`
+  cursor: pointer;
+  font-size: 18px;
+  margin-right: 5px;
+`;
+
+const Menu = styled.div`
+  position: absolute;
+  top: 40px;
+  right: 0;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+`;
+
+const MenuItem = styled.div`
+  padding: 10px 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 600;
+  &:hover {
+    background-color: #f0f0f0;
+  }
+`;
+
+const OptionIcon = styled(SlOptions)`
   cursor: pointer;
   font-size: 15px;
   margin-left: 10px;
+  position: relative;
 `;
 
 const TripContainer = styled.div`

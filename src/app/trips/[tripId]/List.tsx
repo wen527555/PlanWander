@@ -332,7 +332,6 @@ const TimeDisplayCard = styled.div`
   width: 100px;
   margin-top: 5px;
   cursor: pointer;
-  /* background-color: #e0e0ff; */
   background-color: #e7e7ef;
   color: #3f51b5;
   text-align: center;

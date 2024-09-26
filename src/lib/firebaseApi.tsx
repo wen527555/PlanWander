@@ -4,6 +4,7 @@ import {
   addDoc,
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -370,22 +371,22 @@ export const fetchUserAllTrips = async () => {
           const userTrips = await Promise.all(
             querySnapshot.docs.map(async (doc) => {
               const tripData = doc.data();
-              let photo = null;
-              const daysRef = collection(db, 'trips', doc.id, 'days');
-              const daysSnapshot = await getDocs(daysRef);
+              // let photo = null;
+              // const daysRef = collection(db, 'trips', doc.id, 'days');
+              // const daysSnapshot = await getDocs(daysRef);
 
-              if (!daysSnapshot.empty) {
-                const firstDayDoc = daysSnapshot.docs[0];
-                const firstDayData = firstDayDoc.data();
-                if (Array.isArray(firstDayData.places) && firstDayData.places.length > 0) {
-                  const firstPlace = firstDayData.places[0];
-                  photo = firstPlace.photo || null;
-                }
-              }
+              // if (!daysSnapshot.empty) {
+              //   const firstDayDoc = daysSnapshot.docs[0];
+              //   const firstDayData = firstDayDoc.data();
+              //   if (Array.isArray(firstDayData.places) && firstDayData.places.length > 0) {
+              //     const firstPlace = firstDayData.places[0];
+              //     photo = firstPlace.photo || null;
+              //   }
+              // }
 
               return {
                 id: doc.id,
-                photo: photo,
+                // photo: photo,
                 ...tripData,
               };
             })
@@ -579,4 +580,22 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
       userName: data.userName,
     };
   });
+};
+
+export const fetchDeleteTrip = async (tripId: string) => {
+  try {
+    const tripRef = doc(db, 'trips', tripId);
+    await deleteDoc(tripRef);
+  } catch (error) {
+    console.error('Error delete trips:', error);
+  }
+};
+
+export const fetchDeleteArticle = async (articleId: string) => {
+  try {
+    const articleRef = doc(db, 'articles', articleId);
+    await deleteDoc(articleRef);
+  } catch (error) {
+    console.error('Error delete articles:', error);
+  }
 };

@@ -1,10 +1,21 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
+import { addDays } from 'date-fns';
 import { useRouter } from 'next/navigation';
 import { forwardRef, useState } from 'react';
-import DatePicker from 'react-datepicker';
+import { RangeKeyDict } from 'react-date-range';
+// import DatePicker from 'react-datepicker';
 import { IoMdClose } from 'react-icons/io';
+import Select from 'react-select';
 import styled from 'styled-components';
+
+import DateRangePicker from '@/lib/DateRangePicker';
+
+import 'react-date-range/dist/styles.css';
+import 'react-date-range/dist/theme/default.css';
+
+import { fetchCountries } from '@/lib/mapApi';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
@@ -19,6 +30,16 @@ interface CustomInputProps {
   onClick?: () => void;
 }
 
+interface Country {
+  code: string;
+  name: string;
+}
+
+interface SelectedOption {
+  value: string;
+  label: string;
+}
+
 const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(({ value, onClick }, ref) => (
   <button className="date-input" onClick={onClick} ref={ref}>
     {value ? value : 'Select Date'}
@@ -28,23 +49,52 @@ const CustomInput = forwardRef<HTMLButtonElement, CustomInputProps>(({ value, on
 CustomInput.displayName = 'CustomInput';
 
 const AddNewTripModal: React.FC<AddTripModalProps> = ({ onClose }) => {
-  const [startDate, setStartDate] = useState<Date | undefined>(undefined);
-  const [endDate, setEndDate] = useState<Date | undefined>(undefined);
+  const [date, setDate] = useState([
+    {
+      startDate: new Date(),
+      endDate: addDays(new Date(), 7),
+      key: 'selection',
+    },
+  ]);
+
   const [tripTitle, setTripTitle] = useState<string>('');
+  const [selectedCountries, setSelectedCountries] = useState<SelectedOption[]>([]);
+  const [showCalendar, setShowCalendar] = useState(false);
   const router = useRouter();
   const handleCreateTrip = async () => {
+    const startDate = date[0].startDate;
+    const endDate = date[0].endDate;
     if (!startDate || !endDate || !tripTitle) {
       console.error('Missing required fields');
       return;
     }
     try {
-      const tripId = await createNewTrip(tripTitle, startDate, endDate);
+      const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
       console.log('Trip created successfully');
       onClose();
       router.push(`/trips/${tripId}`);
     } catch (err) {
       console.error('Error creating trip:', err);
     }
+  };
+
+  const { data: countryOptions } = useQuery<SelectedOption[]>({
+    queryKey: ['countries'],
+    queryFn: async () => {
+      const countries: Country[] = await fetchCountries();
+      return countries.map((country) => ({
+        value: country.code,
+        label: country.name,
+      }));
+    },
+  });
+  const handleChange = (selectedOptions: SelectedOption[]) => {
+    setSelectedCountries(selectedOptions);
+  };
+
+  const handleSelect = (ranges: RangeKeyDict) => {
+    setDate([ranges.selection]);
+    setShowCalendar(false);
   };
 
   return (
@@ -54,32 +104,28 @@ const AddNewTripModal: React.FC<AddTripModalProps> = ({ onClose }) => {
           <CloseBtn />
         </CloseBtnWrapper>
         <Content>
-          <Title>Trip name</Title>
-          <NameInput type="text" value={tripTitle} onChange={(e) => setTripTitle(e.target.value)} />
-          <StyledDatePickerWrapper>
-            <DatePicker
-              selected={startDate}
-              onChange={(date) => setStartDate(date ?? undefined)}
-              startDate={startDate}
-              endDate={endDate}
-              selectsStart
-              dateFormat="d MMMM yyyy"
-              customInput={<CustomInput />}
-              placeholderText="Start date"
-            />
-            <span className="separator">→</span>
-            <DatePicker
-              selected={endDate}
-              onChange={(date) => setEndDate(date ?? undefined)}
-              startDate={startDate}
-              endDate={endDate}
-              selectsEnd
-              minDate={startDate}
-              dateFormat="d MMMM yyyy"
-              customInput={<CustomInput />}
-              placeholderText="End date"
-            />
-          </StyledDatePickerWrapper>
+          <Title>Trip Name</Title>
+          <NameInput
+            type="text"
+            value={tripTitle}
+            onChange={(e) => setTripTitle(e.target.value)}
+            placeholder="Give you trip a name..."
+          />
+          <Title>Which countries are you going?</Title>
+          <StyledSelect
+            isMulti
+            value={selectedCountries}
+            onChange={(newValue) => handleChange(newValue as SelectedOption[])}
+            options={countryOptions}
+            classNamePrefix="select"
+            placeholder="Select countries..."
+          />
+          <DateRangePicker
+            date={date}
+            showCalendar={showCalendar}
+            setShowCalendar={setShowCalendar}
+            handleSelect={handleSelect}
+          />
           <CreateButtonWrapper>
             <CreateButton onClick={handleCreateTrip}>Start Planning</CreateButton>
           </CreateButtonWrapper>
@@ -106,16 +152,15 @@ const Overlay = styled.div`
 
 const Modal = styled.div`
   background-color: white;
-  padding: 10px;
+  padding: 64px 48px 48px 48px;
   border-radius: 25px;
-  width: 450px;
+  /* width: 450px; */
   position: relative;
   border: 1px solid rgba(0, 0, 0, 0.2);
-  height: 320px;
 `;
 
 const Content = styled.div`
-  padding: 30px 20px;
+  padding: 0;
 `;
 
 const CloseBtn = styled(IoMdClose)`
@@ -137,18 +182,23 @@ const CloseBtnWrapper = styled.button`
 `;
 
 const Title = styled.h2`
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 15px;
 `;
 
 const NameInput = styled.input`
-  width: 80%;
+  width: 100%;
   margin-bottom: 30px;
-  font-size: 24px;
+  font-size: 16px;
   border: 1px solid #ddd;
   border-radius: 8px;
   outline: none;
+  padding: 18px 24px;
+  &:hover {
+    border-color: #94c3d2;
+  }
 `;
 
 const CreateButtonWrapper = styled.div`
@@ -157,71 +207,57 @@ const CreateButtonWrapper = styled.div`
 `;
 
 const CreateButton = styled.button`
-  margin-top: 70px;
-  width: 150px;
+  margin-top: 40px;
+  width: auto;
   border-radius: 25px;
-  padding: 10px;
+  padding: 15px;
   border: none;
   text-align: center;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
+  cursor: pointer;
+  color: white;
+  background-color: #94c3d2;
 `;
 
-const StyledDatePickerWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  .date-input {
-    padding: 10px;
+const StyledSelect = styled(Select)`
+  .select__control {
     border: 1px solid #ddd;
-    background: #ffff;
     border-radius: 8px;
-    text-align: center;
-    font-size: 16px;
-    cursor: pointer;
-    min-width: 150px;
+    padding: 10px 20px;
+    box-shadow: none;
+    &:hover {
+      border-color: #94c3d2;
+    }
   }
 
-  .separator {
-    font-size: 24px;
+  .select__multi-value {
+    background-color: #e0f7fa;
   }
 
-  .description {
-    font-size: 12px;
-    color: #666;
-    margin-top: 8px;
+  .select__multi-value__label {
+    color: #333;
   }
 
-  .react-datepicker {
-    border: none;
+  .select__multi-value__remove {
+    color: #333;
+    &:hover {
+      background-color: #94c3d2;
+      color: white;
+    }
   }
 
-  .react-datepicker__header {
+  .select__option {
     background-color: white;
-    border-bottom: none;
-  }
-
-  .react-datepicker__day--selected,
-  .react-datepicker__day--in-range {
-    background-color: #b4b5b4;
-    color: white;
-    border-radius: 50%;
-  }
-
-  .react-datepicker__day--in-range {
-    background-color: #d2d2d2;
-    color: white;
-  }
-
-  .react-datepicker__day--in-range-start,
-  .react-datepicker__day--in-range-end {
-    background-color: #b4b5b4;
-    color: white;
-  }
-
-  .react-datepicker__day:hover {
-    background-color: #d2d2d2;
-    color: white;
+    color: #333;
+    padding: 10px;
+    &:hover {
+      background-color: #e0f7fa;
+      color: #333;
+    }
+    &.select__option--is-selected {
+      background-color: #e0f7fa;
+      color: #333;
+    }
   }
 `;

@@ -1,6 +1,12 @@
 import { Autocomplete, Libraries, LoadScript } from '@react-google-maps/api';
 import React, { useCallback, useState } from 'react';
 
+interface Country {
+  name: {
+    common: string;
+  };
+  cca3: string;
+}
 const libraries: Libraries = ['places'];
 export const LocationAutocomplete: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -61,4 +67,34 @@ const formatDuration = (duration: any) => {
   } else {
     return `${min}min`;
   }
+};
+
+export const fetchCountries = async (): Promise<{ name: string; code: string }[]> => {
+  try {
+    const response = await fetch('https://restcountries.com/v3.1/all');
+    if (!response.ok) {
+      throw new Error('Failed to fetch countries');
+    }
+    const data: Country[] = await response.json();
+    return data.map((country) => ({
+      name: country.name.common,
+      code: country.cca3,
+    }));
+  } catch (error) {
+    console.error('Error fetching countries', error);
+    return [];
+  }
+};
+
+export const fetchCountryImage = async (countryName: string): Promise<string | null> => {
+  const unsplashAccessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
+  const res = await fetch(
+    `https://api.unsplash.com/search/photos?query=${countryName}&client_id=${unsplashAccessKey}&per_page=1`
+  );
+  const data = await res.json();
+
+  if (data.results && data.results.length > 0) {
+    return data.results[0].urls.regular;
+  }
+  return null;
 };

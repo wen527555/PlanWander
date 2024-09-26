@@ -15,21 +15,9 @@ import {
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
-//移至另一個api檔
-// import { createApi } from 'unsplash-js';
-
+import { fetchCountryImage } from '@/lib/mapApi';
 import { db, storage } from '../lib/firebaseConfig';
 import { useUserStore } from './store';
-
-// const unsplashAccessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
-
-// if (!unsplashAccessKey) {
-//   throw new Error('Unsplash Access Key is missing. Please define it in your .env.local file');
-// }
-
-// const unsplash = createApi({
-//   accessKey: unsplashAccessKey,
-// });
 
 interface UserInfo {
   uid: string;
@@ -97,7 +85,12 @@ export const fetchUserData = async () => {
   }
 };
 
-export const createNewTrip = async (tripTitle: string, startDate: Date, endDate: Date): Promise<string> => {
+export const createNewTrip = async (
+  tripTitle: string,
+  startDate: Date,
+  endDate: Date,
+  selectedCountries: any[]
+): Promise<string> => {
   try {
     const user = auth.currentUser;
     const userId = user?.uid;
@@ -105,28 +98,26 @@ export const createNewTrip = async (tripTitle: string, startDate: Date, endDate:
       throw new Error('No authenticated user found');
     }
 
-    if (!startDate || !endDate || !tripTitle || !userId) {
+    if (!startDate || !endDate || !tripTitle || !userId || selectedCountries.length === 0) {
       throw new Error('Missing required trip data');
     }
+    const firstCountry = selectedCountries[0].label;
+    const countryImageUrl = await fetchCountryImage(firstCountry);
 
-    // const countryName = tripTitle.split(' ')[0];
-    // const response = await unsplash.search.getPhotos({
-    //   query: countryName,
-    //   perPage: 1,
-    // });
-    // console.log('countryName', countryName);
-    // console.log('response', response);
-    // const imageUrl = response?.response?.results?.[0]?.urls?.small || '';
-
-    // console.log('mageUrl', imageUrl);
+    const countries = selectedCountries.map((country) => ({
+      code: country.value,
+      name: country.label,
+    }));
+    console.log('mageUrl', countryImageUrl);
 
     const tripData = {
       tripTitle,
       startDate: dayjs(startDate).format('YYYY-MM-DD'),
       endDate: dayjs(endDate).format('YYYY-MM-DD'),
+      countries,
       createdAt: new Date(),
       uid: userId,
-      // imageUrl,
+      imageUrl: countryImageUrl || '',
     };
 
     const tripRef = await addDoc(collection(db, 'trips'), tripData);
@@ -150,7 +141,7 @@ export const createNewTrip = async (tripTitle: string, startDate: Date, endDate:
     }
 
     await batch.commit();
-    console.log('Trip created and days added to Firestore successfully');
+    console.log('Trip created and days added to FireStore successfully');
     return tripId;
   } catch (error) {
     console.error('Error creating trip: ', error);

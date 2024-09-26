@@ -64,7 +64,6 @@ const TripPage: React.FC = () => {
     staleTime: 5000,
   });
 
-  console.log('tripData', tripData);
   //*要再研究是否有必要用到zustand
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
   const router = useRouter();
@@ -198,7 +197,6 @@ const TripPage: React.FC = () => {
     deletePlaceMutation.mutate({ tripId, dayId, placeId });
   };
 
-  console.log('selectedPlace', selectedPlace);
   const handlePlaceClick = async (place: Place) => {
     setSelectedPlace(place);
   };

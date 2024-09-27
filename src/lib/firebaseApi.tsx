@@ -109,7 +109,7 @@ export const createNewTrip = async (
       code: country.value,
       name: country.label,
     }));
-    console.log('mageUrl', countryImageUrl);
+    console.log('imageUrl', countryImageUrl);
 
     const tripData = {
       tripTitle,

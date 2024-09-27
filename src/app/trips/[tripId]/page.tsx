@@ -23,6 +23,7 @@ import {
 import { getRoute } from '../../../lib/mapApi';
 // import useStore from '../../../lib/store';
 import List from './List';
+import Sidebar from './Sidebar';
 
 interface Place {
   id: string;
@@ -154,7 +155,6 @@ const TripPage: React.FC = () => {
     });
   };
 
-  //應該用zustand減少不必要的重複炫染
   const transportModeUpdateMutation = useMutation({
     mutationFn: async ({ dayId, place, newRoute, transportMode }: AddLocationParams) => {
       await updatePlaceRoute(tripId, dayId, place, newRoute, transportMode);
@@ -208,7 +208,7 @@ const TripPage: React.FC = () => {
   if (isLoading || !tripData) {
     return <div>Loading...</div>;
   }
-  // console.log('tripData', tripData);
+  console.log('tripData.days', tripData);
   const { places, route } = processDays(tripData.days as any);
 
   return (
@@ -218,6 +218,7 @@ const TripPage: React.FC = () => {
           <HomeIcon onClick={handleBackProfile} />
           <TripName>{tripData.tripTitle}</TripName>
         </ListHeader>
+        <Sidebar />
         <List
           days={tripData.days as any}
           onPlaceAdded={handleAddPlace}
@@ -286,9 +287,16 @@ const Container = styled.div`
 `;
 
 const ListHeader = styled.div`
-  margin: 10px 20px;
   display: flex;
   align-items: center;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid #e9ecef;
+  height: 54px;
+  width: 100%;
+  background-color: white;
+  padding: 5px 80px;
 `;
 
 const HomeIcon = styled(IoArrowBackCircleOutline)`

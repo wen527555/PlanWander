@@ -92,7 +92,7 @@ const Arrow = styled.div`
 
 const CalendarPopup = styled.div`
   position: absolute;
-  top: 80px;
+  bottom: 60px;
   left: 0;
   z-index: 999;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);

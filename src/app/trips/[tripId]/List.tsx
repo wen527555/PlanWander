@@ -253,7 +253,7 @@ const List: React.FC<ListProps> = ({
 export default List;
 
 const ItemContainer = styled.div`
-  margin: 10px 20px;
+  margin: 64px 20px 10px 80px;
   /* border-bottom: 1px solid #ccc; */
   padding-bottom: 10px;
 `;

@@ -9,8 +9,10 @@ import { GoShare } from 'react-icons/go';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
+import TripModal from '@/components/TripModal';
 import {
   createArticleFromTrip,
+  createNewTrip,
   fetchDeleteArticle,
   fetchDeleteTrip,
   fetchUserAllArticles,
@@ -20,7 +22,6 @@ import { useUserStore } from '@/lib/store';
 import defaultProfileImg from '@/public/earth-profile.png';
 import Carousel from '../../components/Carousel';
 import { auth } from '../../lib/firebaseConfig';
-import AddNewTripModal from './AddNewTripModal';
 
 interface Trip {
   imageUrl: string | undefined;
@@ -36,6 +37,11 @@ interface Article {
   description: string;
   createdAt: string;
   coverImage: string;
+}
+
+interface SelectedOption {
+  value: string;
+  label: string;
 }
 
 const ProfilePage = () => {
@@ -140,6 +146,17 @@ const ProfilePage = () => {
     }
   };
 
+  const handleCreateTrip = async (
+    tripTitle: string,
+    startDate: Date,
+    endDate: Date,
+    selectedCountries: SelectedOption[]
+  ) => {
+    const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
+    console.log('Trip created successfully');
+    router.push(`/trips/${tripId}`);
+  };
+
   if (loadingTrips) {
     return <p>Loading</p>;
   }
@@ -228,8 +245,8 @@ const ProfilePage = () => {
             )}
           </ArticleContainer>
         </MainContent>
+        {isModalOpen && <TripModal onClose={handleModalClose} isEditing={false} onSubmit={handleCreateTrip} />}
       </Container>
-      {isModalOpen && <AddNewTripModal onClose={handleModalClose}></AddNewTripModal>}
     </>
   );
 };

@@ -22,7 +22,7 @@ const SidebarWrapper = styled.div`
   position: fixed;
   background-color: #fff;
   border-right: 1px solid #dee2e6;
-  z-index: 50;
+  /* z-index: 50; */
 `;
 
 const SidebarItem = styled.div``;

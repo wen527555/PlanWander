@@ -42,8 +42,13 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
       key: 'selection',
     },
   ]);
-  const [tripTitle, setTripTitle] = useState<string>('');
-  const [selectedCountries, setSelectedCountries] = useState<SelectedOption[]>([]);
+  const [tripTitle, setTripTitle] = useState<string>(initialData?.tripTitle || '');
+  const [selectedCountries, setSelectedCountries] = useState<SelectedOption[]>(
+    initialData?.countries?.map((country: any) => ({
+      value: country.code || country.value,
+      label: country.name || country.label,
+    })) || []
+  );
   const [showCalendar, setShowCalendar] = useState(false);
 
   const { data: countryOptions } = useQuery<SelectedOption[]>({

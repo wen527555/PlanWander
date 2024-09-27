@@ -6,6 +6,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  DocumentReference,
   getDoc,
   getDocs,
   query,
@@ -40,6 +41,29 @@ interface Article {
     nanoseconds: number;
   };
   coverImage?: string;
+}
+
+interface SelectedOption {
+  value: string;
+  label: string;
+}
+
+interface TripData {
+  tripTitle: string;
+  startDate: string;
+  endDate: string;
+  countries: SelectedOption[];
+  imageUrl: string;
+  days: Day[];
+}
+
+interface UpdateTripParams {
+  tripId: string;
+  tripTitle: string;
+  startDate: Date;
+  endDate: Date;
+  selectedCountries: SelectedOption[];
+  originalTripData?: TripData;
 }
 
 const auth = getAuth();
@@ -109,13 +133,12 @@ export const createNewTrip = async (
       code: country.value,
       name: country.label,
     }));
-    console.log('imageUrl', countryImageUrl);
 
     const tripData = {
       tripTitle,
       startDate: dayjs(startDate).format('YYYY-MM-DD'),
       endDate: dayjs(endDate).format('YYYY-MM-DD'),
-      countries,
+      countries: countries,
       createdAt: new Date(),
       uid: userId,
       imageUrl: countryImageUrl || '',
@@ -159,13 +182,15 @@ export const fetchTripData = async (tripId: string) => {
       throw new Error('No such trip found');
     }
     const tripData = tripSnapshot.data();
-    const tripTitle = tripData?.tripTitle || '';
     const daysCollection = collection(db, `trips/${tripId}/days`);
     const daysSnapshot = await getDocs(daysCollection);
     const daysData = daysSnapshot.docs.map((doc) => doc.data() as Day);
-
     return {
-      tripTitle,
+      tripTitle: tripData?.tripTitle,
+      startDate: tripData?.startDate,
+      countries: tripData?.countries,
+      endDate: tripData?.endDate,
+      imageUrl: tripData?.imageUrl,
       days: daysData,
     };
   } catch (error) {
@@ -371,22 +396,8 @@ export const fetchUserAllTrips = async () => {
           const userTrips = await Promise.all(
             querySnapshot.docs.map(async (doc) => {
               const tripData = doc.data();
-              // let photo = null;
-              // const daysRef = collection(db, 'trips', doc.id, 'days');
-              // const daysSnapshot = await getDocs(daysRef);
-
-              // if (!daysSnapshot.empty) {
-              //   const firstDayDoc = daysSnapshot.docs[0];
-              //   const firstDayData = firstDayDoc.data();
-              //   if (Array.isArray(firstDayData.places) && firstDayData.places.length > 0) {
-              //     const firstPlace = firstDayData.places[0];
-              //     photo = firstPlace.photo || null;
-              //   }
-              // }
-
               return {
                 id: doc.id,
-                // photo: photo,
                 ...tripData,
               };
             })
@@ -597,5 +608,110 @@ export const fetchDeleteArticle = async (articleId: string) => {
     await deleteDoc(articleRef);
   } catch (error) {
     console.error('Error delete articles:', error);
+  }
+};
+
+export const fetchUpdateTrip = async (updateData: UpdateTripParams): Promise<void> => {
+  const { tripId, tripTitle, startDate, endDate, selectedCountries, originalTripData } = updateData;
+
+  const updatedTripData: {
+    tripTitle: string;
+    startDate: string;
+    endDate: string;
+    countries: { code: string; name: string }[];
+    updatedAt: Date;
+    imageUrl?: string;
+  } = {
+    tripTitle,
+    startDate: dayjs(startDate).format('YYYY-MM-DD'),
+    endDate: dayjs(endDate).format('YYYY-MM-DD'),
+    countries: selectedCountries.map((country) => ({
+      code: country.value,
+      name: country.label,
+    })),
+    updatedAt: new Date(),
+  };
+
+  if (selectedCountries[0]?.label !== originalTripData?.countries[0]?.label && originalTripData) {
+    const firstCountry = selectedCountries[0].label;
+    const countryImageUrl = await fetchCountryImage(firstCountry);
+    if (countryImageUrl) {
+      updatedTripData.imageUrl = countryImageUrl;
+    }
+  }
+
+  const tripRef = doc(db, 'trips', tripId);
+  await updateDoc(tripRef, updatedTripData);
+  await handleDateRangeChange(tripRef, startDate, endDate, originalTripData);
+  console.log('Trip updated successfully with date changes and imageUrl in Firebase');
+};
+
+//改成更好的寫法
+const handleDateRangeChange = async (
+  tripRef: DocumentReference,
+  startDate: Date,
+  endDate: Date,
+  originalTripData: TripData | undefined
+) => {
+  if (!originalTripData) {
+    console.error('Original trip data is missing');
+    return;
+  }
+  const originalStartDate = dayjs(originalTripData.startDate);
+  const originalEndDate = dayjs(originalTripData.endDate);
+  const newStartDate = dayjs(startDate);
+  const newEndDate = dayjs(endDate);
+  const batch = writeBatch(db);
+
+  const originalDaysCount = originalEndDate.diff(originalStartDate, 'day') + 1;
+  const newDaysCount = newEndDate.diff(newStartDate, 'day') + 1;
+
+  if (newDaysCount < originalDaysCount) {
+    const confirmDelete = confirm(
+      `你選擇的天數少於原本的天數 (${originalDaysCount} 天)，將會刪除多餘的天數。是否繼續？`
+    );
+
+    if (!confirmDelete) {
+      console.log('用戶取消了日期範圍的變更');
+      return;
+    }
+
+    let currentDate = newEndDate.add(1, 'day');
+    while (currentDate.isBefore(originalEndDate) || currentDate.isSame(originalEndDate)) {
+      const formattedDate = currentDate.format('YYYY-MM-DD');
+      const dayRef = doc(collection(tripRef, 'days'), formattedDate);
+      batch.delete(dayRef);
+      currentDate = currentDate.add(1, 'day');
+    }
+    await batch.commit();
+  }
+
+  if (newDaysCount > originalDaysCount) {
+    let currentDate = originalEndDate.add(1, 'day');
+    while (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate)) {
+      const formattedDate = currentDate.format('YYYY-MM-DD');
+      const dayData = { date: formattedDate };
+      const dayRef = doc(collection(tripRef, 'days'), formattedDate);
+      batch.set(dayRef, dayData);
+      currentDate = currentDate.add(1, 'day');
+    }
+    await batch.commit();
+  }
+
+  if (newDaysCount === originalDaysCount) {
+    let currentDate = newStartDate;
+    let originalCurrentDate = originalStartDate;
+    while (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate)) {
+      const formattedDate = currentDate.format('YYYY-MM-DD');
+      const originalFormattedDate = originalCurrentDate.format('YYYY-MM-DD');
+      const dayRef = doc(collection(tripRef, 'days'), originalFormattedDate);
+      const updatedDayData = {
+        date: formattedDate,
+      };
+      batch.update(dayRef, updatedDayData);
+      currentDate = currentDate.add(1, 'day');
+      originalCurrentDate = originalCurrentDate.add(1, 'day');
+    }
+    await batch.commit();
   }
 };

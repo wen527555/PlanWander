@@ -1,6 +1,7 @@
 'use client';
 
 // import { useMutation } from '@tanstack/react-query';
+import { Libraries, LoadScript } from '@react-google-maps/api';
 import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaMapMarker } from 'react-icons/fa';
@@ -14,6 +15,7 @@ import LocationSearch from './LocationSearch';
 import TimePicker from './TimePicker';
 import TransportModeSelector from './TransportSelector';
 
+const libraries: Libraries = ['places'];
 interface Place {
   id: string;
   name: string;
@@ -173,80 +175,82 @@ const List: React.FC<ListProps> = ({
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      {days.map((day, dateIndex) => (
-        <Droppable droppableId={`${day.date}`} key={`${day.date}-${dateIndex}`}>
-          {(provided) => (
-            <ItemContainer ref={provided.innerRef} {...provided.droppableProps}>
-              <ItemHeader>
-                <ItemDate>
-                  {new Date(day.date).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    month: 'long',
-                    day: 'numeric',
-                  })}
-                </ItemDate>
-              </ItemHeader>
-              <ItemContent>
-                {day.places?.map((place, index) => (
-                  <Draggable key={`${place.id}-${index}`} draggableId={`${place.id}-${index}`} index={index}>
-                    {(provided) => (
-                      <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
-                        {index > 0 && day.places[index]?.route && (
-                          <RouteInfo>
-                            <TransportModeSelector
-                              onModeUpdate={onModeUpdate}
-                              start={{ lat: day.places[index - 1].lat, lng: day.places[index - 1].lng }}
-                              end={{ lat: place.lat, lng: place.lng }}
-                              dayId={day.date}
-                              placeId={place.id}
-                              route={day.places[index].route}
-                            />
-                          </RouteInfo>
-                        )}
-                        <PlaceContainer>
-                          <MarkerContainer>
-                            <MarkerIcon color={getColorForDate(dateIndex)} />
-                            <MarkerNumber>{index + 1}</MarkerNumber>
-                          </MarkerContainer>
-                          <BlockWrapper>
-                            <PlaceBlock onClick={() => onPlaceClick(place)}>
-                              <PlaceName>{place.name}</PlaceName>
-                            </PlaceBlock>
-                            <PlaceBlock>
-                              {selectedTime[place.id] ? (
-                                <TimeDisplayCard onClick={() => handleTimeCardClick(place.id)}>
-                                  <TimeLabel>{`${selectedTime[place.id].startTime} - ${selectedTime[place.id].endTime}`}</TimeLabel>
-                                </TimeDisplayCard>
-                              ) : (
-                                <TimeDisplayCard onClick={() => handleTimeCardClick(place.id)}>
-                                  <TimeLabel>Add Time</TimeLabel>
-                                </TimeDisplayCard>
-                              )}
-                              {activePlaceId === place.id && (
-                                <TimePicker
-                                  place={place}
-                                  dayId={day.date}
-                                  onSave={handleSaveTimePicker}
-                                  onClear={handleCloseTimePicker}
-                                />
-                              )}
-                            </PlaceBlock>
-                          </BlockWrapper>
-                          <DeleteIcon onClick={() => onPlaceDelete(day.date, place.id)} />
-                        </PlaceContainer>
-                      </div>
-                    )}
-                  </Draggable>
-                ))}
-                {provided.placeholder}
-              </ItemContent>
-              <LocationSearch onPlaceAdded={onPlaceAdded} dayId={day.date} />
-            </ItemContainer>
-          )}
-        </Droppable>
-      ))}
-    </DragDropContext>
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
+      <DragDropContext onDragEnd={onDragEnd}>
+        {days.map((day, dateIndex) => (
+          <Droppable droppableId={`${day.date}`} key={`${day.date}-${dateIndex}`}>
+            {(provided) => (
+              <ItemContainer ref={provided.innerRef} {...provided.droppableProps}>
+                <ItemHeader>
+                  <ItemDate>
+                    {new Date(day.date).toLocaleDateString('en-US', {
+                      weekday: 'long',
+                      month: 'long',
+                      day: 'numeric',
+                    })}
+                  </ItemDate>
+                </ItemHeader>
+                <ItemContent>
+                  {day.places?.map((place, index) => (
+                    <Draggable key={`${place.id}-${index}`} draggableId={`${place.id}-${index}`} index={index}>
+                      {(provided) => (
+                        <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                          {index > 0 && day.places[index]?.route && (
+                            <RouteInfo>
+                              <TransportModeSelector
+                                onModeUpdate={onModeUpdate}
+                                start={{ lat: day.places[index - 1].lat, lng: day.places[index - 1].lng }}
+                                end={{ lat: place.lat, lng: place.lng }}
+                                dayId={day.date}
+                                placeId={place.id}
+                                route={day.places[index].route}
+                              />
+                            </RouteInfo>
+                          )}
+                          <PlaceContainer>
+                            <MarkerContainer>
+                              <MarkerIcon color={getColorForDate(dateIndex)} />
+                              <MarkerNumber>{index + 1}</MarkerNumber>
+                            </MarkerContainer>
+                            <BlockWrapper>
+                              <PlaceBlock onClick={() => onPlaceClick(place)}>
+                                <PlaceName>{place.name}</PlaceName>
+                              </PlaceBlock>
+                              <PlaceBlock>
+                                {selectedTime[place.id] ? (
+                                  <TimeDisplayCard onClick={() => handleTimeCardClick(place.id)}>
+                                    <TimeLabel>{`${selectedTime[place.id].startTime} - ${selectedTime[place.id].endTime}`}</TimeLabel>
+                                  </TimeDisplayCard>
+                                ) : (
+                                  <TimeDisplayCard onClick={() => handleTimeCardClick(place.id)}>
+                                    <TimeLabel>Add Time</TimeLabel>
+                                  </TimeDisplayCard>
+                                )}
+                                {activePlaceId === place.id && (
+                                  <TimePicker
+                                    place={place}
+                                    dayId={day.date}
+                                    onSave={handleSaveTimePicker}
+                                    onClear={handleCloseTimePicker}
+                                  />
+                                )}
+                              </PlaceBlock>
+                            </BlockWrapper>
+                            <DeleteIcon onClick={() => onPlaceDelete(day.date, place.id)} />
+                          </PlaceContainer>
+                        </div>
+                      )}
+                    </Draggable>
+                  ))}
+                  {provided.placeholder}
+                </ItemContent>
+                <LocationSearch onPlaceAdded={onPlaceAdded} dayId={day.date} />
+              </ItemContainer>
+            )}
+          </Droppable>
+        ))}
+      </DragDropContext>
+    </LoadScript>
   );
 };
 

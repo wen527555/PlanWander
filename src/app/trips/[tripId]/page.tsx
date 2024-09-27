@@ -1,20 +1,24 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
-import { FaClock, FaMapPin } from 'react-icons/fa6';
+import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
+// import { PiPencilLine } from 'react-icons/pi';
 import styled from 'styled-components';
 
+import TripModal from '@/components/TripModal';
 import { processDays } from '@/lib/processDays';
 import { usePlaceStore } from '@/lib/store';
 import {
   addPlaceToDay,
   deletePlace,
   fetchTripData,
+  fetchUpdateTrip,
   getLastPlaceOfDay,
   getPlaceForDay,
   updatePlaceRoute,
@@ -49,6 +53,32 @@ interface Route {
   duration: string;
 }
 
+interface SelectedOption {
+  value: string;
+  label: string;
+}
+interface Day {
+  date: string;
+}
+
+interface TripData {
+  tripTitle: string;
+  startDate: string;
+  endDate: string;
+  countries: SelectedOption[];
+  imageUrl: string;
+  days: Day[];
+}
+
+interface UpdateTripParams {
+  tripId: string;
+  tripTitle: string;
+  startDate: Date;
+  endDate: Date;
+  selectedCountries: SelectedOption[];
+  originalTripData?: TripData;
+}
+
 type TransportMode = 'driving' | 'walking' | 'cycling';
 
 const MapComponent = dynamic(() => import('@/components/Map'), {
@@ -59,11 +89,62 @@ const TripPage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const queryClient = useQueryClient();
   const modalRef = useRef<HTMLDivElement | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
     staleTime: 5000,
   });
+
+  const formattedStartDate = dayjs(tripData?.startDate).format('M/D');
+  const formattedEndDate = dayjs(tripData?.endDate).format('M/D');
+
+  const updateTripMutation = useMutation({
+    mutationFn: fetchUpdateTrip,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tripData', tripId as string] });
+      console.log('Trip updated successfully');
+    },
+    onError: (error: any) => {
+      console.error('Error updating trip:', error);
+    },
+  });
+
+  const handleUpdateTrip = async (
+    tripTitle: string,
+    startDate: Date,
+    endDate: Date,
+    selectedCountries: SelectedOption[]
+  ) => {
+    const isTitleChanged = tripTitle !== tripData?.tripTitle;
+    const isStartDateChanged = dayjs(startDate).format('YYYY-MM-DD') !== tripData?.startDate;
+    const isEndDateChanged = dayjs(endDate).format('YYYY-MM-DD') !== tripData?.endDate;
+    const isCountriesChanged = JSON.stringify(selectedCountries) !== JSON.stringify(tripData?.countries);
+
+    if (isTitleChanged || isStartDateChanged || isEndDateChanged || isCountriesChanged) {
+      const updateData: UpdateTripParams = {
+        tripId,
+        tripTitle,
+        startDate,
+        endDate,
+        selectedCountries,
+        originalTripData: tripData, // 如果 tripData 存在就傳遞
+      };
+
+      updateTripMutation.mutate(updateData);
+    } else {
+      console.log('No changes detected, no update required');
+    }
+  };
+
+  const handleUpdateClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setIsModalOpen(false);
+  };
 
   //*要再研究是否有必要用到zustand
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
@@ -208,7 +289,6 @@ const TripPage: React.FC = () => {
   if (isLoading || !tripData) {
     return <div>Loading...</div>;
   }
-  console.log('tripData.days', tripData);
   const { places, route } = processDays(tripData.days as any);
 
   return (
@@ -217,6 +297,10 @@ const TripPage: React.FC = () => {
         <ListHeader>
           <HomeIcon onClick={handleBackProfile} />
           <TripName>{tripData.tripTitle}</TripName>
+          <TripDate onClick={handleUpdateClick}>
+            <CalendarIcon />
+            {formattedStartDate}-{formattedEndDate}
+          </TripDate>
         </ListHeader>
         <Sidebar />
         <List
@@ -276,6 +360,14 @@ const TripPage: React.FC = () => {
           </PlaceInfoModal>
         )}
       </MapContainer>
+      {isModalOpen && (
+        <TripModal
+          onClose={handleModalClose}
+          isEditing={true}
+          initialData={tripData}
+          onSubmit={handleUpdateTrip}
+        ></TripModal>
+      )}
     </Container>
   );
 };
@@ -296,7 +388,7 @@ const ListHeader = styled.div`
   height: 54px;
   width: 100%;
   background-color: white;
-  padding: 5px 80px;
+  padding: 5px 10px;
 `;
 
 const HomeIcon = styled(IoArrowBackCircleOutline)`
@@ -309,6 +401,29 @@ const TripName = styled.h1`
   font-size: 20px;
   font-weight: 700;
 `;
+
+const TripDate = styled.div`
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #6c757d;
+  margin-left: 8px;
+  cursor: pointer;
+`;
+
+const CalendarIcon = styled(FaRegCalendarDays)`
+  font-size: 14px;
+  margin-right: 8px;
+  color: #6c757d;
+`;
+
+// const EditIcon = styled(PiPencilLine)`
+//   font-size: 14px;
+//   color: #b0b0b0;
+//   transition:
+//     color 0.3s ease,
+//     transform 0.3s ease;
+// `;
 
 const ListContainer = styled.div`
   width: 45%;

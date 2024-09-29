@@ -112,7 +112,6 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
                 justifyContent: 'center',
                 alignItems: 'center',
                 backgroundColor: `${place.color}`,
-                //   backgroundColor: visiblePlace === place.id ? '#ff0000' : `${place.color}`, // 放大時變為紅色
                 width: visiblePlace === place.id ? '50px' : '32px',
                 height: visiblePlace === place.id ? '50px' : '32px',
                 borderRadius: '50%',

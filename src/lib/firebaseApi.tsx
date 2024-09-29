@@ -657,61 +657,63 @@ const handleDateRangeChange = async (
     console.error('Original trip data is missing');
     return;
   }
+
   const originalStartDate = dayjs(originalTripData.startDate);
   const originalEndDate = dayjs(originalTripData.endDate);
   const newStartDate = dayjs(startDate);
   const newEndDate = dayjs(endDate);
-  const batch = writeBatch(db);
 
-  const originalDaysCount = originalEndDate.diff(originalStartDate, 'day') + 1;
-  const newDaysCount = newEndDate.diff(newStartDate, 'day') + 1;
+  let batch = writeBatch(db);
+  const daysData = [];
 
-  if (newDaysCount < originalDaysCount) {
-    const confirmDelete = confirm(
-      `你選擇的天數少於原本的天數 (${originalDaysCount} 天)，將會刪除多餘的天數。是否繼續？`
-    );
+  let originalCurrentDate = originalStartDate;
+  while (originalCurrentDate.isBefore(originalEndDate) || originalCurrentDate.isSame(originalEndDate)) {
+    const originalFormattedDate = originalCurrentDate.format('YYYY-MM-DD');
+    const originalDayRef = doc(collection(tripRef, 'days'), originalFormattedDate);
 
-    if (!confirmDelete) {
-      console.log('用戶取消了日期範圍的變更');
-      return;
+    const originalDayDoc = await getDoc(originalDayRef);
+    if (originalDayDoc.exists()) {
+      daysData.push({
+        data: originalDayDoc.data(),
+        originalFormattedDate,
+      });
+      batch.delete(originalDayRef);
     }
 
-    let currentDate = newEndDate.add(1, 'day');
-    while (currentDate.isBefore(originalEndDate) || currentDate.isSame(originalEndDate)) {
-      const formattedDate = currentDate.format('YYYY-MM-DD');
-      const dayRef = doc(collection(tripRef, 'days'), formattedDate);
-      batch.delete(dayRef);
-      currentDate = currentDate.add(1, 'day');
-    }
-    await batch.commit();
+    originalCurrentDate = originalCurrentDate.add(1, 'day');
   }
 
-  if (newDaysCount > originalDaysCount) {
-    let currentDate = originalEndDate.add(1, 'day');
-    while (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate)) {
-      const formattedDate = currentDate.format('YYYY-MM-DD');
-      const dayData = { date: formattedDate };
-      const dayRef = doc(collection(tripRef, 'days'), formattedDate);
-      batch.set(dayRef, dayData);
-      currentDate = currentDate.add(1, 'day');
-    }
-    await batch.commit();
+  await batch.commit();
+
+  batch = writeBatch(db);
+
+  let currentDate = newStartDate;
+  let index = 0;
+
+  while (index < daysData.length && (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate))) {
+    const formattedDate = currentDate.format('YYYY-MM-DD');
+    const newDayRef = doc(collection(tripRef, 'days'), formattedDate);
+
+    const originalData = daysData[index] ? daysData[index].data : {};
+    batch.set(newDayRef, {
+      ...originalData,
+      date: formattedDate,
+    });
+
+    currentDate = currentDate.add(1, 'day');
+    index++;
   }
 
-  if (newDaysCount === originalDaysCount) {
-    let currentDate = newStartDate;
-    let originalCurrentDate = originalStartDate;
-    while (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate)) {
-      const formattedDate = currentDate.format('YYYY-MM-DD');
-      const originalFormattedDate = originalCurrentDate.format('YYYY-MM-DD');
-      const dayRef = doc(collection(tripRef, 'days'), originalFormattedDate);
-      const updatedDayData = {
-        date: formattedDate,
-      };
-      batch.update(dayRef, updatedDayData);
-      currentDate = currentDate.add(1, 'day');
-      originalCurrentDate = originalCurrentDate.add(1, 'day');
-    }
-    await batch.commit();
+  while (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate)) {
+    const formattedDate = currentDate.format('YYYY-MM-DD');
+    const newDayRef = doc(collection(tripRef, 'days'), formattedDate);
+
+    batch.set(newDayRef, {
+      date: formattedDate,
+    });
+
+    currentDate = currentDate.add(1, 'day');
   }
+
+  await batch.commit();
 };

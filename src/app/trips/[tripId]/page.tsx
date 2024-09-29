@@ -27,7 +27,8 @@ import {
 import { getRoute } from '../../../lib/mapApi';
 // import useStore from '../../../lib/store';
 import List from './List';
-import Sidebar from './Sidebar';
+
+// import Sidebar from './Sidebar';
 
 interface Place {
   id: string;
@@ -90,7 +91,7 @@ const TripPage: React.FC = () => {
   const queryClient = useQueryClient();
   const modalRef = useRef<HTMLDivElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  // const [activeDate, setActiveDate] = useState(null);
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
@@ -99,6 +100,10 @@ const TripPage: React.FC = () => {
 
   const formattedStartDate = dayjs(tripData?.startDate).format('M/D');
   const formattedEndDate = dayjs(tripData?.endDate).format('M/D');
+
+  // const handleDateClick = (date) => {
+  //   setActiveDate(date);
+  // };
 
   const updateTripMutation = useMutation({
     mutationFn: fetchUpdateTrip,
@@ -302,9 +307,10 @@ const TripPage: React.FC = () => {
             {formattedStartDate}-{formattedEndDate}
           </TripDate>
         </ListHeader>
-        <Sidebar />
+        {/* <Sidebar days={tripData.days as any} activeDate={activeDate} onDateClick={handleDateClick} /> */}
         <List
           days={tripData.days as any}
+          // activeDate={activeDate}
           onPlaceAdded={handleAddPlace}
           onDaysUpdate={handleDaysUpdate}
           onModeUpdate={handleModeChange}

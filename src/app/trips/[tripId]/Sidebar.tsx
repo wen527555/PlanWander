@@ -1,10 +1,17 @@
 import styled from 'styled-components';
 
-const Sidebar = () => {
+const Sidebar = ({ days, activeDate, onDateClick }) => {
   return (
     <SidebarContainer>
       <SidebarWrapper>
-        <SidebarItem></SidebarItem>
+        {days.map((day, index) => (
+          <DateButton key={index} isActive={activeDate === day.date} onClick={() => onDateClick(day.date)}>
+            {new Date(day.date).toLocaleDateString('en-US', {
+              month: 'short',
+              day: 'numeric',
+            })}
+          </DateButton>
+        ))}
       </SidebarWrapper>
     </SidebarContainer>
   );
@@ -23,6 +30,30 @@ const SidebarWrapper = styled.div`
   background-color: #fff;
   border-right: 1px solid #dee2e6;
   /* z-index: 50; */
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
-const SidebarItem = styled.div``;
+const DateButton = styled.button`
+  background-color: ${(props) => (props.isActive ? '#aacaed' : 'transparent')};
+  color: ${(props) => (props.isActive ? '#fff' : '#000')};
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 15px;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+
+  &:hover {
+    background-color: #aacaed;
+    color: white;
+  }
+
+  &:focus {
+    outline: none;
+  }
+`;

@@ -52,9 +52,9 @@ const ProfilePage = () => {
   const { photoURL, userName } = useUserStore();
   // console.log('photoURL', photoURL);
   const queryClient = useQueryClient();
-  const handleAddClick = () => {
-    setIsModalOpen(true);
-  };
+  // const handleAddClick = () => {
+  //   setIsModalOpen(true);
+  // };
 
   const handleModalClose = () => {
     setIsModalOpen(false);
@@ -157,6 +157,16 @@ const ProfilePage = () => {
     router.push(`/trips/${tripId}`);
   };
 
+  // const handleLogout = async () => {
+  //   try {
+  //     await auth.signOut();
+  //     setUser(null);
+  //     router.push('/');
+  //   } catch (error) {
+  //     console.error('Error during logout: ', error);
+  //   }
+  // };
+
   if (loadingTrips) {
     return <p>Loading</p>;
   }
@@ -165,81 +175,89 @@ const ProfilePage = () => {
     <>
       <Container>
         <Sidebar>
-          <ProfileImg src={photoURL || defaultProfileImg.src} />
+          <ImgWrapper>
+            <ProfileImg src={photoURL || defaultProfileImg.src} />
+          </ImgWrapper>
           {userName && <UserName>{userName}</UserName>}
+          {/* <Button onClick={handleLogout}>Logout</Button> */}
         </Sidebar>
         <MainContent>
-          <ButtonWrapper>
+          {/* <ButtonWrapper>
             <Button onClick={handleAddClick}>Add</Button>
-          </ButtonWrapper>
+          </ButtonWrapper> */}
           <TripContainer>
-            <Title>Trips</Title>
             {trips?.length > 0 ? (
-              <Carousel<Trip>
-                item={trips}
-                renderItem={(trip) => (
-                  <CardWrapper>
-                    <CardHeader>
-                      <IconWrapper>
-                        <PublishWrapper onClick={() => handlePublishClick(trip.id)}>
-                          <PublishIcon />
-                          Publish
-                        </PublishWrapper>
-                        <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
-                        {openMenuTripId === trip.id && (
-                          <Menu>
-                            <MenuItem>
-                              <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
-                              Delete
-                            </MenuItem>
-                          </Menu>
-                        )}
-                      </IconWrapper>
-                    </CardHeader>
-                    <CardContent onClick={() => handleTripClick(trip.id)}>
-                      <TripImg src={trip.imageUrl} />
-                      <CardDetails>
-                        <TripName>{trip.tripTitle}</TripName>
-                        <TripDate>{trip.startDate}</TripDate>
-                        <TripDate>{trip.endDate}</TripDate>
-                      </CardDetails>
-                    </CardContent>
-                  </CardWrapper>
-                )}
-              />
+              <CarouselWrapper>
+                <Carousel<Trip>
+                  item={trips}
+                  renderItem={(trip) => (
+                    <CardWrapper>
+                      <CardHeader>
+                        <IconWrapper>
+                          <PublishWrapper onClick={() => handlePublishClick(trip.id)}>
+                            <PublishIcon />
+                            Publish
+                          </PublishWrapper>
+                          <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
+                          {openMenuTripId === trip.id && (
+                            <Menu>
+                              <MenuItem>
+                                <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
+                                Delete
+                              </MenuItem>
+                            </Menu>
+                          )}
+                        </IconWrapper>
+                      </CardHeader>
+                      <CardContent onClick={() => handleTripClick(trip.id)}>
+                        <TripImg src={trip.imageUrl} />
+                        <CardDetails>
+                          <TripName>{trip.tripTitle}</TripName>
+                          <TripDate>{trip.startDate}</TripDate>
+                          <TripDate>{trip.endDate}</TripDate>
+                        </CardDetails>
+                      </CardContent>
+                    </CardWrapper>
+                  )}
+                />
+              </CarouselWrapper>
             ) : (
               <p>No trips found.</p>
             )}
           </TripContainer>
           <ArticleContainer>
-            <Title>Articles</Title>
+            <ArticleSeparator>
+              <Title>Travel Memories</Title>
+            </ArticleSeparator>
             {articles?.length > 0 ? (
-              <Carousel<Article>
-                item={articles}
-                renderItem={(article) => (
-                  <CardWrapper>
-                    <CardHeader>
-                      <OptionIcon onClick={() => handleArticleOptionClick(article.id)} />
-                      {openMenuArticleId === article.id && (
-                        <Menu>
-                          <MenuItem>
-                            <DeleteIcon onClick={() => handleDeleteArticleClick(article.id)} />
-                            Delete
-                          </MenuItem>
-                        </Menu>
-                      )}
-                    </CardHeader>
-                    <ArticleWrapper onClick={() => handleArticleClick(article.id)}>
-                      <ArticleContent>
-                        <ArticleTitle>{article.title}</ArticleTitle>
-                        <ArticleDescription>{article.description}</ArticleDescription>
-                        <PublishedDate>Published on {article.createdAt}</PublishedDate>
-                      </ArticleContent>
-                      <ArticleImage src={article.coverImage} alt={article.title} />
-                    </ArticleWrapper>
-                  </CardWrapper>
-                )}
-              />
+              <CarouselWrapper>
+                <Carousel<Article>
+                  item={articles}
+                  renderItem={(article) => (
+                    <CardWrapper>
+                      <CardHeader>
+                        <OptionIcon onClick={() => handleArticleOptionClick(article.id)} />
+                        {openMenuArticleId === article.id && (
+                          <Menu>
+                            <MenuItem>
+                              <DeleteIcon onClick={() => handleDeleteArticleClick(article.id)} />
+                              Delete
+                            </MenuItem>
+                          </Menu>
+                        )}
+                      </CardHeader>
+                      <ArticleWrapper onClick={() => handleArticleClick(article.id)}>
+                        <ArticleContent>
+                          <ArticleTitle>{article.title}</ArticleTitle>
+                          <ArticleDescription>{article.description}</ArticleDescription>
+                          <PublishedDate>Published on {article.createdAt}</PublishedDate>
+                        </ArticleContent>
+                        <ArticleImage src={article.coverImage} alt={article.title} />
+                      </ArticleWrapper>
+                    </CardWrapper>
+                  )}
+                />
+              </CarouselWrapper>
             ) : (
               <p>No Article found.</p>
             )}
@@ -256,65 +274,92 @@ export default ProfilePage;
 const Container = styled.div`
   display: flex;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 54px);
   margin-top: 60px;
 `;
 
 const Sidebar = styled.div`
   width: 250px;
-  background-color: #f1f1f1;
+  background-color: #f9fcfd;
+  border-right: 1px solid #dde9ed;
   display: flex;
   flex-direction: column;
   align-items: center;
+  padding: 16px 24px;
+  height: calc(100vh - 54px);
 `;
 
-const UserName = styled.div`
+const UserName = styled.h1`
   margin-top: 25px;
   font-weight: 700;
   font-size: 20px;
 `;
 
+const ImgWrapper = styled.div`
+  box-shadow: 0 2px 3px #00000017;
+  border: 4px solid #ffffff;
+  background: #ecf6f9;
+  border-radius: 50%;
+  margin-top: 30px;
+  width: 96px;
+  height: 96px;
+`;
+
 const ProfileImg = styled.img`
   border-radius: 50%;
-  width: 150px;
-  height: 150px;
-  margin-top: 30px;
+  width: 100%;
+  height: 100%;
   /* border: 2px solid #a19a9a; */
-  background-color: white;
+  object-fit: cover;
 `;
 
 const MainContent = styled.div`
   flex: 1;
   padding: 20px;
   overflow-x: hidden;
-  margin: 0px 60px;
-`;
-
-const ButtonWrapper = styled.div`
-  width: 100%;
+  /* margin: 0px 60px; */
   display: flex;
-  justify-content: flex-end;
+  flex-direction: column;
+  align-items: center;
 `;
 
-const Button = styled.button`
-  width: 80px;
-  font-weight: 700;
-  transition: all 0.2s ease-in-out;
-  font-size: 20px;
-  border-radius: 20px;
-  background-color: white;
-  border: 1px solid #dde9ed;
-  padding: 5px 10px;
-  cursor: pointer;
-  &hover {
-    background-color: #dde9ed;
-  }
+// const Button = styled.button`
+//   width: 80px;
+//   font-weight: 700;
+//   transition: all 0.2s ease-in-out;
+//   font-size: 20px;
+//   border-radius: 20px;
+//   background-color: white;
+//   border: 1px solid #dde9ed;
+//   padding: 5px 10px;
+//   cursor: pointer;
+//   &hover {
+//     background-color: #dde9ed;
+//   }
+// `;
+
+const ArticleSeparator = styled.div`
+  display: flex;
+  justify-content: start;
+  margin: 10px 0px 15px 10px;
+  position: relative;
 `;
 
 const Title = styled.div`
-  font-size: 24px;
-  font-weight: 700;
-  margin-left: 30px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #658c96;
+  background: #fff;
+  /* &::after {
+    content: '';
+    height: 1px;
+    width: 100%;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    background: #dde9ed;
+    z-index: 0;
+  } */
 `;
 
 const TripImg = styled.img`
@@ -326,8 +371,11 @@ const TripImg = styled.img`
 `;
 
 const CardWrapper = styled.div`
-  width: 700px;
+  width: 100%;
   cursor: pointer;
+  border-radius: 15px;
+  overflow: hidden;
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
 `;
 
 const CardDetails = styled.div`
@@ -414,11 +462,39 @@ const OptionIcon = styled(SlOptions)`
 `;
 
 const TripContainer = styled.div`
-  margin: 0;
+  margin: 0px 20px;
+  position: relative;
+`;
+
+const CarouselWrapper = styled.div`
+  max-width: 800px;
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -5px;
+    height: 100%;
+    width: 100px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: -5px;
+    height: 100%;
+    width: 100px;
+    background: linear-gradient(-90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 1;
+  }
 `;
 
 const ArticleContainer = styled.div`
-  margin: 10px 0px;
+  margin: 10px 20px;
 `;
 
 const ArticleWrapper = styled.div`

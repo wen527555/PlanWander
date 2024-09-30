@@ -25,7 +25,7 @@ interface MapComponentProps {
   visiblePlace: string | null;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], visiblePlace }) => {
+const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], visiblePlace, onMarkerClick }) => {
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [viewState, setViewState] = useState({
@@ -122,6 +122,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
                 fontWeight: 'bold',
                 fontSize: '15px',
               }}
+              onClick={() => onMarkerClick(place.id)}
             >
               {place.number}
             </Marker>

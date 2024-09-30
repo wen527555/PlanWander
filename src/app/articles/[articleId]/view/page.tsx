@@ -18,17 +18,25 @@ const MapComponent = dynamic(() => import('../Map'), {
 const ArticlesPage = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const [visiblePlace, setVisiblePlace] = useState<string | null>(null);
+  const [manualScroll, setManualScroll] = useState(false);
   const { data: articleData, isLoading } = useQuery({
     queryKey: ['articleData', articleId],
     queryFn: () => fetchArticleData(articleId as string),
     enabled: !!articleId,
   });
   const router = useRouter();
-  const handleBackProfile = () => {
-    router.push('/profile');
+  const handleBackHome = () => {
+    router.push('/');
   };
 
   const handlePlaceVisible = (placeId: string) => {
+    if (!manualScroll) {
+      setVisiblePlace(placeId);
+    }
+  };
+
+  const handleMarkerClick = (placeId: string) => {
+    setManualScroll(true);
     setVisiblePlace(placeId);
   };
 
@@ -38,12 +46,23 @@ const ArticlesPage = () => {
     <Container>
       <ListContainer>
         <ListHeader>
-          <HomeIcon onClick={handleBackProfile} />
+          <HomeIcon onClick={handleBackHome} />
         </ListHeader>
-        <ViewList articleData={articleData} articleId={articleId} onPlaceVisible={handlePlaceVisible} />
+        <ViewList
+          articleData={articleData}
+          articleId={articleId}
+          onPlaceVisible={handlePlaceVisible}
+          visiblePlace={visiblePlace}
+          setManualScroll={setManualScroll}
+        />
       </ListContainer>
       <MapContainer>
-        <MapComponent places={places as any} routes={route as any} visiblePlace={visiblePlace} />
+        <MapComponent
+          places={places as any}
+          routes={route as any}
+          visiblePlace={visiblePlace}
+          onMarkerClick={handleMarkerClick}
+        />
       </MapContainer>
     </Container>
   );
@@ -56,9 +75,18 @@ const Container = styled.div`
 `;
 
 const ListHeader = styled.div`
-  margin: 10px 20px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid #e9ecef;
+  height: 54px;
+  width: 55%;
+  background-color: white;
+  padding: 5px 10px;
+  z-index: 5;
 `;
 
 const HomeIcon = styled(IoArrowBackCircleOutline)`
@@ -70,7 +98,7 @@ const ListContainer = styled.div`
   width: 55%;
   height: 100vh;
   overflow-y: auto;
-  padding: 0px 30px;
+  /* padding: 0px 30px; */
 `;
 
 const MapContainer = styled.div`

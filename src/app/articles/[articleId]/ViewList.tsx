@@ -1,7 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { FaMapMarker } from 'react-icons/fa';
+import { MdOutlineLibraryBooks } from 'react-icons/md';
 import styled from 'styled-components';
 
 import { getColorForDate } from '@/lib/colors';
@@ -11,34 +12,35 @@ interface ListProps {
     title: string;
     description: string;
     days: any;
+    coverImage: any;
   };
   articleId: string;
   onPlaceVisible: (placeId: string) => void;
 }
 
-const EditList: React.FC<ListProps> = ({ articleData, onPlaceVisible }) => {
+const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePlace, setManualScroll }) => {
   const [articleTitle, setArticleTitle] = useState('');
   const [articleDescription, setArticleDescription] = useState('');
   const [descriptions, setDescriptions] = useState<{ [key: string]: string }>({});
   const [images, setImages] = useState<{ [key: string]: string | File }>({});
-  // const [coverImage, setCoverImage] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
+  const placeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const placeId = entry.target.getAttribute('data-place-id');
-            if (placeId) {
-              onPlaceVisible(placeId);
-            }
+          const placeId = entry.target.getAttribute('data-place-id');
+          if (entry.isIntersecting && placeId) {
+            onPlaceVisible(placeId);
           }
         });
       },
-      { threshold: 0.8 }
+      { threshold: 0.99 }
     );
 
     const placeItems = document.querySelectorAll('.place-item');
-    observer.observe(placeItems[0]);
+    // observer.observe(placeItems[0]);
     placeItems.forEach((item) => observer.observe(item));
 
     return () => {
@@ -50,7 +52,7 @@ const EditList: React.FC<ListProps> = ({ articleData, onPlaceVisible }) => {
     if (articleData) {
       setArticleTitle(articleData.title);
       setArticleDescription(articleData.description);
-      // setCoverImage(articleData.coverImage);
+      setCoverImage(articleData.coverImage);
       const initialDescriptions: { [key: string]: string } = {};
       const initialImages: { [key: string]: string } = {};
 
@@ -68,87 +70,164 @@ const EditList: React.FC<ListProps> = ({ articleData, onPlaceVisible }) => {
     }
   }, [articleData]);
 
+  useEffect(() => {
+    if (visiblePlace && placeRefs.current[visiblePlace]) {
+      placeRefs.current[visiblePlace].scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+    }
+
+    setTimeout(() => {
+      setManualScroll(false);
+    }, 500);
+  }, [visiblePlace]);
+
   return (
-    <Container>
-      <ArticleHeader>
-        <ArticleTitleInput>{articleTitle}</ArticleTitleInput>
-        <DescriptionInput>{articleDescription}</DescriptionInput>
-      </ArticleHeader>
-      {articleData.days?.length > 0 ? (
-        articleData.days.map((day: any, dateIndex: number) => (
-          <ItemContainer key={dateIndex}>
-            <ItemTitle>DAY {dateIndex + 1}</ItemTitle>
-            {Array.isArray(day.places) &&
-              day.places.map((place: any, index: string) => (
-                <div key={index} data-place-id={place.id} className="place-item">
-                  <ItemHeader>
-                    <MarkerContainer>
-                      <MarkerIcon color={getColorForDate(dateIndex)} />
-                      <MarkerNumber>{index + 1}</MarkerNumber>
-                    </MarkerContainer>
-                    <ItemName>{place.name}</ItemName>
-                  </ItemHeader>
-                  {images[place.id] && (
-                    <ImageUploadWrapper>
-                      <Image src={`${images[place.id]}`} />
-                    </ImageUploadWrapper>
-                  )}
-                  <Description>{descriptions[place.id] || ''}</Description>
-                </div>
-              ))}
-          </ItemContainer>
-        ))
-      ) : (
-        <p>No trip days found.</p>
-      )}
-    </Container>
+    <>
+      {/* <ListHeader>
+        <HomeIcon onClick={handleBackProfile} />
+      </ListHeader> */}
+      <Container>
+        <CoverImageWrapper>
+          <CoverImage src={coverImage} />
+          <ArticleTitle>{articleTitle}</ArticleTitle>
+        </CoverImageWrapper>
+        <ViewWrapper>
+          <DescIcon />
+          <ArticleDescription>{articleDescription}</ArticleDescription>
+        </ViewWrapper>
+        {articleData.days?.length > 0 ? (
+          articleData.days.map((day: any, dateIndex: number) => (
+            <ItemContainer key={dateIndex}>
+              <ItemTitle>DAY {dateIndex + 1}</ItemTitle>
+              {Array.isArray(day.places) &&
+                day.places.map((place: any, index: string) => (
+                  <PlaceItem
+                    key={index}
+                    data-place-id={place.id}
+                    className="place-item"
+                    visible={visiblePlace === place.id}
+                    ref={(el) => (placeRefs.current[place.id] = el)}
+                  >
+                    <ItemHeader>
+                      <MarkerContainer>
+                        <MarkerIcon color={getColorForDate(dateIndex)} />
+                        <MarkerNumber>{index + 1}</MarkerNumber>
+                      </MarkerContainer>
+                      <ItemName>{place.name}</ItemName>
+                    </ItemHeader>
+                    {images[place.id] && (
+                      <ImageUploadWrapper>
+                        <Image src={`${images[place.id]}`} />
+                      </ImageUploadWrapper>
+                    )}
+                    <Description>{descriptions[place.id] || ''}</Description>
+                  </PlaceItem>
+                ))}
+            </ItemContainer>
+          ))
+        ) : (
+          <p>No trip days found.</p>
+        )}
+      </Container>
+    </>
   );
 };
 
-export default EditList;
+export default ViewList;
 
 const Container = styled.div`
-  margin: 10px;
+  /* margin: 10px; */
   /* border-bottom: 1px solid #ccc; */
   padding-bottom: 10px;
+  margin-top: 54px;
 `;
 
-const ArticleHeader = styled.div`
+const CoverImageWrapper = styled.div`
+  position: relative;
+  height: 300px;
+  margin-bottom: 10px;
+  width: 100%;
+  border: none;
+  overflow: hidden;
+
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+  }
+`;
+
+const CoverImage = styled.img`
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+`;
+
+const ViewWrapper = styled.div`
+  width: 100%;
+  background: #f9fcfd;
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-  padding: 20px;
-  width: 100%;
+  align-items: center;
+  padding: 5px 30px 15px 30px;
 `;
 
-const ArticleTitleInput = styled.div`
-  padding: 10px;
-  font-size: 20px;
-  border-radius: 5px;
-  height: auto;
-  width: 100%;
-  font-weight: 500;
+const DescIcon = styled(MdOutlineLibraryBooks)`
+  font-size: 22px;
+  color: #2c3e50;
 `;
 
-const DescriptionInput = styled.div`
-  font-size: 14px;
-  padding: 2cqb;
-  height: auto;
-  width: 100%;
-  background-color: #ececec;
-  height: auto;
-  border-radius: 5px;
+const ArticleTitle = styled.h2`
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+  font-weight: 700;
+  z-index: 1;
+  font-size: 24px;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 `;
 
+const ArticleDescription = styled.div`
+  font-size: 18px;
+  padding: 10px 20px;
+  width: 100%;
+  height: auto;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
+`;
 const ItemContainer = styled.div`
   width: 100%;
   margin: 10px 0px;
 `;
 
+const PlaceItem = styled.div<{ visible: boolean }>`
+  position: relative;
+  margin: 20px 0px;
+  padding: 10px 12px;
+  /* transition: background-color 0.3s ease; */
+  min-height: 500px;
+  ${({ visible }) =>
+    visible
+      ? `
+          background-color: #ecf6f9;
+      `
+      : `
+         background-color:#ffff;
+      `}
+`;
+
 const ItemHeader = styled.div`
   display: flex;
   align-items: center;
-  margin: 15px 0px;
+  margin: 5px 0px 15px 10px;
   gap: 10px;
 `;
 
@@ -156,11 +235,12 @@ const ItemTitle = styled.h3`
   width: 100px;
   font-size: 18px;
   font-weight: 500;
-  border-radius: 15px;
+  border-radius: 20px;
   background-color: #ececec;
   color: #393a3c;
   text-align: center;
-  padding: 5px 0px;
+  padding: 10px 0px;
+  margin: 20px 0px 0px 15px;
 `;
 
 const ItemName = styled.h3`
@@ -188,14 +268,16 @@ const Image = styled.img`
 `;
 
 const Description = styled.div`
-  font-size: 14px;
+  font-size: 16px;
   color: #888;
-  margin: 20px 0px 30px 0px;
+  margin: 20px 0px 20px 0px;
   border: none;
   width: 100%;
   outline: none;
   height: auto;
   padding: 0px 40px;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 `;
 
 const MarkerContainer = styled.div`

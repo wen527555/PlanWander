@@ -189,7 +189,7 @@ const ProfileWrapper = styled.div`
     top: -15px;
     width: 40%;
     height: 3px;
-    background-color: ${(props) => (props.isActive ? '#71c1dc' : 'transparent')};
+    background-color: ${(props) => (props.isActive ? '#78b7cc' : 'transparent')};
     transition: background-color 0.3s ease;
   }
 `;
@@ -228,13 +228,13 @@ const DiscoverWrapper = styled.div`
     top: -15px;
     width: 40%;
     height: 3px;
-    background-color: ${(props) => (props.isActive ? '#71c1dc' : 'transparent')};
+    background-color: ${(props) => (props.isActive ? '#78b7cc' : 'transparent')};
     transition: background-color 0.3s ease;
   }
 `;
 
 const AddButton = styled.button`
-  background-color: #a7d6e6;
+  background-color: #78b7cc;
   color: white;
   border: none;
   border-radius: 20px;

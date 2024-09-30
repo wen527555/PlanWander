@@ -255,10 +255,8 @@ const ItineraryTitle = styled.h2`
 `;
 
 const ItemContainer = styled.div`
-  /* margin: 64px 20px 10px 80px; */
-  /* border-bottom: 1px solid #ccc; */
   padding-bottom: 10px;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px dashed #dddcdc;
 `;
 
 const ItemHeader = styled.div`

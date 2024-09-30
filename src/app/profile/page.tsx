@@ -1,6 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import dayjs from 'dayjs';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -123,7 +124,7 @@ const ProfilePage = () => {
     queryKey: ['userTrips'],
     queryFn: fetchUserAllTrips,
   });
-
+  console.log('trips', trips);
   const { data: articles = [] } = useQuery<any>({
     queryKey: ['userArticles'],
     queryFn: fetchUserAllArticles,
@@ -190,35 +191,41 @@ const ProfilePage = () => {
               <CarouselWrapper>
                 <Carousel<Trip>
                   item={trips}
-                  renderItem={(trip) => (
-                    <CardWrapper>
-                      <CardHeader>
-                        <IconWrapper>
-                          <PublishWrapper onClick={() => handlePublishClick(trip.id)}>
-                            <PublishIcon />
-                            Publish
-                          </PublishWrapper>
-                          <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
-                          {openMenuTripId === trip.id && (
-                            <Menu>
-                              <MenuItem>
-                                <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
-                                Delete
-                              </MenuItem>
-                            </Menu>
-                          )}
-                        </IconWrapper>
-                      </CardHeader>
-                      <CardContent onClick={() => handleTripClick(trip.id)}>
-                        <TripImg src={trip.imageUrl} />
-                        <CardDetails>
-                          <TripName>{trip.tripTitle}</TripName>
-                          <TripDate>{trip.startDate}</TripDate>
-                          <TripDate>{trip.endDate}</TripDate>
-                        </CardDetails>
-                      </CardContent>
-                    </CardWrapper>
-                  )}
+                  renderItem={(trip) => {
+                    const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
+                    const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
+
+                    return (
+                      <CardWrapper>
+                        <CardHeader>
+                          <IconWrapper>
+                            <PublishWrapper onClick={() => handlePublishClick(trip.id)}>
+                              <PublishIcon />
+                              Publish
+                            </PublishWrapper>
+                            <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
+                            {openMenuTripId === trip.id && (
+                              <Menu>
+                                <MenuItem>
+                                  <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
+                                  Delete
+                                </MenuItem>
+                              </Menu>
+                            )}
+                          </IconWrapper>
+                        </CardHeader>
+                        <CardContent onClick={() => handleTripClick(trip.id)}>
+                          <TripImg src={trip.imageUrl} />
+                          <CardDetails>
+                            <TripName>{trip.tripTitle}</TripName>
+                            <TripDate>
+                              {formattedStartDate} - {formattedEndDate}
+                            </TripDate>
+                          </CardDetails>
+                        </CardContent>
+                      </CardWrapper>
+                    );
+                  }}
                 />
               </CarouselWrapper>
             ) : (
@@ -235,7 +242,7 @@ const ProfilePage = () => {
                   item={articles}
                   renderItem={(article) => (
                     <CardWrapper>
-                      <CardHeader>
+                      <ArticleHeader>
                         <OptionIcon onClick={() => handleArticleOptionClick(article.id)} />
                         {openMenuArticleId === article.id && (
                           <Menu>
@@ -245,7 +252,7 @@ const ProfilePage = () => {
                             </MenuItem>
                           </Menu>
                         )}
-                      </CardHeader>
+                      </ArticleHeader>
                       <ArticleWrapper onClick={() => handleArticleClick(article.id)}>
                         <ArticleContent>
                           <ArticleTitle>{article.title}</ArticleTitle>
@@ -341,12 +348,12 @@ const MainContent = styled.div`
 const ArticleSeparator = styled.div`
   display: flex;
   justify-content: start;
-  margin: 10px 0px 15px 10px;
+  margin: 20px 0px 10px 30px;
   position: relative;
 `;
 
 const Title = styled.div`
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 600;
   color: #658c96;
   background: #fff;
@@ -379,14 +386,22 @@ const CardWrapper = styled.div`
 `;
 
 const CardDetails = styled.div`
-  padding: 16px;
+  padding: 10px 20px;
   color: #333;
 `;
 
 const CardHeader = styled.div`
   width: 100%;
   height: 50px;
-  /* margin-bottom: 2px; */
+  padding: 5px 20px;
+  display: flex;
+  justify-content: end;
+`;
+
+const ArticleHeader = styled.div`
+  width: 100%;
+  height: 20px;
+  padding: 5px 20px;
   display: flex;
   justify-content: end;
 `;

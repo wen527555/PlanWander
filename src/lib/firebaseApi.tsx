@@ -101,7 +101,6 @@ export const fetchUserData = async () => {
     const userDocSnap = await getDoc(userDocRef);
     if (userDocSnap.exists()) {
       const userData = userDocSnap.data();
-      console.log('userData', userData);
       const { photoURL, userName } = userData;
       useUserStore.getState().setUserData({ photoURL, userName });
     } else {
@@ -481,7 +480,6 @@ export const saveImageToStorage = async (placeId: string, file: File) => {
     const imageRef = ref(storage, `places/${placeId}/${file.name}`);
     const uploadResult = await uploadBytes(imageRef, file);
     const imageUrl = await getDownloadURL(uploadResult.ref);
-
     return imageUrl;
   } catch (error) {
     console.error('Error uploading image:', error);
@@ -580,7 +578,6 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
 
   return querySnapshot.docs.map((doc) => {
     const data = doc.data();
-    console.log('data', data);
     return {
       id: doc.id,
       title: data.title || '',

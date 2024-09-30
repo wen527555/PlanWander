@@ -213,7 +213,7 @@ const PlaceItem = styled.div<{ visible: boolean }>`
   margin: 20px 0px;
   padding: 10px 12px;
   /* transition: background-color 0.3s ease; */
-  min-height: 500px;
+  /* min-height: 500px; */
   ${({ visible }) =>
     visible
       ? `

@@ -26,7 +26,7 @@ const ArticlesPage = () => {
   });
   const router = useRouter();
   const handleBackHome = () => {
-    router.push('/');
+    router.push('/discover');
   };
 
   const handlePlaceVisible = (placeId: string) => {

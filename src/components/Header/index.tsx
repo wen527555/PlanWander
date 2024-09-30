@@ -76,6 +76,10 @@ const Header = () => {
     router.push('/profile');
   };
 
+  const handleToDiscover = () => {
+    router.push('/discover');
+  };
+
   const handleCreateTrip = async (
     tripTitle: string,
     startDate: Date,
@@ -99,7 +103,7 @@ const Header = () => {
               <ProfileIcon src={photoURL || defaultProfileImg.src} onClick={handleToProfile} />
               <IconText>You</IconText>
             </ProfileWrapper>
-            <DiscoverWrapper isActive={isDiscoverActive}>
+            <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
               <DiscoverIcon />
               <IconText>Discover</IconText>
             </DiscoverWrapper>
@@ -174,11 +178,12 @@ const IconWrapper = styled.div`
   transform: translate(-100%);
 `;
 
-const ProfileWrapper = styled.div`
+const ProfileWrapper = styled.div<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 8px;
   cursor: pointer;
+  position: relative;
   &:hover {
     color: #d9d9d9;
   }
@@ -187,7 +192,7 @@ const ProfileWrapper = styled.div`
     position: absolute;
     left: 0;
     top: -15px;
-    width: 40%;
+    width: 100%;
     height: 3px;
     background-color: ${(props) => (props.isActive ? '#78b7cc' : 'transparent')};
     transition: background-color 0.3s ease;
@@ -215,18 +220,19 @@ const DiscoverIcon = styled(RiCompassDiscoverLine)`
   color: #658c96;
 `;
 
-const DiscoverWrapper = styled.div`
+const DiscoverWrapper = styled.div<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   gap: 5px;
   cursor: pointer;
   color: #6c757d;
+  position: relative;
   &::before {
     content: '';
     position: absolute;
     left: 0;
-    top: -15px;
-    width: 40%;
+    top: -20px;
+    width: 100%;
     height: 3px;
     background-color: ${(props) => (props.isActive ? '#78b7cc' : 'transparent')};
     transition: background-color 0.3s ease;

@@ -6,10 +6,11 @@ import React, { useState } from 'react';
 import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import { FaGripVertical, FaMapMarker } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
-import { RiDeleteBinLine } from 'react-icons/ri';
+import { VscTrash } from 'react-icons/vsc';
 import styled from 'styled-components';
 
 import { getColorForDate } from '@/lib/colors';
+import { usePlaceStore } from '@/lib/store';
 import { updatePlaceStayTime } from '../../../lib/firebaseApi';
 // import usePlaceStore from '@/lib/store';
 import LocationSearch from './LocationSearch';
@@ -39,7 +40,7 @@ interface ListProps {
   onDaysUpdate: (updates: any[]) => void;
   onModeUpdate: (dayId: string, placeId: string, newRoute: any, newMode: any) => void;
   onPlaceDelete: (dayId: string, placeId: string) => void;
-  onPlaceClick: (place: Place) => void;
+  // onPlaceClick: (place: Place) => void;
 }
 
 interface SelectedTime {
@@ -60,13 +61,12 @@ const List: React.FC<ListProps> = ({
   onDaysUpdate,
   onModeUpdate,
   onPlaceDelete,
-  onPlaceClick,
+  // onPlaceClick,
 }) => {
   const [selectedTime, setSelectedTime] = useState<SelectedTime>({});
-  const [activePlaceId, setActivePlaceId] = useState<string | null>(null);
+  const [openTimePick, setOpenTimePick] = useState<string | null>(null);
   const [openDays, setOpenDays] = useState(days.reduce((acc, day) => ({ ...acc, [day.date]: true }), {}));
-  // const [isDateListOpen, setIsDateListOpen] = useState(true);
-
+  const { selectedPlace, setSelectedPlace } = usePlaceStore();
   const handleToggleOpen = (date) => {
     setOpenDays((prev) => ({ ...prev, [date]: !prev[date] }));
   };
@@ -112,7 +112,7 @@ const List: React.FC<ListProps> = ({
       ...prev,
       [placeId]: { startTime, endTime },
     }));
-    setActivePlaceId(null);
+    setOpenTimePick(null);
 
     try {
       await updatePlaceStayTime(tripId, dayId, placeId, startTime, endTime);
@@ -122,26 +122,22 @@ const List: React.FC<ListProps> = ({
   };
 
   const handleCloseTimePicker = (): void => {
-    setActivePlaceId(null);
+    setOpenTimePick(null);
   };
 
   const handleTimeCardClick = (placeId: string): void => {
-    setActivePlaceId(placeId.id);
+    setOpenTimePick(placeId);
   };
 
-  const handlePlaceClick = (placeId: any) => {
-    console.log('placeId', placeId);
-    setActivePlaceId(placeId);
-    if (onPlaceClick) {
-      onPlaceClick(placeId);
-    }
+  const handlePlaceClick = (place: any) => {
+    setSelectedPlace(place);
   };
 
-  console.log('ActivePlaceId', activePlaceId);
+  // console.log('ActivePlaceId', activePlaceId);
   return (
     <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
       <ListContainer>
-        <ItineraryTitle>Itinerary</ItineraryTitle>
+        {/* <ItineraryTitle>Itinerary</ItineraryTitle> */}
         <DragDropContext onDragEnd={onDragEnd}>
           {days.map((day, dateIndex) => (
             <Droppable droppableId={`${day.date}`} key={`${day.date}-${dateIndex}`}>
@@ -176,15 +172,12 @@ const List: React.FC<ListProps> = ({
                                     />
                                   </RouteInfo>
                                 )}
-                                <PlaceContainer
-                                  isActive={activePlaceId?.id === place.id}
-                                  onClick={() => handlePlaceClick(place)}
-                                >
+                                <PlaceContainer onClick={() => handlePlaceClick(place)}>
                                   <MarkerContainer>
                                     <MarkerIcon color={getColorForDate(dateIndex)} />
                                     <MarkerNumber>{index + 1}</MarkerNumber>
                                   </MarkerContainer>
-                                  <BlockWrapper>
+                                  <BlockWrapper isActive={selectedPlace?.id === place.id}>
                                     <PlaceBlock>
                                       <PlaceName>{place.name}</PlaceName>
                                     </PlaceBlock>
@@ -208,7 +201,7 @@ const List: React.FC<ListProps> = ({
                                           <TimeLabel>Add Time</TimeLabel>
                                         </TimeDisplayCard>
                                       )}
-                                      {activePlaceId === place.id && (
+                                      {openTimePick === place.id && (
                                         <TimePicker
                                           place={place}
                                           dayId={day.date}
@@ -243,20 +236,24 @@ const List: React.FC<ListProps> = ({
 export default List;
 
 const ListContainer = styled.div`
-  /* margin: 64px 20px 10px 80px; */
-  margin: 64px 30px 10px 30px;
+  margin: 60px 30px 100px 30px;
 `;
 
-const ItineraryTitle = styled.h2`
-  font-size: 25px;
-  font-weight: 700;
-  text-align: left;
-  margin-left: 10px;
-`;
+// const ItineraryTitle = styled.h2`
+//   font-size: 25px;
+//   font-weight: 700;
+//   text-align: left;
+//   margin-left: 10px;
+// `;
 
 const ItemContainer = styled.div`
-  padding-bottom: 10px;
+  padding: 10px 0px 20px 0px;
   border-bottom: 1px dashed #dddcdc;
+  overflow: hidden;
+
+  &:last-child {
+    border-bottom: none;
+  }
 `;
 
 const ItemHeader = styled.div`
@@ -291,55 +288,56 @@ const DragIcon = styled(FaGripVertical)`
   color: #6c757d;
 `;
 
-const DeleteIcon = styled(RiDeleteBinLine)`
+const DeleteIcon = styled(VscTrash)`
   position: absolute;
-  right: -25px;
+  right: -35px;
   top: 50%;
   transform: translateY(-50%);
   opacity: 0;
   transition: opacity 0.3s ease-in-out;
   cursor: pointer;
-  font-size: 25px;
+  font-size: 20px;
+  font-weight: 600;
   color: #6c757d;
-  width: 15px;
-  height: 15px;
   &:hover {
     color: #c0c0c0;
   }
 `;
 
-const PlaceContainer = styled.div.withConfig({
-  shouldForwardProp: (prop) => prop !== 'isActive',
-})<PlaceContainerProps>`
+const PlaceContainer = styled.div`
   width: 100%;
   display: flex;
   margin: 5px 30px 0px 20px;
   position: relative;
-  &::before {
+  overflow: visible;
+  /* background-color: #ecf6f9; */
+  /* &::before {
     content: '';
     position: absolute;
-    /* left: -51px; */
-    left: -31px;
+    left: -49px;
     top: 0;
     bottom: 0;
-    width: 3px;
-    background-color: ${(props) => (props.isActive ? '#658c96 !important' : 'transparent')};
+    width: 6px;
+    background-color: ${(props) => (props.isActive ? '#78b7cc !important' : 'transparent')};
     border-radius: 3px;
-  }
-
+  } */
   &:hover ${DeleteIcon}, &:hover ${DragIcon} {
     opacity: 1;
   }
 `;
 
-const BlockWrapper = styled.div`
+const BlockWrapper = styled.div.withConfig({
+  shouldForwardProp: (prop) => prop !== 'isActive',
+})<PlaceContainerProps>`
   width: 100%;
   padding: 10px;
-  background-color: #f3f4f5;
+  /* background-color: #f3f4f5; */
   border-radius: 5px;
   height: auto;
   cursor: pointer;
   padding-left: 25px;
+
+  background-color: ${(props) => (props.isActive ? '#ebedee' : '#f3f4f5')};
 `;
 
 const PlaceBlock = styled.div`

@@ -1,6 +1,6 @@
 import { Autocomplete } from '@react-google-maps/api';
 import React, { useCallback, useState } from 'react';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 
 interface Place {
   id: string;
@@ -49,15 +49,17 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceAdded, dayId }) 
 
   return (
     // <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
-    <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
-      <SearchInput
-        type="text"
-        value={inputValue}
-        onChange={(e) => setInputValue(e.target.value)}
-        placeholder="Add a place"
-      />
-    </Autocomplete>
-    // </LoadScript>
+    <>
+      <GlobalStyle />
+      <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>
+        <SearchInput
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          placeholder="Add a place"
+        />
+      </Autocomplete>
+    </>
   );
 };
 
@@ -73,4 +75,50 @@ const SearchInput = styled.input`
   font-size: 16px;
   margin: 10px 0px 0px 21px;
   cursor: pointer;
+  &:focus {
+    box-shadow:
+      inset 0 1px 1px rgba(0, 0, 0, 0.075),
+      0 0 0 0.2rem rgba(63, 82, 227, 0.25);
+    outline: none;
+  }
+`;
+const GlobalStyle = createGlobalStyle`
+  .pac-container {
+    max-height: 150px;
+    position:fixed;
+    overflow-y: auto;
+    border-radius: 8px;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    white-space: normal;
+    word-wrap: break-word; 
+  }
+  
+  .pac-item {
+    font-size: 16px;
+    padding: 10px 15px;
+    display: flex;
+    align-items: center; 
+    gap: 12px;
+    color: #333;
+    background-color: #fff;
+    border-bottom: 1px solid #f0f0f0;
+    cursor: pointer;
+  }
+
+  .pac-item:hover {
+    background-color: #f5f5f5;
+  }
+
+  .pac-item-selected {
+    background-color: #e0e0e0;
+  }
+
+
+
+  .pac-item-query {
+    font-weight: bold;
+    color: #000;
+  }
 `;

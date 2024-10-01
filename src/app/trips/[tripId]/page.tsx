@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
+import { RiEdit2Fill } from 'react-icons/ri';
 // import { PiPencilLine } from 'react-icons/pi';
 import styled from 'styled-components';
 
@@ -80,6 +81,16 @@ interface UpdateTripParams {
   originalTripData?: TripData;
 }
 
+const daysMap = {
+  星期日: 'Su',
+  星期一: 'Mo',
+  星期二: 'Tu',
+  星期三: 'We',
+  星期四: 'Th',
+  星期五: 'Fr',
+  星期六: 'Sa',
+};
+
 type TransportMode = 'driving' | 'walking' | 'cycling';
 
 const MapComponent = dynamic(() => import('@/components/Map'), {
@@ -100,10 +111,6 @@ const TripPage: React.FC = () => {
 
   const formattedStartDate = dayjs(tripData?.startDate).format('M/D');
   const formattedEndDate = dayjs(tripData?.endDate).format('M/D');
-
-  // const handleDateClick = (date) => {
-  //   setActiveDate(date);
-  // };
 
   const updateTripMutation = useMutation({
     mutationFn: fetchUpdateTrip,
@@ -189,6 +196,10 @@ const TripPage: React.FC = () => {
     };
   }, []);
 
+  const formattedOpeningHours = selectedPlace?.openTime?.map((time) => {
+    const [day, hours] = time.split(': ');
+    return { day: daysMap[day], hours };
+  });
   const handleAddPlace = (place: Place, dayId: string) => {
     addMutation.mutate({
       place,
@@ -283,9 +294,9 @@ const TripPage: React.FC = () => {
     deletePlaceMutation.mutate({ tripId, dayId, placeId });
   };
 
-  const handlePlaceClick = async (place: Place) => {
-    setSelectedPlace(place);
-  };
+  // const handlePlaceClick = async (place: Place) => {
+  //   setSelectedPlace(place);
+  // };
 
   const handleBackProfile = () => {
     router.push('/profile');
@@ -302,10 +313,11 @@ const TripPage: React.FC = () => {
         <ListHeader>
           <HomeIcon onClick={handleBackProfile} />
           <TripName>{tripData.tripTitle}</TripName>
-          <TripDate onClick={handleUpdateClick}>
+          <TripDate>
             <CalendarIcon />
             {formattedStartDate}-{formattedEndDate}
           </TripDate>
+          <EditIcon onClick={handleUpdateClick} />
         </ListHeader>
         {/* <Sidebar days={tripData.days as any} activeDate={activeDate} onDateClick={handleDateClick} /> */}
         <List
@@ -315,12 +327,12 @@ const TripPage: React.FC = () => {
           onDaysUpdate={handleDaysUpdate}
           onModeUpdate={handleModeChange}
           onPlaceDelete={handlePlaceDelete}
-          onPlaceClick={handlePlaceClick}
+          // onPlaceClick={handlePlaceClick}
           tripId={tripId}
         />
       </ListContainer>
       <MapContainer>
-        <MapComponent places={places as any} routes={route as any} onPlaceClick={handlePlaceClick} />
+        <MapComponent places={places as any} routes={route as any} />
         {selectedPlace && (
           <PlaceInfoModal ref={modalRef}>
             <ModalHeader>
@@ -341,11 +353,19 @@ const TripPage: React.FC = () => {
               </Wrapper>
             )}
 
-            {selectedPlace.openingHours && (
-              <HoursWrapper>
-                <FaClock />
-                {selectedPlace.openingHours}
-              </HoursWrapper>
+            {formattedOpeningHours?.length > 0 && (
+              <OpeningHoursWrapper>
+                <ClockIcon />
+                <OpeningHoursList>
+                  {formattedOpeningHours.map((time, index) => (
+                    <OpeningHourItem key={index}>
+                      <DayCircle>{time.day}</DayCircle>
+                      {/* <DayLabel>{time.day}</DayLabel> */}
+                      <HoursLabel>{time.hours}</HoursLabel>
+                    </OpeningHourItem>
+                  ))}
+                </OpeningHoursList>
+              </OpeningHoursWrapper>
             )}
 
             {selectedPlace.phone && (
@@ -382,6 +402,9 @@ export default TripPage;
 
 const Container = styled.div`
   display: flex;
+  height: 100vh;
+  /* overflow-y: auto; */
+  overflow: hidden;
 `;
 
 const ListHeader = styled.div`
@@ -392,9 +415,10 @@ const ListHeader = styled.div`
   left: 0;
   border-bottom: 1px solid #e9ecef;
   height: 54px;
-  width: 100%;
+  width: 45%;
   background-color: white;
-  padding: 5px 10px;
+  padding: 5px 20px;
+  z-index: 2;
 `;
 
 const HomeIcon = styled(IoArrowBackCircleOutline)`
@@ -412,35 +436,40 @@ const TripDate = styled.div`
   display: flex;
   align-items: center;
   font-size: 14px;
+  font-weight: 600;
   color: #6c757d;
   margin-left: 8px;
   cursor: pointer;
 `;
 
 const CalendarIcon = styled(FaRegCalendarDays)`
-  font-size: 14px;
+  font-size: 15px;
   margin-right: 8px;
   color: #6c757d;
 `;
 
-// const EditIcon = styled(PiPencilLine)`
-//   font-size: 14px;
-//   color: #b0b0b0;
-//   transition:
-//     color 0.3s ease,
-//     transform 0.3s ease;
-// `;
+const EditIcon = styled(RiEdit2Fill)`
+  font-size: 22px;
+  font-weight: 800;
+  color: #6c757d;
+  margin: 0px 20px 0px auto;
+  cursor: pointer;
+  &:hover {
+    color: #495057;
+  }
+`;
 
 const ListContainer = styled.div`
   width: 45%;
-  height: 100vh;
   overflow-y: auto;
+  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
 `;
 
 const MapContainer = styled.div`
   width: 55%;
   height: 100vh;
-  position: relative;
+  position: sticky;
+  top: 0;
 `;
 
 const PlaceInfoModal = styled.div`
@@ -449,11 +478,12 @@ const PlaceInfoModal = styled.div`
   bottom: 60px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 20px;
+  padding: 20px 30px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 80%;
-  height: auto;
+  width: 70%;
+  max-height: 400px;
+  overflow-y: auto;
 `;
 
 const ModalHeader = styled.div`
@@ -467,24 +497,31 @@ const PlaceName = styled.h1`
 `;
 
 const RatingWrapper = styled.div`
-  margin-top: 8px;
+  margin-bottom: 10px;
   display: flex;
   align-items: center;
 `;
 
 const Rating = styled.div`
-  font-size: 14px;
+  font-size: 16px;
   color: #ff9800;
   display: flex;
   align-items: center;
   font-weight: 700;
+  margin: 10px 0px;
+`;
+
+const RatingIcon = styled(FaStar)`
+  font-size: 16px;
+  color: #ff9800;
+  margin-right: 10px;
 `;
 
 const Wrapper = styled.div`
-  margin-top: 12px;
   display: flex;
   align-items: center;
   color: #333;
+  margin-bottom: 8px;
   svg {
     margin-right: 8px;
   }
@@ -499,23 +536,49 @@ const PlaceAddress = styled.div`
   font-size: 16px;
 `;
 
-const AddressIcon = styled(FaMapPin)`
+const OpeningHoursWrapper = styled.div`
+  display: flex;
+  align-items: flex-start;
+  margin: 15px 0px;
+`;
+
+const ClockIcon = styled(FaClock)`
   font-size: 16px;
-  margin-right: 10px;
+  margin-right: 8px;
 `;
 
-const RatingIcon = styled(FaStar)`
-  font-size: 14px;
-  color: #ff9800;
-  margin-right: 10px;
+const OpeningHoursList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
 `;
 
-const HoursWrapper = styled.div`
-  margin-top: 8px;
+const OpeningHourItem = styled.li`
   display: flex;
   align-items: center;
-  color: #555;
-  svg {
-    margin-right: 10px;
-  }
+  margin-bottom: 5px;
+`;
+
+const DayCircle = styled.div`
+  width: 25px;
+  height: 25px;
+  background-color: #f0f0f0;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  margin-right: 10px;
+  font-size: 12px;
+`;
+
+const HoursLabel = styled.span`
+  color: #888;
+  font-size: 14px;
+  font-weight: 500;
+`;
+
+const AddressIcon = styled(FaMapPin)`
+  font-size: 16px;
+  margin-right: 15px;
 `;

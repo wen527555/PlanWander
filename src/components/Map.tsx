@@ -148,7 +148,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [] })
 
 export default MapComponent;
 
-const framesColor = (color) => keyframes`
+const framesColor = (color: string) => keyframes`
   0% {
     box-shadow: 0 0 0 0 rgba(${color}, 0.7);
   }
@@ -157,7 +157,7 @@ const framesColor = (color) => keyframes`
   }
 `;
 
-const hexToRgb = (hex) => {
+const hexToRgb = (hex: string) => {
   hex = hex.replace('#', '');
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;

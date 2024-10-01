@@ -6,6 +6,7 @@ import { MdOutlineLibraryBooks } from 'react-icons/md';
 import styled from 'styled-components';
 
 import { getColorForDate } from '@/lib/colors';
+import defaultCoverImg from '@/public/travel.jpg';
 
 interface ListProps {
   articleData: {
@@ -16,6 +17,8 @@ interface ListProps {
   };
   articleId: string;
   onPlaceVisible: (placeId: string) => void;
+  visiblePlace: string | null;
+  setManualScroll: (placeId: boolean) => void;
 }
 
 const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePlace, setManualScroll }) => {
@@ -90,7 +93,7 @@ const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePla
       </ListHeader> */}
       <Container>
         <CoverImageWrapper>
-          <CoverImage src={coverImage} />
+          <CoverImage src={coverImage || defaultCoverImg.src} />
           <ArticleTitle>{articleTitle}</ArticleTitle>
         </CoverImageWrapper>
         <ViewWrapper>
@@ -108,7 +111,9 @@ const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePla
                     data-place-id={place.id}
                     className="place-item"
                     visible={visiblePlace === place.id}
-                    ref={(el) => (placeRefs.current[place.id] = el)}
+                    ref={(el) => {
+                      placeRefs.current[place.id] = el;
+                    }}
                   >
                     <ItemHeader>
                       <MarkerContainer>

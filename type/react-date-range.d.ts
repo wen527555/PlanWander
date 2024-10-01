@@ -14,8 +14,12 @@ declare module 'react-date-range' {
   }
 
   export interface DateRangeProps {
-    ranges: RangeKeyDict;
+    ranges: any;
     onChange: (ranges: RangeKeyDict) => void;
+    months?: number;
+    direction?: 'horizontal' | 'vertical';
+    rangeColors?: string[];
+    autoFocus?: boolean;
   }
 
   export const DateRange: React.FC<DateRangeProps>;

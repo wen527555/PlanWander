@@ -221,7 +221,9 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
                       <div>No image has been uploaded.</div>
                     )}
                     <input
-                      ref={(el) => (fileInputRefs.current[place.id] = el)}
+                      ref={(el) => {
+                        fileInputRefs.current[place.id] = el;
+                      }}
                       type="file"
                       style={{ display: 'none' }}
                       onChange={(e) => {

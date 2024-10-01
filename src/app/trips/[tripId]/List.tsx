@@ -65,9 +65,11 @@ const List: React.FC<ListProps> = ({
 }) => {
   const [selectedTime, setSelectedTime] = useState<SelectedTime>({});
   const [openTimePick, setOpenTimePick] = useState<string | null>(null);
-  const [openDays, setOpenDays] = useState(days.reduce((acc, day) => ({ ...acc, [day.date]: true }), {}));
+  const [openDays, setOpenDays] = useState<{ [key: string]: boolean }>(
+    days.reduce((acc, day) => ({ ...acc, [day.date]: true }), {})
+  );
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
-  const handleToggleOpen = (date) => {
+  const handleToggleOpen = (date: string) => {
     setOpenDays((prev) => ({ ...prev, [date]: !prev[date] }));
   };
 
@@ -318,7 +320,6 @@ const PlaceContainer = styled.div`
     top: 0;
     bottom: 0;
     width: 6px;
-    background-color: ${(props) => (props.isActive ? '#78b7cc !important' : 'transparent')};
     border-radius: 3px;
   } */
   &:hover ${DeleteIcon}, &:hover ${DragIcon} {

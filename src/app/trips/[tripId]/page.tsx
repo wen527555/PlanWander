@@ -37,7 +37,7 @@ interface Place {
   lat: number;
   lng: number;
   route?: any;
-  openingHours?: any;
+  openTime?: string[];
   phone?: string;
   website?: string;
 }
@@ -141,7 +141,7 @@ const TripPage: React.FC = () => {
         startDate,
         endDate,
         selectedCountries,
-        originalTripData: tripData, // 如果 tripData 存在就傳遞
+        originalTripData: tripData,
       };
 
       updateTripMutation.mutate(updateData);
@@ -196,10 +196,12 @@ const TripPage: React.FC = () => {
     };
   }, []);
 
-  const formattedOpeningHours = selectedPlace?.openTime?.map((time) => {
-    const [day, hours] = time.split(': ');
-    return { day: daysMap[day], hours };
-  });
+  const formattedOpeningHours =
+    selectedPlace?.openTime?.map((time) => {
+      const [day, hours] = time.split(': ');
+      const mappedDay = daysMap[day as keyof typeof daysMap] || day;
+      return { day: mappedDay, hours };
+    }) || [];
   const handleAddPlace = (place: Place, dayId: string) => {
     addMutation.mutate({
       place,

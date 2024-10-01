@@ -161,15 +161,15 @@ const ProfilePage = () => {
     router.push(`/trips/${tripId}`);
   };
 
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      setUser(null);
-      router.push('/');
-    } catch (error) {
-      console.error('Error during logout: ', error);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     await auth.signOut();
+  //     setUser(null);
+  //     router.push('/');
+  //   } catch (error) {
+  //     console.error('Error during logout: ', error);
+  //   }
+  // };
 
   if (loadingTrips) {
     return <p>Loading</p>;
@@ -197,7 +197,7 @@ const ProfilePage = () => {
           </InfoSection>
           <LogoutWrapper>
             <LogoutIcon />
-            <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+            <LogoutButton>Logout</LogoutButton>
           </LogoutWrapper>
         </Sidebar>
         <MainContent>

@@ -9,7 +9,7 @@ type UserState = {
 interface Place {
   website?: any;
   phone?: any;
-  openingHours?: any;
+  openTime?: string[];
   id: string;
   name: string;
   lat: number;

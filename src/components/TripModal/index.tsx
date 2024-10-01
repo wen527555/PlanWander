@@ -37,8 +37,8 @@ interface TripModalProps {
 const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initialData, onSubmit }) => {
   const [date, setDate] = useState([
     {
-      startDate: initialData?.startDate || new Date(),
-      endDate: initialData?.endDate || addDays(new Date(), 2),
+      startDate: initialData?.startDate ?? new Date(),
+      endDate: initialData?.endDate ?? addDays(new Date(), 2),
       key: 'selection',
     },
   ]);
@@ -66,7 +66,14 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
   };
 
   const handleSelect = (ranges: RangeKeyDict) => {
-    setDate([ranges.selection]);
+    const { selection } = ranges;
+    setDate([
+      {
+        startDate: selection.startDate ?? new Date(),
+        endDate: selection.endDate ?? addDays(new Date(), 2),
+        key: selection.key,
+      },
+    ]);
     setShowCalendar(false);
   };
 

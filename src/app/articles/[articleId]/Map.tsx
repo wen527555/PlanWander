@@ -24,6 +24,7 @@ interface MapComponentProps {
   places: Place[];
   routes: Route[];
   visiblePlace: string | null;
+  onMarkerClick: (place: string) => void;
 }
 
 const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], visiblePlace, onMarkerClick }) => {
@@ -142,7 +143,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
 
 export default MapComponent;
 
-const framesColor = (color) => keyframes`
+const framesColor = (color: string) => keyframes`
   0% {
     box-shadow: 0 0 0 0 rgba(${color}, 0.7);
   }
@@ -151,7 +152,7 @@ const framesColor = (color) => keyframes`
   }
 `;
 
-const hexToRgb = (hex) => {
+const hexToRgb = (hex: string) => {
   hex = hex.replace('#', '');
   const bigint = parseInt(hex, 16);
   const r = (bigint >> 16) & 255;

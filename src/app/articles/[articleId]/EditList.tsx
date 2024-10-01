@@ -278,6 +278,7 @@ const ListHeader = styled.div`
   background-color: white;
   padding: 5px 10px;
   margin: 0px 10px;
+  z-index: 2;
 `;
 
 const HomeIcon = styled(IoArrowBackCircleOutline)`
@@ -341,6 +342,8 @@ const DescriptionInput = styled.textarea`
   resize: none;
   height: 100px;
   border: none;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 `;
 
 const ItemContainer = styled.div`
@@ -398,6 +401,8 @@ const Description = styled.textarea`
   border: none;
   width: 100%;
   outline: none;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 `;
 
 const MarkerContainer = styled.div`

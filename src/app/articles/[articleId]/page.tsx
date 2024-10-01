@@ -17,6 +17,7 @@ const MapComponent = dynamic(() => import('./Map'), {
 const ArticlesPage = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const [visiblePlace, setVisiblePlace] = useState<string | null>(null);
+  const [manualScroll, setManualScroll] = useState(false);
   const { data: articleData, isLoading } = useQuery({
     queryKey: ['articleData', articleId],
     queryFn: () => fetchArticleData(articleId as string),
@@ -27,6 +28,13 @@ const ArticlesPage = () => {
   // };
 
   const handlePlaceVisible = (placeId: string) => {
+    if (!manualScroll) {
+      setVisiblePlace(placeId);
+    }
+  };
+
+  const handleMarkerClick = (placeId: string) => {
+    setManualScroll(true);
     setVisiblePlace(placeId);
   };
 
@@ -41,7 +49,12 @@ const ArticlesPage = () => {
         <EditList articleData={articleData} articleId={articleId} onPlaceVisible={handlePlaceVisible} />
       </ListContainer>
       <MapContainer>
-        <MapComponent places={places as any} routes={route as any} visiblePlace={visiblePlace} />
+        <MapComponent
+          places={places as any}
+          routes={route as any}
+          visiblePlace={visiblePlace}
+          onMarkerClick={handleMarkerClick}
+        />
       </MapContainer>
     </Container>
   );

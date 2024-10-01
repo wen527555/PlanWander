@@ -1,6 +1,7 @@
 import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Map, Marker, Source, ViewStateChangeEvent } from 'react-map-gl';
+import styled, { css, keyframes } from 'styled-components';
 
 import 'mapbox-gl/dist/mapbox-gl.css';
 
@@ -103,28 +104,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
       >
         {isMapLoaded &&
           places?.map((place, index) => (
-            <Marker
-              key={index}
-              longitude={place.lng}
-              latitude={place.lat}
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: `${place.color}`,
-                width: visiblePlace === place.id ? '50px' : '32px',
-                height: visiblePlace === place.id ? '50px' : '32px',
-                borderRadius: '50%',
-                border: `2px solid #ffff`,
-                //   width: '32px',
-                //   height: '32px',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '15px',
-              }}
-              onClick={() => onMarkerClick(place.id)}
-            >
-              {place.number}
+            <Marker key={index} longitude={place.lng} latitude={place.lat} onClick={() => onMarkerClick(place.id)}>
+              <MarkerWrapper color={place.color} isActive={visiblePlace === place.id}>
+                {place.number}
+              </MarkerWrapper>
             </Marker>
           ))}
         {isMapLoaded &&
@@ -158,3 +141,62 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
 };
 
 export default MapComponent;
+
+const framesColor = (color) => keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(${color}, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(${color}, 0);
+  }
+`;
+
+const hexToRgb = (hex) => {
+  hex = hex.replace('#', '');
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return `${r}, ${g}, ${b}`;
+};
+
+const MarkerWrapper = styled.div<{ color: string; isActive: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ color }) => color};
+  border-radius: 50%;
+  border: 2px solid white;
+  width: 32px;
+  height: 32px;
+  color: white;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  z-index: ${({ isActive }) => (isActive ? 100 : 1)};
+  position: relative;
+  &:hover {
+    ${({ color }) => css`
+      animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
+    `}
+    border: 2px solid ${({ color }) => color};
+  }
+
+  &:active {
+    ${({ color }) => css`
+      animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
+    `}
+    border: 2px solid ${({ color }) => color};
+  }
+
+  ${({ color, isActive }) =>
+    isActive &&
+    css`
+      animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
+      border: 2px solid ${color};
+      width: 40px;
+      height: 40px;
+      font-size: 18px;
+    `}
+`;

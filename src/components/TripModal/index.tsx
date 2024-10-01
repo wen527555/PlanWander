@@ -205,7 +205,10 @@ const CreateButton = styled.button`
   font-weight: 600;
   cursor: pointer;
   color: white;
-  background-color: #94c3d2;
+  background-color: #78b7cc;
+  &:hover {
+    border-color: #94c3d2;
+  }
 `;
 
 const StyledSelect = styled(Select)`

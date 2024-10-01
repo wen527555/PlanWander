@@ -13,9 +13,9 @@ import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
 import { useUserStore } from '@/lib/store';
 // import { BsPersonCircle } from 'react-icons/bs';
 import defaultProfileImg from '@/public/earth-profile.png';
+import placeWanderLogo from '@/public/PlanWanderLogo.png';
 import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
 import LoginModal from '../LoginModal';
-import placeWanderLogo from './PlanwanderLogo.png';
 
 interface SelectedOption {
   value: string;
@@ -94,13 +94,13 @@ const Header = () => {
   return (
     <Container>
       <Link href="/" passHref>
-        <Image src={placeWanderLogo} alt="Logo" width={120} height={20} style={{ cursor: 'pointer' }} />
+        <Image src={placeWanderLogo} alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
       </Link>
       {user ? (
         <>
           <IconWrapper>
-            <ProfileWrapper isActive={isProfileActive}>
-              <ProfileIcon src={photoURL || defaultProfileImg.src} onClick={handleToProfile} />
+            <ProfileWrapper isActive={isProfileActive} onClick={handleToProfile}>
+              <ProfileIcon src={photoURL || defaultProfileImg.src} />
               <IconText>You</IconText>
             </ProfileWrapper>
             <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
@@ -167,6 +167,10 @@ const ProfileIcon = styled.img`
   border-radius: 50%;
   width: 30px;
   height: 30px;
+
+  &:hover {
+    color: #d9d9d9;
+  }
 `;
 
 const IconWrapper = styled.div`
@@ -193,7 +197,7 @@ const ProfileWrapper = styled.div<{ isActive: boolean }>`
     left: 0;
     top: -15px;
     width: 100%;
-    height: 3px;
+    height: 4px;
     background-color: ${(props) => (props.isActive ? '#78b7cc' : 'transparent')};
     transition: background-color 0.3s ease;
   }
@@ -201,7 +205,7 @@ const ProfileWrapper = styled.div<{ isActive: boolean }>`
 
 const IconText = styled.span`
   /* font-size: 16px;
-  color: #6c757d; */
+  color: #fdfeff; */
   font-size: 14px;
   font-weight: 600;
   /* color: #0f3e4a; */
@@ -209,7 +213,7 @@ const IconText = styled.span`
   cursor: pointer;
   transition: 0.2s;
   &:hover {
-    color: #d9d9d9;
+    color: #c7c4c4;
   }
 `;
 
@@ -233,7 +237,7 @@ const DiscoverWrapper = styled.div<{ isActive: boolean }>`
     left: 0;
     top: -20px;
     width: 100%;
-    height: 3px;
+    height: 4px;
     background-color: ${(props) => (props.isActive ? '#78b7cc' : 'transparent')};
     transition: background-color 0.3s ease;
   }
@@ -249,7 +253,7 @@ const AddButton = styled.button`
   cursor: pointer;
   font-weight: 700;
   &:hover {
-    background-color: #dde9ed;
+    background-color: #e0e7ea;
   }
 `;
 

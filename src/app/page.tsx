@@ -63,7 +63,9 @@ const Heading = styled.h1`
 const Description = styled.p`
   font-size: 20px;
   color: #6c757d;
-  margin: 20px 0;
+  margin: 30px 0;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
 `;
 
 const ButtonGroup = styled.div`
@@ -77,8 +79,8 @@ const StartButton = styled.button`
   color: white;
   border: none;
   border-radius: 25px;
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 18px;
+  font-weight: 700;
   cursor: pointer;
 
   &:hover {

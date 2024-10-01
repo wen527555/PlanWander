@@ -1,3 +1,4 @@
+// import { useState } from 'react';
 import styled from 'styled-components';
 
 interface CarouselProp<T> {
@@ -6,6 +7,18 @@ interface CarouselProp<T> {
 }
 
 const Carousel = <T,>({ item, renderItem }: CarouselProp<T>): React.ReactElement => {
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  // const handleNext = () => {
+  //   if (currentIndex < item.length - 1) {
+  //     setCurrentIndex(currentIndex + 1);
+  //   }
+  // };
+
+  // const handlePrev = () => {
+  //   if (currentIndex > 0) {
+  //     setCurrentIndex(currentIndex - 1);
+  //   }
+  // };
   return (
     <CarouselContainer>
       {item.map((item, index) => (
@@ -22,7 +35,7 @@ const CarouselContainer = styled.div`
   overflow-x: auto;
   gap: 16px;
   /* padding: 20px 30px; */
-  max-width: 800px;
+  max-width: 1000px;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
 

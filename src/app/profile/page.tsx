@@ -7,7 +7,10 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { GoShare } from 'react-icons/go';
+import { IoEarthOutline } from 'react-icons/io5';
+import { PiArticleNyTimes } from 'react-icons/pi';
 import { SlOptions } from 'react-icons/sl';
+import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
 import TripModal from '@/components/TripModal';
@@ -158,15 +161,15 @@ const ProfilePage = () => {
     router.push(`/trips/${tripId}`);
   };
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await auth.signOut();
-  //     setUser(null);
-  //     router.push('/');
-  //   } catch (error) {
-  //     console.error('Error during logout: ', error);
-  //   }
-  // };
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      setUser(null);
+      router.push('/');
+    } catch (error) {
+      console.error('Error during logout: ', error);
+    }
+  };
 
   if (loadingTrips) {
     return <p>Loading</p>;
@@ -180,12 +183,27 @@ const ProfilePage = () => {
             <ProfileImg src={photoURL || defaultProfileImg.src} />
           </ImgWrapper>
           {userName && <UserName>{userName}</UserName>}
-          {/* <Button onClick={handleLogout}>Logout</Button> */}
+          <InfoSection>
+            <InfoItem>
+              <TripsIcon />
+              <InfoText>Trips</InfoText>
+              <InfoCount>{trips?.length}</InfoCount>
+            </InfoItem>
+            <InfoItem>
+              <ArticlesIcon />
+              <InfoText>Articles</InfoText>
+              <InfoCount>{articles?.length}</InfoCount>
+            </InfoItem>
+          </InfoSection>
+          <LogoutWrapper>
+            <LogoutIcon />
+            <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+          </LogoutWrapper>
         </Sidebar>
         <MainContent>
-          {/* <ButtonWrapper>
-            <Button onClick={handleAddClick}>Add</Button>
-          </ButtonWrapper> */}
+          <Separator>
+            <Title>Trip plans</Title>
+          </Separator>
           <TripContainer>
             {trips?.length > 0 ? (
               <CarouselWrapper>
@@ -233,9 +251,9 @@ const ProfilePage = () => {
             )}
           </TripContainer>
           <ArticleContainer>
-            <ArticleSeparator>
+            <Separator>
               <Title>Travel Memories</Title>
-            </ArticleSeparator>
+            </Separator>
             {articles?.length > 0 ? (
               <CarouselWrapper>
                 <Carousel<Article>
@@ -247,8 +265,10 @@ const ProfilePage = () => {
                         {openMenuArticleId === article.id && (
                           <Menu>
                             <MenuItem>
-                              <DeleteIcon onClick={() => handleDeleteArticleClick(article.id)} />
-                              Delete
+                              <DeleteWrapper onClick={() => handleDeleteArticleClick(article.id)}>
+                                <DeleteIcon />
+                                Delete
+                              </DeleteWrapper>
                             </MenuItem>
                           </Menu>
                         )}
@@ -292,6 +312,7 @@ const Sidebar = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   padding: 16px 24px;
   height: calc(100vh - 54px);
 `;
@@ -307,7 +328,7 @@ const ImgWrapper = styled.div`
   border: 4px solid #ffffff;
   background: #ecf6f9;
   border-radius: 50%;
-  margin-top: 30px;
+  margin-top: 40px;
   width: 96px;
   height: 96px;
 `;
@@ -320,53 +341,99 @@ const ProfileImg = styled.img`
   object-fit: cover;
 `;
 
+const InfoSection = styled.div`
+  padding: 20px;
+`;
+
+const InfoItem = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ecf6f9;
+  padding: 10px 20px;
+  border-radius: 15px;
+  margin: 30px 0px;
+  width: 180px;
+  font-size: 16px;
+  font-weight: 600;
+  &:nth-child(2) {
+    background-color: #f9fcfd;
+  }
+`;
+
+const TripsIcon = styled(IoEarthOutline)`
+  font-size: 14px;
+  color: #0f3e4a;
+`;
+
+const ArticlesIcon = styled(PiArticleNyTimes)`
+  font-size: 14px;
+  color: #0f3e4a;
+`;
+
+const InfoText = styled.span`
+  font-size: 16px;
+  color: #333;
+  flex-grow: 1;
+  margin-left: 10px;
+`;
+
+const InfoCount = styled.span`
+  font-size: 16px;
+  color: #6c757d;
+`;
+
+const LogoutWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  margin-top: auto;
+  margin-bottom: 15px;
+
+  /* &:hover {
+    background-color: #78b7cc;
+  } */
+`;
+
+const LogoutButton = styled.button`
+  width: 80px;
+  font-weight: 700;
+  font-size: 16px;
+  padding: 5px 10px;
+  cursor: pointer;
+  color: #0f3e4a;
+  background-color: #f9fcfd;
+  border: none;
+`;
+
+const LogoutIcon = styled(TbLogout2)`
+  font-size: 14px;
+  color: #0f3e4a;
+`;
+
 const MainContent = styled.div`
   flex: 1;
-  padding: 20px;
+  padding: 25px 0px;
   overflow-x: hidden;
-  /* margin: 0px 60px; */
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
-// const Button = styled.button`
-//   width: 80px;
-//   font-weight: 700;
-//   transition: all 0.2s ease-in-out;
-//   font-size: 20px;
-//   border-radius: 20px;
-//   background-color: white;
-//   border: 1px solid #dde9ed;
-//   padding: 5px 10px;
-//   cursor: pointer;
-//   &hover {
-//     background-color: #dde9ed;
-//   }
-// `;
-
-const ArticleSeparator = styled.div`
+const Separator = styled.div`
   display: flex;
-  justify-content: start;
-  margin: 20px 0px 10px 30px;
+  justify-content: center;
+  margin: 20px 0px 20px 30px;
   position: relative;
 `;
 
 const Title = styled.div`
-  font-size: 22px;
-  font-weight: 600;
+  font-size: 30px;
+  font-weight: 800;
   color: #658c96;
   background: #fff;
-  /* &::after {
-    content: '';
-    height: 1px;
-    width: 100%;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    background: #dde9ed;
-    z-index: 0;
-  } */
+  letter-spacing: 5px;
 `;
 
 const TripImg = styled.img`
@@ -433,6 +500,11 @@ const PublishWrapper = styled.div`
   font-weight: 600;
   display: flex;
   align-items: center;
+  border-radius: 8px;
+  padding: 5px 10px;
+  &:hover {
+    background-color: #d5eff7;
+  }
 `;
 
 const PublishIcon = styled(GoShare)`
@@ -441,8 +513,12 @@ const PublishIcon = styled(GoShare)`
   margin-right: 5px;
 `;
 
-const DeleteIcon = styled(AiOutlineDelete)`
+const DeleteWrapper = styled.div`
   cursor: pointer;
+  width: 100%;
+`;
+
+const DeleteIcon = styled(AiOutlineDelete)`
   font-size: 18px;
   margin-right: 5px;
 `;
@@ -464,6 +540,7 @@ const MenuItem = styled.div`
   align-items: center;
   font-size: 13px;
   font-weight: 600;
+  border-radius: 8px;
   &:hover {
     background-color: #f0f0f0;
   }
@@ -483,6 +560,7 @@ const TripContainer = styled.div`
 
 const CarouselWrapper = styled.div`
   max-width: 800px;
+  margin: 0px 25px;
   &::before {
     content: '';
     position: absolute;
@@ -509,7 +587,8 @@ const CarouselWrapper = styled.div`
 `;
 
 const ArticleContainer = styled.div`
-  margin: 10px 20px;
+  margin: 0;
+  position: relative;
 `;
 
 const ArticleWrapper = styled.div`

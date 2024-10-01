@@ -1,15 +1,15 @@
 // utils/colors.ts
 const colors = [
-  '#8e8ee0',
-  '#00adb0',
-  '#00c8ff',
-  '#4b61cf',
-  '#f1a731',
-  '#ed7fcc',
-  '#41e26c',
-  '#83d685',
+  '#a9a9e1',
+  '#78C2C4',
+  '#7B90D2',
+  '#7DB9DE',
+  '#FAD689',
+  '#EBB471',
+  '#F8C3CD',
+  '#F4A7B9',
+  '#5DAC81',
   '#dc9a61',
-  '#dc618a',
 ];
 
 const getRandomLightColor = () => {

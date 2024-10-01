@@ -210,8 +210,8 @@ const CreateButton = styled.button`
   text-align: center;
   font-size: 14px;
   font-weight: 600;
-  cursor: pointer;
   color: white;
+  cursor: pointer;
   background-color: #78b7cc;
   &:hover {
     border-color: #94c3d2;

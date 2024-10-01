@@ -68,10 +68,11 @@ interface UpdateTripParams {
 
 const auth = getAuth();
 
-// interface TripData {
-//   tripTitle: string;
-//   day: Day[];
-// }
+interface UserData {
+  photoURL: string;
+  userName: string;
+  [key: string]: any;
+}
 
 export const saveUserData = async (userInfo: UserInfo | null): Promise<void> => {
   if (!userInfo || !userInfo.uid) {
@@ -100,9 +101,8 @@ export const fetchUserData = async () => {
     const userDocRef = doc(db, 'users', uid);
     const userDocSnap = await getDoc(userDocRef);
     if (userDocSnap.exists()) {
-      const userData = userDocSnap.data();
-      const { photoURL, userName } = userData;
-      useUserStore.getState().setUserData({ photoURL, userName });
+      const userData = userDocSnap.data() as UserData;
+      useUserStore.getState().setUserData(userData);
     } else {
       console.log('No such document!');
     }

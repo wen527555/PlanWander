@@ -1,6 +1,5 @@
 'use client';
 
-import { User } from 'firebase/auth';
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
@@ -24,8 +23,8 @@ interface SelectedOption {
 const Header = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
-  const { photoURL } = useUserStore();
+  // const [user, setUser] = useState<User | null>(null);
+  const { userData } = useUserStore();
   const router = useRouter();
   const pathname = usePathname();
   const isProfileActive = pathname === '/profile';
@@ -33,10 +32,8 @@ const Header = () => {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setUser(user);
         fetchUserData();
       } else {
-        setUser(null);
         router.push('/');
       }
     });
@@ -95,11 +92,11 @@ const Header = () => {
       <Link href="/" passHref>
         <Image src="/PlanWanderLogo.png" alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
       </Link>
-      {user ? (
+      {userData ? (
         <>
           <IconWrapper>
             <ProfileWrapper isActive={isProfileActive} onClick={handleToProfile}>
-              <ProfileIcon src={photoURL || defaultProfileImg.src} />
+              <ProfileIcon src={userData?.photoURL || defaultProfileImg.src} />
               <IconText>You</IconText>
             </ProfileWrapper>
             <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>

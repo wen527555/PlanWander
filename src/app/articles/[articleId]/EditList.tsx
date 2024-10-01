@@ -29,7 +29,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const [descriptions, setDescriptions] = useState<{ [key: string]: string }>({});
   const [images, setImages] = useState<{ [key: string]: any }>({});
   const [coverImage, setCoverImage] = useState<string | null>(null);
-  const { photoURL, userName } = useUserStore();
+  const { userData } = useUserStore();
   const coverImageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   console.log('coverImage', coverImage);
@@ -136,8 +136,8 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
         descriptions,
         images,
         coverImage,
-        photoURL,
-        userName
+        userData?.photoURL || null,
+        userData?.userName || null
       );
     },
     onSuccess: () => {

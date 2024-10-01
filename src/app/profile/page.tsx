@@ -53,7 +53,7 @@ const ProfilePage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
   const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);
-  const { photoURL, userName } = useUserStore();
+  const { userData, setUserData } = useUserStore();
   // console.log('photoURL', photoURL);
   const queryClient = useQueryClient();
   // const handleAddClick = () => {
@@ -161,15 +161,15 @@ const ProfilePage = () => {
     router.push(`/trips/${tripId}`);
   };
 
-  // const handleLogout = async () => {
-  //   try {
-  //     await auth.signOut();
-  //     setUser(null);
-  //     router.push('/');
-  //   } catch (error) {
-  //     console.error('Error during logout: ', error);
-  //   }
-  // };
+  const handleLogout = async () => {
+    try {
+      await auth.signOut();
+      setUserData(null);
+      router.push('/');
+    } catch (error) {
+      console.error('Error during logout: ', error);
+    }
+  };
 
   if (loadingTrips) {
     return <p>Loading</p>;
@@ -180,9 +180,9 @@ const ProfilePage = () => {
       <Container>
         <Sidebar>
           <ImgWrapper>
-            <ProfileImg src={photoURL || defaultProfileImg.src} />
+            <ProfileImg src={userData?.photoURL || defaultProfileImg.src} />
           </ImgWrapper>
-          {userName && <UserName>{userName}</UserName>}
+          {userData?.userName && <UserName>{userData?.userName}</UserName>}
           <InfoSection>
             <InfoItem>
               <TripsIcon />
@@ -197,7 +197,7 @@ const ProfilePage = () => {
           </InfoSection>
           <LogoutWrapper>
             <LogoutIcon />
-            <LogoutButton>Logout</LogoutButton>
+            <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
           </LogoutWrapper>
         </Sidebar>
         <MainContent>
@@ -414,7 +414,7 @@ const LogoutIcon = styled(TbLogout2)`
 
 const MainContent = styled.div`
   flex: 1;
-  padding: 25px 0px;
+  padding: 10px 0px;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;

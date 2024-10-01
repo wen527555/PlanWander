@@ -190,6 +190,9 @@ const Input = styled.input`
   width: 100%;
   height: 50px;
   box-sizing: border-box;
+  &:hover {
+    border-color: #94c3d2;
+  }
 `;
 
 const GoogleButton = styled.button`
@@ -212,10 +215,18 @@ const LoginButton = styled.button`
   width: 100%;
   border-radius: 25px;
   padding: 10px;
-  border: 1px solid #ccc;
   text-align: center;
   font-size: 14px;
   font-weight: 500;
+  background-color: #78b7cc;
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+  cursor: pointer;
+  border: none;
+  &:hover {
+    background-color: #e0e7ea;
+  }
 `;
 
 const Divider = styled.div`
@@ -247,6 +258,6 @@ const ToggleLink = styled.span`
   margin-top: 1rem;
 
   &:hover {
-    color: #0056b3;
+    color: #a7d6e6;
   }
 `;

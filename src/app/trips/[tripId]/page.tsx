@@ -477,14 +477,14 @@ const MapContainer = styled.div`
 const PlaceInfoModal = styled.div`
   background-color: #fff;
   position: absolute;
-  bottom: 60px;
+  bottom: 30px;
   left: 50%;
   transform: translateX(-50%);
-  padding: 20px 30px;
-  border-radius: 10px;
+  padding: 25px 30px;
+  border-radius: 13px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 70%;
-  max-height: 400px;
+  width: 80%;
+  max-height: 300px;
   overflow-y: auto;
 `;
 

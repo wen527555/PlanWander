@@ -1,10 +1,15 @@
 import { create } from 'zustand';
 
-type UserState = {
+interface UserData {
   photoURL: string;
   userName: string;
-  setUserData: (data: { photoURL: string; userName: string }) => void;
-};
+  [key: string]: any;
+}
+
+interface UserStore {
+  userData: UserData | null;
+  setUserData: (userData: UserData | null) => void;
+}
 
 interface Place {
   website?: any;
@@ -32,8 +37,7 @@ export const usePlaceStore = create<PlaceStore>((set) => ({
   setPlaceDetail: (placeDetail) => set({ placeDetail }),
 }));
 
-export const useUserStore = create<UserState>((set) => ({
-  photoURL: '',
-  userName: '',
-  setUserData: (userData) => set(userData),
+export const useUserStore = create<UserStore>((set) => ({
+  userData: null,
+  setUserData: (userData: UserData | null) => set({ userData }),
 }));

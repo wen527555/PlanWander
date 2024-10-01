@@ -1,6 +1,9 @@
 import { LngLatBounds } from 'mapbox-gl';
 import React, { useEffect, useRef, useState } from 'react';
 import { Layer, Map, Marker, Source, ViewStateChangeEvent } from 'react-map-gl';
+import styled, { css, keyframes } from 'styled-components';
+
+import { usePlaceStore } from '@/lib/store';
 
 // import usePlaceStore from '@/lib/store'
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -23,13 +26,12 @@ interface Route {
 interface MapComponentProps {
   places: Place[];
   routes: Route[];
-  onPlaceClick?: (place: Place) => void;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], onPlaceClick }) => {
-  // const { selectedPlace, setSelectedPlace } = usePlaceStore();
+const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [] }) => {
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
+  const { selectedPlace, setSelectedPlace } = usePlaceStore();
   const [viewState, setViewState] = useState({
     longitude: 0,
     latitude: 0,
@@ -62,7 +64,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
   }, [mapRef]);
 
   useEffect(() => {
-    if (mapRef.current && isMapLoaded && places.length > 0) {
+    if (mapRef.current && isMapLoaded && places.length > 0 && !selectedPlace) {
       const bounds = new LngLatBounds();
       places.forEach((place) => bounds.extend([place.lng, place.lat]));
       mapRef.current.fitBounds(bounds, {
@@ -72,21 +74,24 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
     }
   }, [places, isMapLoaded]);
 
+  useEffect(() => {
+    if (selectedPlace && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [selectedPlace.lng, selectedPlace.lat],
+        zoom: 14,
+        speed: 1.2,
+        curve: 1,
+        essential: false,
+      });
+    }
+  }, [selectedPlace]);
+
   const handleViewStateChange = (evt: ViewStateChangeEvent) => {
     setViewState(evt.viewState);
   };
 
   const handleMarkerClick = (place: Place) => {
-    if (onPlaceClick) {
-      onPlaceClick(place);
-    } else {
-      console.warn('onPlaceClick 回調函數未傳遞');
-    }
-    // setViewState({
-    //   longitude: place.lng,
-    //   latitude: place.lat,
-    //   zoom: viewState.zoom,
-    // });
+    setSelectedPlace(place);
   };
 
   return (
@@ -102,27 +107,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
       >
         {isMapLoaded &&
           places?.map((place, index) => (
-            <Marker
-              key={index}
-              longitude={place.lng}
-              latitude={place.lat}
-              style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                backgroundColor: `${place.color}`,
-                borderRadius: '50%',
-                border: `2px solid #ffff`,
-                width: '32px',
-                height: '32px',
-                color: 'white',
-                fontWeight: 'bold',
-                fontSize: '15px',
-                cursor: 'pointer',
-              }}
-              onClick={() => handleMarkerClick(place)}
-            >
-              {place.number}
+            <Marker key={index} longitude={place.lng} latitude={place.lat} onClick={() => handleMarkerClick(place)}>
+              <MarkerWrapper color={place.color} isActive={selectedPlace?.id === place.id}>
+                {place.number}
+              </MarkerWrapper>
             </Marker>
           ))}
 
@@ -159,3 +147,65 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], o
 };
 
 export default MapComponent;
+
+const framesColor = (color: string) => keyframes`
+  0% {
+    box-shadow: 0 0 0 0 rgba(${color}, 0.7);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(${color}, 0);
+  }
+`;
+
+const hexToRgb = (hex: string) => {
+  hex = hex.replace('#', '');
+  const bigint = parseInt(hex, 16);
+  const r = (bigint >> 16) & 255;
+  const g = (bigint >> 8) & 255;
+  const b = bigint & 255;
+
+  return `${r}, ${g}, ${b}`;
+};
+
+const MarkerWrapper = styled.div<{ color: string; isActive: boolean }>`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: ${({ color }) => color};
+
+  /* background-color: white; */
+  border-radius: 50%;
+  border: 2px solid white;
+  width: 32px;
+  height: 32px;
+  color: white;
+  /* color: ${({ color }) => color}; */
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  position: relative;
+  z-index: ${({ isActive }) => (isActive ? 100 : 1)};
+  &:hover {
+    ${({ color }) => css`
+      animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
+    `}
+    border: 2px solid ${({ color }) => color};
+  }
+
+  &:active {
+    ${({ color }) => css`
+      animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
+    `}
+    border: 2px solid ${({ color }) => color};
+  }
+
+  ${({ color, isActive }) =>
+    isActive &&
+    css`
+      animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
+      border: 2px solid ${color};
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
+    `}
+`;

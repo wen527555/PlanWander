@@ -31,7 +31,7 @@ const TimePickerWrapper = styled.div`
   background-color: white;
   border-radius: 10px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 20px 30px;
   display: flex;
   flex-direction: column;
   z-index: 1000;
@@ -44,10 +44,25 @@ const Label = styled.div`
 
 const Select = styled.select`
   padding: 10px;
-  border-radius: 5px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   margin-bottom: 12px;
   font-size: 16px;
+
+  option {
+    background-color: white;
+    color: #333;
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* &:focus {
+    border-color: #94c3d2;
+  }
+
+  &:hover {
+    border-color: #94c3d2;
+  } */
 `;
 
 const ButtonGroup = styled.div`
@@ -58,17 +73,18 @@ const ButtonGroup = styled.div`
 const Button = styled.button<ButtonProps>`
   padding: 8px 16px;
   border: none;
-  border-radius: 5px;
+  border-radius: 15px;
   cursor: pointer;
   font-size: 14px;
+  font-weight: 600;
   ${({ variant }) =>
     variant === 'clear'
       ? `
       background-color: #f0f0f0;
-      color: #757575;
+      color: #6d6f70;
     `
       : `
-      background-color: #a1a9a8;
+      background-color: #a7d6e6;
       color: white;
     `}
 `;
@@ -86,7 +102,6 @@ const TimePicker: React.FC<TimePickerProps> = ({ place, dayId, onSave, onClear }
     <TimePickerWrapper>
       <Label>Start time</Label>
       <Select value={startTime} onChange={(e) => setStartTime(e.target.value)}>
-        <option value="">Select start time</option>
         {timeSlots.map((time, index) => (
           <option key={index} value={time}>
             {time}
@@ -96,7 +111,6 @@ const TimePicker: React.FC<TimePickerProps> = ({ place, dayId, onSave, onClear }
 
       <Label>End time</Label>
       <Select value={endTime} onChange={(e) => setEndTime(e.target.value)}>
-        <option value="">Select end time</option>
         {timeSlots.map((time, index) => (
           <option key={index} value={time}>
             {time}

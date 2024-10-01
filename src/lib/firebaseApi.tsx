@@ -4,7 +4,9 @@ import {
   addDoc,
   arrayUnion,
   collection,
+  deleteDoc,
   doc,
+  DocumentReference,
   getDoc,
   getDocs,
   query,
@@ -15,21 +17,9 @@ import {
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
-//移至另一個api檔
-// import { createApi } from 'unsplash-js';
-
+import { fetchCountryImage } from '@/lib/mapApi';
 import { db, storage } from '../lib/firebaseConfig';
 import { useUserStore } from './store';
-
-// const unsplashAccessKey = process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY;
-
-// if (!unsplashAccessKey) {
-//   throw new Error('Unsplash Access Key is missing. Please define it in your .env.local file');
-// }
-
-// const unsplash = createApi({
-//   accessKey: unsplashAccessKey,
-// });
 
 interface UserInfo {
   uid: string;
@@ -51,6 +41,29 @@ interface Article {
     nanoseconds: number;
   };
   coverImage?: string;
+}
+
+interface SelectedOption {
+  value: string;
+  label: string;
+}
+
+interface TripData {
+  tripTitle: string;
+  startDate: string;
+  endDate: string;
+  countries: SelectedOption[];
+  imageUrl: string;
+  days: Day[];
+}
+
+interface UpdateTripParams {
+  tripId: string;
+  tripTitle: string;
+  startDate: Date;
+  endDate: Date;
+  selectedCountries: SelectedOption[];
+  originalTripData?: TripData;
 }
 
 const auth = getAuth();
@@ -88,7 +101,6 @@ export const fetchUserData = async () => {
     const userDocSnap = await getDoc(userDocRef);
     if (userDocSnap.exists()) {
       const userData = userDocSnap.data();
-      console.log('userData', userData);
       const { photoURL, userName } = userData;
       useUserStore.getState().setUserData({ photoURL, userName });
     } else {
@@ -97,7 +109,12 @@ export const fetchUserData = async () => {
   }
 };
 
-export const createNewTrip = async (tripTitle: string, startDate: Date, endDate: Date): Promise<string> => {
+export const createNewTrip = async (
+  tripTitle: string,
+  startDate: Date,
+  endDate: Date,
+  selectedCountries: any[]
+): Promise<string> => {
   try {
     const user = auth.currentUser;
     const userId = user?.uid;
@@ -105,28 +122,25 @@ export const createNewTrip = async (tripTitle: string, startDate: Date, endDate:
       throw new Error('No authenticated user found');
     }
 
-    if (!startDate || !endDate || !tripTitle || !userId) {
+    if (!startDate || !endDate || !tripTitle || !userId || selectedCountries.length === 0) {
       throw new Error('Missing required trip data');
     }
+    const firstCountry = selectedCountries[0].label;
+    const countryImageUrl = await fetchCountryImage(firstCountry);
 
-    // const countryName = tripTitle.split(' ')[0];
-    // const response = await unsplash.search.getPhotos({
-    //   query: countryName,
-    //   perPage: 1,
-    // });
-    // console.log('countryName', countryName);
-    // console.log('response', response);
-    // const imageUrl = response?.response?.results?.[0]?.urls?.small || '';
-
-    // console.log('mageUrl', imageUrl);
+    const countries = selectedCountries.map((country) => ({
+      code: country.value,
+      name: country.label,
+    }));
 
     const tripData = {
       tripTitle,
       startDate: dayjs(startDate).format('YYYY-MM-DD'),
       endDate: dayjs(endDate).format('YYYY-MM-DD'),
+      countries: countries,
       createdAt: new Date(),
       uid: userId,
-      // imageUrl,
+      imageUrl: countryImageUrl || '',
     };
 
     const tripRef = await addDoc(collection(db, 'trips'), tripData);
@@ -150,7 +164,7 @@ export const createNewTrip = async (tripTitle: string, startDate: Date, endDate:
     }
 
     await batch.commit();
-    console.log('Trip created and days added to Firestore successfully');
+    console.log('Trip created and days added to FireStore successfully');
     return tripId;
   } catch (error) {
     console.error('Error creating trip: ', error);
@@ -167,13 +181,15 @@ export const fetchTripData = async (tripId: string) => {
       throw new Error('No such trip found');
     }
     const tripData = tripSnapshot.data();
-    const tripTitle = tripData?.tripTitle || '';
     const daysCollection = collection(db, `trips/${tripId}/days`);
     const daysSnapshot = await getDocs(daysCollection);
     const daysData = daysSnapshot.docs.map((doc) => doc.data() as Day);
-
     return {
-      tripTitle,
+      tripTitle: tripData?.tripTitle,
+      startDate: tripData?.startDate,
+      countries: tripData?.countries,
+      endDate: tripData?.endDate,
+      imageUrl: tripData?.imageUrl,
       days: daysData,
     };
   } catch (error) {
@@ -295,7 +311,13 @@ export const updatePlaceRoute = async (
   }
 };
 
-export const deletePlace = async (tripId: string, dayId: string, placeId: any) => {
+export const deletePlace = async (
+  tripId: string,
+  dayId: string,
+  placeId: any
+  // newRoute: any,
+  // transportMode: string = 'driving'
+) => {
   const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
   const dayDoc = await getDoc(dayDocRef);
   if (!dayDoc.exists()) {
@@ -346,31 +368,19 @@ export const updatePlaceStayTime = async (
   }
 };
 
-// export const fetchUserAllTrips = async () => {
-//   return new Promise((resolve, reject) => {
-//     onAuthStateChanged(auth, async (user) => {
-//       if (user) {
-//         try {
-//           const userId = user.uid;
-//           const tripRef = collection(db, 'trips');
-//           const q = query(tripRef, where('uid', '==', userId));
-//           const querySnapshot = await getDocs(q);
-//           const userTrips = querySnapshot.docs.map((doc) => ({
-//             id: doc.id,
-//             ...doc.data(),
-//           }));
-//           resolve(userTrips);
-//         } catch (error) {
-//           console.error('Error fetching user trips:', error);
-//           reject([]);
-//         }
-//       } else {
-//         console.log('No user is logged in');
-//         resolve([]);
-//       }
-//     });
-//   });
-// };
+export const getPlaceForDay = async (tripId: string, dayId: string) => {
+  try {
+    const datDocRef = doc(db, 'trips', tripId, 'days', dayId);
+    const dayDoc = await getDoc(datDocRef);
+    if (!dayDoc.exists()) {
+      throw new Error(`Day with id ${dayId} does not exist in trip ${tripId}`);
+    }
+    const places = dayDoc.data()?.places || [];
+    return places;
+  } catch (error) {
+    console.error('Error getting places ', error);
+  }
+};
 
 export const fetchUserAllTrips = async () => {
   return new Promise((resolve, reject) => {
@@ -385,22 +395,8 @@ export const fetchUserAllTrips = async () => {
           const userTrips = await Promise.all(
             querySnapshot.docs.map(async (doc) => {
               const tripData = doc.data();
-              let photo = null;
-              const daysRef = collection(db, 'trips', doc.id, 'days');
-              const daysSnapshot = await getDocs(daysRef);
-
-              if (!daysSnapshot.empty) {
-                const firstDayDoc = daysSnapshot.docs[0];
-                const firstDayData = firstDayDoc.data();
-                if (Array.isArray(firstDayData.places) && firstDayData.places.length > 0) {
-                  const firstPlace = firstDayData.places[0];
-                  photo = firstPlace.photo || null;
-                }
-              }
-
               return {
                 id: doc.id,
-                photo: photo,
                 ...tripData,
               };
             })
@@ -484,7 +480,6 @@ export const saveImageToStorage = async (placeId: string, file: File) => {
     const imageRef = ref(storage, `places/${placeId}/${file.name}`);
     const uploadResult = await uploadBytes(imageRef, file);
     const imageUrl = await getDownloadURL(uploadResult.ref);
-
     return imageUrl;
   } catch (error) {
     console.error('Error uploading image:', error);
@@ -583,7 +578,6 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
 
   return querySnapshot.docs.map((doc) => {
     const data = doc.data();
-    console.log('data', data);
     return {
       id: doc.id,
       title: data.title || '',
@@ -594,4 +588,129 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
       userName: data.userName,
     };
   });
+};
+
+export const fetchDeleteTrip = async (tripId: string) => {
+  try {
+    const tripRef = doc(db, 'trips', tripId);
+    await deleteDoc(tripRef);
+  } catch (error) {
+    console.error('Error delete trips:', error);
+  }
+};
+
+export const fetchDeleteArticle = async (articleId: string) => {
+  try {
+    const articleRef = doc(db, 'articles', articleId);
+    await deleteDoc(articleRef);
+  } catch (error) {
+    console.error('Error delete articles:', error);
+  }
+};
+
+export const fetchUpdateTrip = async (updateData: UpdateTripParams): Promise<void> => {
+  const { tripId, tripTitle, startDate, endDate, selectedCountries, originalTripData } = updateData;
+
+  const updatedTripData: {
+    tripTitle: string;
+    startDate: string;
+    endDate: string;
+    countries: { code: string; name: string }[];
+    updatedAt: Date;
+    imageUrl?: string;
+  } = {
+    tripTitle,
+    startDate: dayjs(startDate).format('YYYY-MM-DD'),
+    endDate: dayjs(endDate).format('YYYY-MM-DD'),
+    countries: selectedCountries.map((country) => ({
+      code: country.value,
+      name: country.label,
+    })),
+    updatedAt: new Date(),
+  };
+
+  if (selectedCountries[0]?.label !== originalTripData?.countries[0]?.label && originalTripData) {
+    const firstCountry = selectedCountries[0].label;
+    const countryImageUrl = await fetchCountryImage(firstCountry);
+    if (countryImageUrl) {
+      updatedTripData.imageUrl = countryImageUrl;
+    }
+  }
+
+  const tripRef = doc(db, 'trips', tripId);
+  await updateDoc(tripRef, updatedTripData);
+  await handleDateRangeChange(tripRef, startDate, endDate, originalTripData);
+  console.log('Trip updated successfully with date changes and imageUrl in Firebase');
+};
+
+//改成更好的寫法
+const handleDateRangeChange = async (
+  tripRef: DocumentReference,
+  startDate: Date,
+  endDate: Date,
+  originalTripData: TripData | undefined
+) => {
+  if (!originalTripData) {
+    console.error('Original trip data is missing');
+    return;
+  }
+
+  const originalStartDate = dayjs(originalTripData.startDate);
+  const originalEndDate = dayjs(originalTripData.endDate);
+  const newStartDate = dayjs(startDate);
+  const newEndDate = dayjs(endDate);
+
+  let batch = writeBatch(db);
+  const daysData = [];
+
+  let originalCurrentDate = originalStartDate;
+  while (originalCurrentDate.isBefore(originalEndDate) || originalCurrentDate.isSame(originalEndDate)) {
+    const originalFormattedDate = originalCurrentDate.format('YYYY-MM-DD');
+    const originalDayRef = doc(collection(tripRef, 'days'), originalFormattedDate);
+
+    const originalDayDoc = await getDoc(originalDayRef);
+    if (originalDayDoc.exists()) {
+      daysData.push({
+        data: originalDayDoc.data(),
+        originalFormattedDate,
+      });
+      batch.delete(originalDayRef);
+    }
+
+    originalCurrentDate = originalCurrentDate.add(1, 'day');
+  }
+
+  await batch.commit();
+
+  batch = writeBatch(db);
+
+  let currentDate = newStartDate;
+  let index = 0;
+
+  while (index < daysData.length && (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate))) {
+    const formattedDate = currentDate.format('YYYY-MM-DD');
+    const newDayRef = doc(collection(tripRef, 'days'), formattedDate);
+
+    const originalData = daysData[index] ? daysData[index].data : {};
+    batch.set(newDayRef, {
+      ...originalData,
+      date: formattedDate,
+    });
+
+    currentDate = currentDate.add(1, 'day');
+    index++;
+  }
+
+  while (currentDate.isBefore(newEndDate) || currentDate.isSame(newEndDate)) {
+    const formattedDate = currentDate.format('YYYY-MM-DD');
+    const newDayRef = doc(collection(tripRef, 'days'), formattedDate);
+
+    batch.set(newDayRef, {
+      date: formattedDate,
+    });
+
+    currentDate = currentDate.add(1, 'day');
+  }
+
+  await batch.commit();
 };

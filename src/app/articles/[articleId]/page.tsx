@@ -2,9 +2,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
-import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 
 import { fetchArticleData } from '@/lib/firebaseApi';
@@ -18,17 +17,24 @@ const MapComponent = dynamic(() => import('./Map'), {
 const ArticlesPage = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const [visiblePlace, setVisiblePlace] = useState<string | null>(null);
+  const [manualScroll, setManualScroll] = useState(false);
   const { data: articleData, isLoading } = useQuery({
     queryKey: ['articleData', articleId],
     queryFn: () => fetchArticleData(articleId as string),
     enabled: !!articleId,
   });
-  const router = useRouter();
-  const handleBackProfile = () => {
-    router.push('/profile');
-  };
+  // const handleBackProfile = () => {
+  //   router.push('/profile');
+  // };
 
   const handlePlaceVisible = (placeId: string) => {
+    if (!manualScroll) {
+      setVisiblePlace(placeId);
+    }
+  };
+
+  const handleMarkerClick = (placeId: string) => {
+    setManualScroll(true);
     setVisiblePlace(placeId);
   };
 
@@ -37,13 +43,18 @@ const ArticlesPage = () => {
   return (
     <Container>
       <ListContainer>
-        <ListHeader>
+        {/* <ListHeader>
           <HomeIcon onClick={handleBackProfile} />
-        </ListHeader>
+        </ListHeader> */}
         <EditList articleData={articleData} articleId={articleId} onPlaceVisible={handlePlaceVisible} />
       </ListContainer>
       <MapContainer>
-        <MapComponent places={places as any} routes={route as any} visiblePlace={visiblePlace} />
+        <MapComponent
+          places={places as any}
+          routes={route as any}
+          visiblePlace={visiblePlace}
+          onMarkerClick={handleMarkerClick}
+        />
       </MapContainer>
     </Container>
   );
@@ -53,17 +64,6 @@ export default ArticlesPage;
 
 const Container = styled.div`
   display: flex;
-`;
-
-const ListHeader = styled.div`
-  margin: 10px 20px;
-  display: flex;
-  align-items: center;
-`;
-
-const HomeIcon = styled(IoArrowBackCircleOutline)`
-  cursor: pointer;
-  font-size: 30px;
 `;
 
 const ListContainer = styled.div`

@@ -1,8 +1,10 @@
 'use client';
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { FaMapMarker } from 'react-icons/fa';
+import { IoArrowBackCircleOutline } from 'react-icons/io5';
 // import { MdPlace } from 'react-icons/md';
 import styled from 'styled-components';
 
@@ -28,6 +30,9 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const [images, setImages] = useState<{ [key: string]: any }>({});
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const { photoURL, userName } = useUserStore();
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  console.log('coverImage', coverImage);
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -44,17 +49,17 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
     );
 
     const placeItems = document.querySelectorAll('.place-item');
-    observer.observe(placeItems[0]);
     placeItems.forEach((item) => observer.observe(item));
 
     return () => {
       placeItems.forEach((item) => observer.unobserve(item));
     };
   }, [articleData, onPlaceVisible]);
+
   const handleCoverImageUpload = async (file: File) => {
     const localCoverImageUrl = URL.createObjectURL(file);
     setCoverImage(localCoverImageUrl);
-
+    URL.revokeObjectURL(localCoverImageUrl);
     try {
       const imageUrl = await saveImageToStorage('cover', file);
       setCoverImage(imageUrl);
@@ -97,6 +102,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   }, [articleData]);
 
   const handleImageUpload = async (placeId: string, file: File) => {
+    console.log('placeId', placeId);
     const localImageUrl = URL.createObjectURL(file);
     setImages((prev) => ({
       ...prev,
@@ -143,6 +149,10 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       alert('Error saving article. Please try again.');
     },
   });
+  const router = useRouter();
+  const handleBackProfile = () => {
+    router.push('/profile');
+  };
 
   const handleSaveArticle = async () => {
     try {
@@ -153,32 +163,43 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   };
   return (
     <Container>
-      <ArticleHeader>
+      <ListHeader>
+        <HomeIcon onClick={handleBackProfile} />
         <SaveWrapper>
-          <SaveButton onClick={handleSaveArticle}>Save</SaveButton>
+          <Button onClick={handleSaveArticle}>Save</Button>
         </SaveWrapper>
+      </ListHeader>
+      <EditWrapper>
         <ImageUploadWrapper>
-          {coverImage ? (
-            <Image src={coverImage} alt="Cover Image" />
-          ) : (
-            <input
-              type="file"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleCoverImageUpload(file);
-                }
-              }}
-            />
-          )}
+          {coverImage ? <Image src={coverImage} alt="Cover Image" /> : <div>No image has been uploaded.</div>}
+          <input
+            ref={coverImageInputRef}
+            type="file"
+            style={{ display: 'none' }}
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) {
+                handleCoverImageUpload(file);
+              }
+            }}
+          />
         </ImageUploadWrapper>
+        <ButtonWrapper>
+          <Button
+            onClick={() => {
+              coverImageInputRef.current?.click();
+            }}
+          >
+            Upload
+          </Button>
+        </ButtonWrapper>
         <ArticleTitleInput value={articleTitle} onChange={handleTitleChange} placeholder="Enter article title..." />
         <DescriptionInput
           value={articleDescription}
           onChange={handleArticleDescChange}
           placeholder="Enter article description..."
         />
-      </ArticleHeader>
+      </EditWrapper>
       {articleData.days?.length > 0 ? (
         articleData.days.map((day: any, dateIndex: number) => (
           <ItemContainer key={dateIndex}>
@@ -197,17 +218,31 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
                     {images[place.id] ? (
                       <Image src={`${images[place.id]}`} alt={place.name} />
                     ) : (
-                      <input
-                        type="file"
-                        onChange={(e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            handleImageUpload(place.id, file);
-                          }
-                        }}
-                      />
+                      <div>No image has been uploaded.</div>
                     )}
+                    <input
+                      ref={(el) => {
+                        fileInputRefs.current[place.id] = el;
+                      }}
+                      type="file"
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          handleImageUpload(place.id, file);
+                        }
+                      }}
+                    />
                   </ImageUploadWrapper>
+                  <ButtonWrapper>
+                    <Button
+                      onClick={() => {
+                        fileInputRefs.current[place.id]?.click();
+                      }}
+                    >
+                      Upload
+                    </Button>
+                  </ButtonWrapper>
                   <Description
                     value={descriptions[place.id] || ''}
                     placeholder="Enter a description..."
@@ -232,29 +267,63 @@ const Container = styled.div`
   padding-bottom: 10px;
 `;
 
+const ListHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  border-bottom: 1px solid #e9ecef;
+  height: 54px;
+  width: 48%;
+  background-color: white;
+  padding: 5px 10px;
+  margin: 0px 10px;
+  z-index: 2;
+`;
+
+const HomeIcon = styled(IoArrowBackCircleOutline)`
+  cursor: pointer;
+  font-size: 30px;
+`;
+
 const SaveWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: end;
 `;
 
-const SaveButton = styled.div`
-  font-weight: 500;
-  transition: all 0.2s ease-in-out;
-  font-size: 16px;
-  border-radius: 20px;
-  background-color: white;
-  border: 1px solid #dde9ed;
-  padding: 5px 10px;
-  cursor: pointer;
+//跟 Add button一樣
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  margin-top: 10px;
 `;
 
-const ArticleHeader = styled.div`
+const Button = styled.div`
+  background-color: #a7d6e6;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 700;
+  &:hover {
+    background-color: #dde9ed;
+  }
+`;
+
+const EditWrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 20px;
   width: 100%;
+  margin-top: 60px;
 `;
 
 const ArticleTitleInput = styled.input`
@@ -275,6 +344,8 @@ const DescriptionInput = styled.textarea`
   resize: none;
   height: 100px;
   border: none;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 `;
 
 const ItemContainer = styled.div`
@@ -312,7 +383,6 @@ const ItemName = styled.h3`
 const ImageUploadWrapper = styled.div`
   background-color: #f3f3f3;
   height: 200px;
-  margin-bottom: 10px;
   border-radius: 8px;
   display: flex;
   justify-content: center;
@@ -333,6 +403,8 @@ const Description = styled.textarea`
   border: none;
   width: 100%;
   outline: none;
+  line-height: 1.6;
+  letter-spacing: 0.5px;
 `;
 
 const MarkerContainer = styled.div`

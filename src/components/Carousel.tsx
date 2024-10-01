@@ -1,3 +1,4 @@
+// import { useState } from 'react';
 import styled from 'styled-components';
 
 interface CarouselProp<T> {
@@ -6,6 +7,18 @@ interface CarouselProp<T> {
 }
 
 const Carousel = <T,>({ item, renderItem }: CarouselProp<T>): React.ReactElement => {
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  // const handleNext = () => {
+  //   if (currentIndex < item.length - 1) {
+  //     setCurrentIndex(currentIndex + 1);
+  //   }
+  // };
+
+  // const handlePrev = () => {
+  //   if (currentIndex > 0) {
+  //     setCurrentIndex(currentIndex - 1);
+  //   }
+  // };
   return (
     <CarouselContainer>
       {item.map((item, index) => (
@@ -16,25 +29,34 @@ const Carousel = <T,>({ item, renderItem }: CarouselProp<T>): React.ReactElement
 };
 
 export default Carousel;
-
 const CarouselContainer = styled.div`
+  position: relative;
   display: flex;
   overflow-x: auto;
   gap: 16px;
-  padding: 20px;
+  /* padding: 20px 30px; */
+  max-width: 1000px;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
+
   &::-webkit-scrollbar {
     display: none;
   }
 `;
 
 const CarouselItem = styled.div`
-  /* min-width: 500px; */
   scroll-snap-align: start;
   border-radius: 10px;
   position: relative;
-  /* overflow: hidden; */
   flex-shrink: 0;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0, 0.1);
+  overflow: hidden;
+  background-color: white;
+  width: 98%;
+  padding: 10px 20px;
+
+  &:hover {
+    opacity: 1;
+    background: #ecf6f9;
+    border-radius: 8px;
+  }
 `;

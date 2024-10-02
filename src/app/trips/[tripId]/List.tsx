@@ -115,7 +115,6 @@ const List: React.FC<ListProps> = ({
       [placeId]: { startTime, endTime },
     }));
     setOpenTimePick(null);
-
     try {
       await updatePlaceStayTime(tripId, dayId, placeId, startTime, endTime);
     } catch (error) {

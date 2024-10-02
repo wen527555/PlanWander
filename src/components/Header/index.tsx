@@ -12,6 +12,7 @@ import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
 import { useUserStore } from '@/lib/store';
 // import { BsPersonCircle } from 'react-icons/bs';
 import defaultProfileImg from '@/public/earth-profile.png';
+import Logo from '@/public/PlanwanderLogo.png';
 import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
 import LoginModal from '../LoginModal';
 
@@ -90,7 +91,7 @@ const Header = () => {
   return (
     <Container>
       <Link href="/" passHref>
-        <Image src="/PlanWanderLogo.png" alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
+        <Image src={Logo} alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
       </Link>
       {userData ? (
         <>

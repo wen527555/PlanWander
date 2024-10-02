@@ -175,7 +175,7 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   gap: 20px;
-  margin-left: 50%;
+  margin-left: 43%;
   transform: translate(-100%);
 `;
 

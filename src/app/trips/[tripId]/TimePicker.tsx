@@ -34,7 +34,7 @@ const TimePickerWrapper = styled.div`
   padding: 20px 30px;
   display: flex;
   flex-direction: column;
-  z-index: 1000;
+  z-index: 999;
 `;
 
 const Label = styled.div`

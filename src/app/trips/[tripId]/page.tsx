@@ -308,7 +308,7 @@ const TripPage: React.FC = () => {
     return <div>Loading...</div>;
   }
   const { places, route } = processDays(tripData.days as any);
-
+  console.log('tripData', tripData);
   return (
     <Container>
       <ListContainer>

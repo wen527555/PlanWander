@@ -250,7 +250,7 @@ const ListContainer = styled.div`
 const ItemContainer = styled.div`
   padding: 10px 0px 20px 0px;
   border-bottom: 1px dashed #dddcdc;
-  overflow: hidden;
+  overflow: visible;
 
   &:last-child {
     border-bottom: none;

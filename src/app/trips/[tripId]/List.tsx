@@ -240,13 +240,6 @@ const ListContainer = styled.div`
   margin: 60px 30px 100px 30px;
 `;
 
-// const ItineraryTitle = styled.h2`
-//   font-size: 25px;
-//   font-weight: 700;
-//   text-align: left;
-//   margin-left: 10px;
-// `;
-
 const ItemContainer = styled.div`
   padding: 10px 0px 20px 0px;
   border-bottom: 1px dashed #dddcdc;
@@ -261,7 +254,6 @@ const ItemHeader = styled.div`
   display: flex;
   align-items: center;
   cursor: pointer;
-  /* padding: 10px 0px; */
   margin: 10px 20px 15px 0px;
   gap: 10px;
 `;

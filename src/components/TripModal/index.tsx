@@ -8,6 +8,7 @@ import Select from 'react-select';
 import styled from 'styled-components';
 
 import DateRangePicker from '@/components/TripModal/DateRangePicker';
+import useAlert from '@/lib/hooks/useAlertMessage';
 import { fetchCountries } from '@/lib/mapApi';
 
 interface Country {
@@ -50,7 +51,7 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
     })) || []
   );
   const [showCalendar, setShowCalendar] = useState(false);
-
+  const { addAlert, AlertMessage } = useAlert();
   const { data: countryOptions } = useQuery<SelectedOption[]>({
     queryKey: ['countries'],
     queryFn: async () => {
@@ -80,15 +81,23 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
   const handleSubmit = async () => {
     const startDate = date[0].startDate;
     const endDate = date[0].endDate;
-    if (!startDate || !endDate || !tripTitle) {
-      console.error('Missing required fields');
+    if (!startDate || !endDate || !tripTitle || selectedCountries.length === 0) {
+      addAlert('Please fill in all fields');
       return;
     }
     try {
       await onSubmit(tripTitle, startDate, endDate, selectedCountries);
+
+      addAlert('Creation successful');
+
       onClose();
     } catch (error) {
       console.error('Error', error);
+      if (isEditing) {
+        addAlert('Update failed, please try again');
+      } else {
+        addAlert('Creation failed, please try again');
+      }
     }
   };
 
@@ -126,6 +135,7 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
           </CreateButtonWrapper>
         </Content>
       </Modal>
+      <AlertMessage />
     </Overlay>
   );
 };

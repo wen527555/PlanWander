@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import { getColorForDate } from '@/lib/colors';
 import { saveArticle, saveImageToStorage } from '@/lib/firebaseApi';
+import useAlert from '@/lib/hooks/useAlertMessage';
 import { useUserStore } from '@/lib/store';
 
 interface ListProps {
@@ -32,7 +33,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const { userData } = useUserStore();
   const coverImageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
-  console.log('coverImage', coverImage);
+  const { addAlert, AlertMessage } = useAlert();
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -102,7 +103,6 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   }, [articleData]);
 
   const handleImageUpload = async (placeId: string, file: File) => {
-    console.log('placeId', placeId);
     const localImageUrl = URL.createObjectURL(file);
     setImages((prev) => ({
       ...prev,
@@ -142,11 +142,11 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['articleData', articleId as string] });
-      alert('Article saved successfully!');
+      addAlert('Article saved successfully!');
     },
     onError: (error: Error) => {
       console.error('Error saving article:', error.message);
-      alert('Error saving article. Please try again.');
+      addAlert('Error saving article. Please try again');
     },
   });
   const router = useRouter();
@@ -155,6 +155,14 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   };
 
   const handleSaveArticle = async () => {
+    if (!coverImage) {
+      addAlert('Please upload coverImage.');
+      return;
+    }
+    if (!articleTitle || articleDescription) {
+      addAlert("Please enter the article's title and description.");
+      return;
+    }
     try {
       saveArticleMutation.mutate();
     } catch (error) {
@@ -163,6 +171,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   };
   return (
     <Container>
+      <AlertMessage />
       <ListHeader>
         <HomeIcon onClick={handleBackProfile} />
         <SaveWrapper>

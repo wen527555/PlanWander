@@ -22,7 +22,7 @@ import {
   fetchUserAllArticles,
   fetchUserAllTrips,
 } from '@/lib/firebaseApi';
-import { useUserStore } from '@/lib/store';
+import { useModalStore, useUserStore } from '@/lib/store';
 import defaultProfileImg from '@/public/earth-profile.png';
 import Carousel from '../../components/Carousel';
 import { auth } from '../../lib/firebaseConfig';
@@ -50,19 +50,11 @@ interface SelectedOption {
 
 const ProfilePage = () => {
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
   const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);
   const { userData, setUserData } = useUserStore();
-  // console.log('photoURL', photoURL);
+  const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
   const queryClient = useQueryClient();
-  // const handleAddClick = () => {
-  //   setIsModalOpen(true);
-  // };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
 
   const handleTripOptionClick = (tripId: string) => {
     if (openMenuTripId === tripId) {
@@ -178,6 +170,9 @@ const ProfilePage = () => {
   return (
     <>
       <Container>
+        {isModalOpen && modalType === 'trip' && (
+          <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
+        )}
         <Sidebar>
           <ImgWrapper>
             <ProfileImg src={userData?.photoURL || defaultProfileImg.src} />
@@ -247,7 +242,15 @@ const ProfilePage = () => {
                 />
               </CarouselWrapper>
             ) : (
-              <p>No trips found.</p>
+              <NoPlannedContainer>
+                <NoPlannedTitle>No upcoming trips planned</NoPlannedTitle>
+                <NoPlannedTitleDescription>
+                  Planning is where the adventure starts. Plan a new trip and start yours! 🚀
+                </NoPlannedTitleDescription>
+                <ButtonWrapper>
+                  <Button onClick={() => openModal('trip')}>Create new trip</Button>
+                </ButtonWrapper>
+              </NoPlannedContainer>
             )}
           </TripContainer>
           <ArticleContainer>
@@ -286,17 +289,57 @@ const ProfilePage = () => {
                 />
               </CarouselWrapper>
             ) : (
-              <p>No Article found.</p>
+              <div></div>
             )}
           </ArticleContainer>
         </MainContent>
-        {isModalOpen && <TripModal onClose={handleModalClose} isEditing={false} onSubmit={handleCreateTrip} />}
       </Container>
     </>
   );
 };
 
 export default ProfilePage;
+
+const NoPlannedContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+`;
+
+const NoPlannedTitle = styled.h1`
+  font-size: 24px;
+  font-weight: bold;
+  color: #34495e;
+  margin-bottom: 10px;
+`;
+
+const NoPlannedTitleDescription = styled.p`
+  font-size: 16px;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 30px;
+`;
+
+const Button = styled.button`
+  background-color: #78b7cc;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 16px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: 700;
+  &:hover {
+    background-color: #e0e7ea;
+  }
+`;
+
+const ButtonWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
 
 const Container = styled.div`
   display: flex;
@@ -516,6 +559,8 @@ const PublishIcon = styled(GoShare)`
 const DeleteWrapper = styled.div`
   cursor: pointer;
   width: 100%;
+  display: flex;
+  align-items: center;
 `;
 
 const DeleteIcon = styled(AiOutlineDelete)`
@@ -559,7 +604,7 @@ const TripContainer = styled.div`
 `;
 
 const CarouselWrapper = styled.div`
-  max-width: 800px;
+  width: 800px;
   margin: 0px 25px;
   &::before {
     content: '';

@@ -30,6 +30,13 @@ interface PlaceStore {
   setPlaceDetail: (places: Place[]) => void;
 }
 
+interface ModalStore {
+  isModalOpen: boolean;
+  modalType: 'login' | 'trip' | null;
+  openModal: (type: 'login' | 'trip') => void;
+  closeModal: () => void;
+}
+
 export const usePlaceStore = create<PlaceStore>((set) => ({
   selectedPlace: null,
   placeDetail: null,
@@ -40,4 +47,11 @@ export const usePlaceStore = create<PlaceStore>((set) => ({
 export const useUserStore = create<UserStore>((set) => ({
   userData: null,
   setUserData: (userData: UserData | null) => set({ userData }),
+}));
+
+export const useModalStore = create<ModalStore>((set) => ({
+  isModalOpen: false,
+  modalType: null,
+  openModal: (type) => set({ isModalOpen: true, modalType: type }),
+  closeModal: () => set({ isModalOpen: false }),
 }));

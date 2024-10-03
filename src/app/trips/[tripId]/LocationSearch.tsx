@@ -48,7 +48,6 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceAdded, dayId }) 
   };
 
   return (
-    // <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
     <>
       <GlobalStyle />
       <Autocomplete onLoad={onLoad} onPlaceChanged={onPlaceChanged}>

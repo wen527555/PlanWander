@@ -1,11 +1,11 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
-// import { createPortal } from 'react-dom';
 import { IoMdClose } from 'react-icons/io';
 import styled from 'styled-components';
 
 import { saveUserData } from '@/lib/firebaseApi';
+import useAlert from '@/lib/hooks/useAlertMessage';
 import {
   auth,
   createUserWithEmailAndPassword,
@@ -15,17 +15,15 @@ import {
 } from '../../lib/firebaseConfig';
 
 interface LoginModalProps {
-  isOpen: boolean;
   onLoginSuccess: () => void;
   onClose: () => void;
 }
 
-const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onLoginSuccess, onClose }) => {
+const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
   const [isLogIn, setIsLogIn] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  if (!isOpen) return null;
-
+  const { addAlert, AlertMessage } = useAlert();
   const handleToggleForm = () => {
     setEmail('');
     setPassword('');
@@ -36,7 +34,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onLoginSuccess, onClose
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-
       const userInfo = {
         uid: user.uid,
         displayName: user.displayName ?? '',
@@ -45,26 +42,25 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onLoginSuccess, onClose
       };
       await saveUserData(userInfo);
       onLoginSuccess();
+      onClose();
     } catch (error) {
-      alert('Login failed: ' + (error as Error).message);
+      addAlert('Error Login. Please try again');
       console.error('Error during Google sign in', error);
     }
   };
   const handleFormSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!email || !password) {
-      alert('請填寫email和密碼');
+      addAlert('Please enter email and password.');
       return;
     }
     if (isLogIn) {
       try {
-        const userCredential = await signInWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-        console.log('user', user);
-        // !user應該要記錄到哪裡 store或是統一firebase管理
+        await signInWithEmailAndPassword(auth, email, password);
         onLoginSuccess();
+        onClose();
       } catch (error) {
-        alert('Login failed: ' + (error as Error).message);
+        addAlert('Error Login. Please try again');
         console.error('Error during login', error);
       }
     } else {
@@ -80,8 +76,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onLoginSuccess, onClose
         };
         await saveUserData(userInfo);
       } catch (error) {
-        alert('SignUp failed: ' + (error as Error).message);
-        console.error('Error during sign up', error);
+        addAlert('Sign up. Please try again');
+        console.error('Error during login', error);
       }
     }
   };
@@ -108,7 +104,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onLoginSuccess, onClose
             </>
           ) : (
             <>
-              <GoogleButton>Sign up With Google</GoogleButton>
+              <GoogleButton onClick={handleGoogleLogin}>Sign up With Google</GoogleButton>
               <form onSubmit={handleFormSubmit}>
                 <Divider>
                   <span>or</span>
@@ -124,6 +120,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onLoginSuccess, onClose
           </ToggleLink>
         </Container>
       </Content>
+      <AlertMessage />
     </Overlay>
   );
 };

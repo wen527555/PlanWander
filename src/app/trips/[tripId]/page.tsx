@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
@@ -14,7 +14,7 @@ import styled from 'styled-components';
 
 import TripModal from '@/components/TripModal';
 import { processDays } from '@/lib/processDays';
-import { usePlaceStore } from '@/lib/store';
+import { useModalStore, usePlaceStore } from '@/lib/store';
 import {
   addPlaceToDay,
   deletePlace,
@@ -26,10 +26,7 @@ import {
   updatePlacesForDay,
 } from '../../../lib/firebaseApi';
 import { getRoute } from '../../../lib/mapApi';
-// import useStore from '../../../lib/store';
 import List from './List';
-
-// import Sidebar from './Sidebar';
 
 interface Place {
   id: string;
@@ -101,8 +98,7 @@ const TripPage: React.FC = () => {
   const { tripId } = useParams<{ tripId: string }>();
   const queryClient = useQueryClient();
   const modalRef = useRef<HTMLDivElement | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [activeDate, setActiveDate] = useState(null);
+  const { isModalOpen, openModal, closeModal } = useModalStore();
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
@@ -148,14 +144,6 @@ const TripPage: React.FC = () => {
     } else {
       console.log('No changes detected, no update required');
     }
-  };
-
-  const handleUpdateClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
   };
 
   //*要再研究是否有必要用到zustand
@@ -296,10 +284,6 @@ const TripPage: React.FC = () => {
     deletePlaceMutation.mutate({ tripId, dayId, placeId });
   };
 
-  // const handlePlaceClick = async (place: Place) => {
-  //   setSelectedPlace(place);
-  // };
-
   const handleBackProfile = () => {
     router.push('/profile');
   };
@@ -308,7 +292,7 @@ const TripPage: React.FC = () => {
     return <div>Loading...</div>;
   }
   const { places, route } = processDays(tripData.days as any);
-  console.log('tripData', tripData);
+
   return (
     <Container>
       <ListContainer>
@@ -319,7 +303,7 @@ const TripPage: React.FC = () => {
             <CalendarIcon />
             {formattedStartDate}-{formattedEndDate}
           </TripDate>
-          <EditIcon onClick={handleUpdateClick} />
+          <EditIcon onClick={() => openModal('trip')} />
         </ListHeader>
         {/* <Sidebar days={tripData.days as any} activeDate={activeDate} onDateClick={handleDateClick} /> */}
         <List
@@ -329,7 +313,6 @@ const TripPage: React.FC = () => {
           onDaysUpdate={handleDaysUpdate}
           onModeUpdate={handleModeChange}
           onPlaceDelete={handlePlaceDelete}
-          // onPlaceClick={handlePlaceClick}
           tripId={tripId}
         />
       </ListContainer>
@@ -389,12 +372,7 @@ const TripPage: React.FC = () => {
         )}
       </MapContainer>
       {isModalOpen && (
-        <TripModal
-          onClose={handleModalClose}
-          isEditing={true}
-          initialData={tripData}
-          onSubmit={handleUpdateTrip}
-        ></TripModal>
+        <TripModal onClose={closeModal} isEditing={true} initialData={tripData} onSubmit={handleUpdateTrip} />
       )}
     </Container>
   );

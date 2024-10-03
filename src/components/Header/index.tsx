@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { RiCompassDiscoverLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
 import TripModal from '@/components/TripModal';
 import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
-import { useUserStore } from '@/lib/store';
+import { useModalStore, useUserStore } from '@/lib/store';
 // import { BsPersonCircle } from 'react-icons/bs';
 import defaultProfileImg from '@/public/earth-profile.png';
 import Logo from '@/public/PlanwanderLogo.png';
@@ -22,9 +22,7 @@ interface SelectedOption {
 }
 
 const Header = () => {
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  // const [user, setUser] = useState<User | null>(null);
+  const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
   const { userData } = useUserStore();
   const router = useRouter();
   const pathname = usePathname();
@@ -41,33 +39,6 @@ const Header = () => {
 
     return () => unsubscribe();
   }, [router]);
-
-  const handleLoginClick = () => {
-    setIsLoginModalOpen(true);
-  };
-
-  const handleLoginSuccess = () => {
-    setIsLoginModalOpen(false);
-    router.push('/profile');
-  };
-
-  const handleAddClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
-
-  // const handleLogout = async () => {
-  //   try {
-  //     await auth.signOut();
-  //     setUser(null);
-  //     router.push('/');
-  //   } catch (error) {
-  //     console.error('Error during logout: ', error);
-  //   }
-  // };
 
   const handleToProfile = () => {
     router.push('/profile');
@@ -107,20 +78,18 @@ const Header = () => {
           </IconWrapper>
           {/* <Button onClick={handleLogout}>Logout</Button> */}
           <ButtonWrapper>
-            <AddButton onClick={handleAddClick}>+ Add</AddButton>
+            <Button onClick={() => openModal('trip')}>+ Plan</Button>
           </ButtonWrapper>
         </>
       ) : (
-        <>
-          <Button onClick={handleLoginClick}>LogIn</Button>
-          <LoginModal
-            isOpen={isLoginModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onLoginSuccess={handleLoginSuccess}
-          ></LoginModal>
-        </>
+        <ButtonWrapper>
+          <Button onClick={() => openModal('login')}>LogIn</Button>
+        </ButtonWrapper>
       )}
-      {isModalOpen && <TripModal onClose={handleModalClose} isEditing={false} onSubmit={handleCreateTrip} />}
+      {isModalOpen && modalType === 'trip' && (
+        <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
+      )}
+      {isModalOpen && modalType === 'login' && <LoginModal onClose={closeModal} onLoginSuccess={handleToProfile} />}
     </Container>
   );
 };
@@ -142,21 +111,6 @@ const Container = styled.div`
   background-color: #fff;
   z-index: 1000;
   /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
-`;
-
-const Button = styled.button`
-  width: 50px;
-  height: 30px;
-  font-weight: 700;
-  transition: all 0.2s ease-in-out;
-  font-size: 12px;
-  border-radius: 8px;
-  border: none;
-  background-color: white;
-  cursor: pointer;
-  &hover {
-    background-color: #dde9ed;
-  }
 `;
 
 const ProfileIcon = styled.img`
@@ -240,7 +194,7 @@ const DiscoverWrapper = styled.div<{ isActive: boolean }>`
   }
 `;
 
-const AddButton = styled.button`
+const Button = styled.button`
   background-color: #78b7cc;
   color: white;
   border: none;

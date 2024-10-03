@@ -243,7 +243,7 @@ const ProfilePage = () => {
               </CarouselWrapper>
             ) : (
               <NoPlannedContainer>
-                <NoPlannedTitle>No upcoming trips planned</NoPlannedTitle>
+                <NoPlannedTitle>Create your first trip</NoPlannedTitle>
                 <NoPlannedTitleDescription>
                   Planning is where the adventure starts. Plan a new trip and start yours! 🚀
                 </NoPlannedTitleDescription>

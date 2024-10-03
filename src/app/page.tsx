@@ -13,10 +13,7 @@ const HomePage = () => {
       <ContentWrapper>
         <TextSection>
           <Heading>A travel planner for everyone</Heading>
-          <Description>
-            Organize flights & hotels and map your trips in a free travel app designed for vacation planning & road
-            trips, powered by AI and Google Maps.
-          </Description>
+          <Description>Organize map your trip in a free travel website designed for vacation planning.</Description>
           <ButtonGroup>
             <StartButton>Start planning</StartButton>
           </ButtonGroup>

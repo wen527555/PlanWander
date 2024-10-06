@@ -7,6 +7,7 @@ import { useEffect } from 'react';
 import { RiCompassDiscoverLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
+// import Loading from '@/app/loading';
 import TripModal from '@/components/TripModal';
 import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
 import { useModalStore, useUserStore } from '@/lib/store';
@@ -23,7 +24,9 @@ interface SelectedOption {
 
 const Header = () => {
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
+  // const { isLoading, setLoading } = useLoadingStore();
   const { userData } = useUserStore();
+  // const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const pathname = usePathname();
   const isProfileActive = pathname === '/profile';
@@ -41,7 +44,10 @@ const Header = () => {
   }, [router]);
 
   const handleToProfile = () => {
+    // setLoading(true);
     router.push('/profile');
+    // startTransition(() => {
+    // });
   };
 
   const handleToDiscover = () => {
@@ -61,6 +67,7 @@ const Header = () => {
 
   return (
     <Container>
+      {/* {isPending && <Loading />} */}
       <Link href="/" passHref>
         <Image src={Logo} alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
       </Link>

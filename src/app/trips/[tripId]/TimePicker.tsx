@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import Flatpickr from 'react-flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
+
 import styled from 'styled-components';
 
 interface ButtonProps {
@@ -7,67 +11,54 @@ interface ButtonProps {
 
 interface TimePickerProps {
   place: { id: string };
+  initialStayDuration: number;
   dayId: string;
-  onSave: (placeId: string, dayId: string, startTime: string, endTime: string) => void;
-  onClear: () => void;
+  onSave: (placeId: string, dayId: string, initialStayDuration: number) => void;
+  onClose: () => void;
 }
-
-const generateTimeSlots = () => {
-  const times = [];
-  let startTime = 0;
-  while (startTime < 24 * 60) {
-    const hours = Math.floor(startTime / 60);
-    const minutes = startTime % 60;
-    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    times.push(timeString);
-    startTime += 30;
-  }
-  return times;
-};
 
 const TimePickerWrapper = styled.div`
   position: absolute;
-  width: 300px;
+  max-width: 250px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px 30px;
+  margin: 0 auto;
+  z-index: 5;
+  padding: 10px 25px 15px;
   display: flex;
   flex-direction: column;
-  z-index: 999;
+
+  .flatpickr-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .flatpickr-calendar {
+    width: 100px;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 999;
+    overflow: hidden;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.2);
+    transform: translateY(10px);
+  }
 `;
 
 const Label = styled.div`
-  font-weight: bold;
-  margin-bottom: 8px;
-`;
-
-const Select = styled.select`
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  margin-bottom: 12px;
-  font-size: 16px;
-
-  option {
-    background-color: white;
-    color: #333;
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  /* &:focus {
-    border-color: #94c3d2;
-  }
-
-  &:hover {
-    border-color: #94c3d2;
-  } */
+  font-weight: 600;
+  margin: 8px 0px;
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  margin-top: 10px;
 `;
 
 const Button = styled.button<ButtonProps>`
@@ -89,37 +80,42 @@ const Button = styled.button<ButtonProps>`
     `}
 `;
 
-const TimePicker: React.FC<TimePickerProps> = ({ place, dayId, onSave, onClear }) => {
-  const [startTime, setStartTime] = useState('');
-  const [endTime, setEndTime] = useState('');
-  const timeSlots = generateTimeSlots();
-
+const TimePickerComponent: React.FC<TimePickerProps> = ({
+  place,
+  initialStayDuration = 3600,
+  dayId,
+  onSave,
+  onClose,
+}) => {
+  const [stayDuration, setStayDuration] = useState<number>(initialStayDuration);
   const handleSave = () => {
-    onSave(place.id, dayId, startTime, endTime);
+    onSave(place.id, dayId, stayDuration);
   };
 
   return (
-    <TimePickerWrapper>
-      <Label>Start time</Label>
-      <Select value={startTime} onChange={(e) => setStartTime(e.target.value)}>
-        {timeSlots.map((time, index) => (
-          <option key={index} value={time}>
-            {time}
-          </option>
-        ))}
-      </Select>
-
-      <Label>End time</Label>
-      <Select value={endTime} onChange={(e) => setEndTime(e.target.value)}>
-        {timeSlots.map((time, index) => (
-          <option key={index} value={time}>
-            {time}
-          </option>
-        ))}
-      </Select>
-
+    <TimePickerWrapper onClick={(e) => e.stopPropagation()}>
+      <Label>Stay Duration</Label>
+      <Flatpickr
+        id="start-time-picker"
+        value={new Date(stayDuration * 1000)}
+        options={{
+          enableTime: true,
+          noCalendar: true,
+          dateFormat: 'H:i',
+          time_24hr: true,
+          allowInput: true,
+        }}
+        onChange={(selectedTime: Date[]) => {
+          if (selectedTime.length > 0) {
+            const selectedDate = selectedTime[0];
+            const selectedHours = selectedDate.getHours();
+            const selectedMinutes = selectedDate.getMinutes();
+            setStayDuration(selectedHours * 3600 + selectedMinutes * 60);
+          }
+        }}
+      />
       <ButtonGroup>
-        <Button variant="clear" onClick={onClear}>
+        <Button variant="clear" onClick={onClose}>
           Close
         </Button>
         <Button variant="save" onClick={handleSave}>
@@ -130,4 +126,4 @@ const TimePicker: React.FC<TimePickerProps> = ({ place, dayId, onSave, onClear }
   );
 };
 
-export default TimePicker;
+export default TimePickerComponent;

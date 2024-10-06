@@ -32,6 +32,16 @@ interface TransportOption {
   icon: JSX.Element;
 }
 
+const formatDuration = (duration: any) => {
+  const hours = Math.floor(duration / 3600);
+  const min = Math.floor((duration % 3600) / 60);
+  if (hours > 0) {
+    return `${hours}hr ${min}min`;
+  } else {
+    return `${min}min`;
+  }
+};
+
 const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
   onModeUpdate,
   start,
@@ -68,7 +78,7 @@ const TransportModeSelector: React.FC<TransportModeSelectorProps> = ({
       <RouteLine />
       <CurrentMode onClick={toggleDropdown}>
         {transportModes.find((tm) => tm.mode === selectedMode)?.icon}
-        {route?.duration}
+        {formatDuration(route?.duration)}
         <DropdownIcon />
       </CurrentMode>
       {showDropdown && (

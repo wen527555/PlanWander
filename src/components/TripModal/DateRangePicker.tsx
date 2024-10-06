@@ -40,6 +40,7 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ date, showCalendar, s
             direction="horizontal"
             rangeColors={['#94C3D2']}
             autoFocus={false}
+            moveRangeOnFirstSelection={false}
           />
         </CalendarPopup>
       )}

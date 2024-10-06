@@ -55,7 +55,6 @@ const ProfilePage = () => {
   const { userData, setUserData } = useUserStore();
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
   const queryClient = useQueryClient();
-
   const handleTripOptionClick = (tripId: string) => {
     if (openMenuTripId === tripId) {
       setOpenTripId(null);

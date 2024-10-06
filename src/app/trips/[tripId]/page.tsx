@@ -305,7 +305,6 @@ const TripPage: React.FC = () => {
           </TripDate>
           <EditIcon onClick={() => openModal('trip')} />
         </ListHeader>
-        {/* <Sidebar days={tripData.days as any} activeDate={activeDate} onDateClick={handleDateClick} /> */}
         <List
           days={tripData.days as any}
           // activeDate={activeDate}

@@ -1,30 +1,46 @@
 // import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styled from 'styled-components';
 
 interface CarouselProp<T> {
   item: T[];
   renderItem: (item: T) => React.ReactNode;
+  currentIndex: number;
+  onChange: (index: number) => void;
 }
 
-const Carousel = <T,>({ item, renderItem }: CarouselProp<T>): React.ReactElement => {
-  // const [currentIndex, setCurrentIndex] = useState(0);
-  // const handleNext = () => {
-  //   if (currentIndex < item.length - 1) {
-  //     setCurrentIndex(currentIndex + 1);
-  //   }
-  // };
+const Carousel = <T,>({ item, renderItem, currentIndex, onChange }: CarouselProp<T>): React.ReactElement => {
+  const [startX, setStartX] = useState(0);
+  const carouselRef = useRef<HTMLDivElement>(null);
+  console.log('currentIndex', currentIndex);
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setStartX(e.touches[0].clientX);
+    console.log('Touch Start at', e.touches[0].clientX);
+  };
 
-  // const handlePrev = () => {
-  //   if (currentIndex > 0) {
-  //     setCurrentIndex(currentIndex - 1);
-  //   }
-  // };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const endX = e.changedTouches[0].clientX;
+    const diffX = startX - endX;
+    console.log('Touch End at', e.changedTouches[0].clientX);
+    console.log('Swipe distance', diffX);
+
+    if (diffX > 30 && currentIndex < item.length - 1) {
+      console.log('Swipe left');
+      onChange(currentIndex + 1);
+    } else if (diffX < -30 && currentIndex > 0) {
+      console.log('Swipe right');
+      onChange(currentIndex - 1);
+    }
+  };
+
   return (
-    <CarouselContainer>
-      {item.map((item, index) => (
-        <CarouselItem key={index}>{renderItem(item)}</CarouselItem>
-      ))}
-    </CarouselContainer>
+    <>
+      <CarouselContainer ref={carouselRef} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+        {item.map((item, index) => (
+          <CarouselItem key={index}>{renderItem(item)}</CarouselItem>
+        ))}
+      </CarouselContainer>
+    </>
   );
 };
 
@@ -51,12 +67,12 @@ const CarouselItem = styled.div`
   flex-shrink: 0;
   overflow: hidden;
   background-color: white;
-  width: 98%;
-  padding: 10px 20px;
+  width: 94%;
+  padding: 10px 5px;
 
   &:hover {
     opacity: 1;
     background: #ecf6f9;
-    border-radius: 8px;
+    border-radius: 10px;
   }
 `;

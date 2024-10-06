@@ -1,109 +1,113 @@
 'use client';
 
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import dayjs from 'dayjs';
+// import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+// import dayjs from 'dayjs';
 import { onAuthStateChanged } from 'firebase/auth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { AiOutlineDelete } from 'react-icons/ai';
-import { GoShare } from 'react-icons/go';
-import { IoEarthOutline } from 'react-icons/io5';
-import { PiArticleNyTimes } from 'react-icons/pi';
-import { SlOptions } from 'react-icons/sl';
-import { TbLogout2 } from 'react-icons/tb';
+// import { AiOutlineDelete } from 'react-icons/ai';
+// import { GoShare } from 'react-icons/go';
+// import { IoEarthOutline } from 'react-icons/io5';
+// import { PiArticleNyTimes } from 'react-icons/pi';
+// import { SlOptions } from 'react-icons/sl';
+// import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
-import TripModal from '@/components/TripModal';
-import {
-  createArticleFromTrip,
-  createNewTrip,
-  fetchDeleteArticle,
-  fetchDeleteTrip,
-  fetchUserAllArticles,
-  fetchUserAllTrips,
-} from '@/lib/firebaseApi';
-import { useModalStore, useUserStore } from '@/lib/store';
-import defaultProfileImg from '@/public/earth-profile.png';
-import Carousel from '../../components/Carousel';
+// import TripModal from '@/components/TripModal';
+// import {
+//   createArticleFromTrip,
+//   createNewTrip,
+//   // fetchDeleteArticle,
+//   fetchDeleteTrip,
+//   fetchUserAllArticles,
+//   fetchUserAllTrips,
+// } from '@/lib/firebaseApi';
+// import { useModalStore, useUserStore } from '@/lib/store';
+// import defaultProfileImg from '@/public/earth-profile.png';
+// import Carousel from '../../components/Carousel';
 import { auth } from '../../lib/firebaseConfig';
+import ArticlesContainer from './Articles';
+import Sidebar from './Sidebar';
+import TripsContainer from './Trips';
 
-interface Trip {
-  imageUrl: string | undefined;
-  id: string;
-  tripTitle: string;
-  startDate: string;
-  endDate: string;
-}
+// interface Trip {
+//   imageUrl: string | undefined;
+//   id: string;
+//   tripTitle: string;
+//   startDate: string;
+//   endDate: string;
+// }
 
-interface Article {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: string;
-  coverImage: string;
-}
+// interface Article {
+//   id: string;
+//   title: string;
+//   description: string;
+//   createdAt: string;
+//   coverImage: string;
+// }
 
-interface SelectedOption {
-  value: string;
-  label: string;
-}
+// interface SelectedOption {
+//   value: string;
+//   label: string;
+// }
 
 const ProfilePage = () => {
+  const [currentTab, setCurrentTab] = useState<'trips' | 'articles'>('trips');
   const router = useRouter();
-  const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
-  const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);
-  const { userData, setUserData } = useUserStore();
-  const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
-  const queryClient = useQueryClient();
-  const handleTripOptionClick = (tripId: string) => {
-    if (openMenuTripId === tripId) {
-      setOpenTripId(null);
-    } else {
-      setOpenTripId(tripId);
-    }
-  };
+  // const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
+  // const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);
+  // const { userData, setUserData } = useUserStore();
+  // const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
+  // const queryClient = useQueryClient();
+  // const handleTripOptionClick = (tripId: string) => {
+  //   if (openMenuTripId === tripId) {
+  //     setOpenTripId(null);
+  //   } else {
+  //     setOpenTripId(tripId);
+  //   }
+  // };
 
-  const handleArticleOptionClick = (ArticleId: string) => {
-    if (openMenuArticleId === ArticleId) {
-      setOpenArticleId(null);
-    } else {
-      setOpenArticleId(ArticleId);
-    }
-  };
+  // const handleArticleOptionClick = (ArticleId: string) => {
+  //   if (openMenuArticleId === ArticleId) {
+  //     setOpenArticleId(null);
+  //   } else {
+  //     setOpenArticleId(ArticleId);
+  //   }
+  // };
 
-  const deleteTripMutation = useMutation({
-    mutationFn: fetchDeleteTrip,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userTrips'] });
-      alert('delete trip successfully!');
-    },
-    onError: (error) => {
-      console.error('Error deleting trip:', error);
-    },
-  });
+  // const deleteTripMutation = useMutation({
+  //   mutationFn: fetchDeleteTrip,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['userTrips'] });
+  //     alert('delete trip successfully!');
+  //   },
+  //   onError: (error) => {
+  //     console.error('Error deleting trip:', error);
+  //   },
+  // });
 
-  const handleDeleteTripClick = (tripId: string) => {
-    if (window.confirm('Are you sure you want to delete this trip?')) {
-      deleteTripMutation.mutate(tripId);
-    }
-  };
+  // const handleDeleteTripClick = (tripId: string) => {
+  //   if (window.confirm('Are you sure you want to delete this trip?')) {
+  //     deleteTripMutation.mutate(tripId);
+  //   }
+  // };
 
-  const deleteArticleMutation = useMutation({
-    mutationFn: fetchDeleteArticle,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['userArticles'] });
-      alert('delete article successfully!');
-    },
-    onError: (error) => {
-      console.error('Error deleting trip:', error);
-    },
-  });
+  // const deleteArticleMutation = useMutation({
+  //   mutationFn: fetchDeleteArticle,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['userArticles'] });
+  //     alert('delete article successfully!');
+  //   },
+  //   onError: (error) => {
+  //     console.error('Error deleting trip:', error);
+  //   },
+  // });
 
-  const handleDeleteArticleClick = (articleId: string) => {
-    if (window.confirm('Are you sure you want to delete this article?')) {
-      deleteArticleMutation.mutate(articleId);
-    }
-  };
+  // const handleDeleteArticleClick = (articleId: string) => {
+  //   if (window.confirm('Are you sure you want to delete this article?')) {
+  //     deleteArticleMutation.mutate(articleId);
+  //   }
+  // };
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -114,62 +118,85 @@ const ProfilePage = () => {
     return () => unsubscribe();
   }, []);
 
-  const { data: trips = [], isLoading: loadingTrips } = useQuery<any>({
-    queryKey: ['userTrips'],
-    queryFn: fetchUserAllTrips,
-  });
-  console.log('trips', trips);
-  const { data: articles = [] } = useQuery<any>({
-    queryKey: ['userArticles'],
-    queryFn: fetchUserAllArticles,
-  });
+  // const { data: trips = [], isLoading: loadingTrips } = useQuery<any>({
+  //   queryKey: ['userTrips'],
+  //   queryFn: fetchUserAllTrips,
+  // });
 
-  const handleTripClick = (tripId: string) => {
-    router.push(`trips/${tripId}`);
-  };
+  // const today = dayjs();
+  // const upcomingTrips = trips?.filter((trip) => dayjs(trip.startDate).isAfter(today));
+  // console.log('upcomingTrips', upcomingTrips);
+  // const pastTrips = trips?.filter((trip) => dayjs(trip.endDate).isBefore(today));
+  // const pastTripsByYear = pastTrips.reduce((acc, trip) => {
+  //   const year = dayjs(trip.startDate).year();
+  //   if (!acc[year]) {
+  //     acc[year] = [];
+  //   }
+  //   acc[year].push(trip);
+  //   return acc;
+  // }, {});
+  // const [currentIndex, setCurrentIndex] = useState(0);
+  // const currentTrip = upcomingTrips[currentIndex];
+  // const daysUntilNextTrip = currentTrip ? dayjs(currentTrip.startDate).diff(today, 'day') : null;
+  // console.log('currentTrip', currentTrip);
+  // const handleSlideChange = (newIndex) => {
+  //   setCurrentIndex(newIndex);
+  // };
+  // const { data: articles = [] } = useQuery<any>({
+  //   queryKey: ['userArticles'],
+  //   queryFn: fetchUserAllArticles,
+  // });
 
-  const handleArticleClick = (articleId: string) => {
-    router.push(`articles/${articleId}`);
-  };
+  // const handleTripClick = (tripId: string) => {
+  //   router.push(`trips/${tripId}`);
+  // };
 
-  const handlePublishClick = async (tripId: string) => {
-    try {
-      await createArticleFromTrip(tripId);
-      router.push(`/articles/${tripId}`);
-    } catch (error) {
-      console.error('Error publishing article:', error);
-    }
-  };
+  // const handleArticleClick = (articleId: string) => {
+  //   router.push(`articles/${articleId}`);
+  // };
 
-  const handleCreateTrip = async (
-    tripTitle: string,
-    startDate: Date,
-    endDate: Date,
-    selectedCountries: SelectedOption[]
-  ) => {
-    const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
-    console.log('Trip created successfully');
-    router.push(`/trips/${tripId}`);
-  };
+  // const handlePublishClick = async (tripId: string) => {
+  //   try {
+  //     await createArticleFromTrip(tripId);
+  //     router.push(`/articles/${tripId}`);
+  //   } catch (error) {
+  //     console.error('Error publishing article:', error);
+  //   }
+  // };
 
-  const handleLogout = async () => {
-    try {
-      await auth.signOut();
-      setUserData(null);
-      router.push('/');
-    } catch (error) {
-      console.error('Error during logout: ', error);
-    }
-  };
+  // const handleCreateTrip = async (
+  //   tripTitle: string,
+  //   startDate: Date,
+  //   endDate: Date,
+  //   selectedCountries: SelectedOption[]
+  // ) => {
+  //   const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
+  //   console.log('Trip created successfully');
+  //   router.push(`/trips/${tripId}`);
+  // };
 
-  if (loadingTrips) {
-    return <p>Loading</p>;
-  }
+  // const handleLogout = async () => {
+  //   try {
+  //     await auth.signOut();
+  //     setUserData(null);
+  //     router.push('/');
+  //   } catch (error) {
+  //     console.error('Error during logout: ', error);
+  //   }
+  // };
+
+  // if (loadingTrips) {
+  //   return <p>Loading</p>;
+  // }
 
   return (
     <>
       <Container>
-        {isModalOpen && modalType === 'trip' && (
+        <Sidebar setCurrentTab={setCurrentTab} />
+        <MainContent>{currentTab === 'trips' ? <TripsContainer /> : <ArticlesContainer />}</MainContent>
+      </Container>
+      {/* <Container> */}
+      {/* {isModalOpen && modalType === 'trip' && (
           <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
         )}
         <Sidebar>
@@ -195,26 +222,85 @@ const ProfilePage = () => {
           </LogoutWrapper>
         </Sidebar>
         <MainContent>
-          <Separator>
-            <Title>Trip plans</Title>
-          </Separator>
           <TripContainer>
-            {trips?.length > 0 ? (
-              <CarouselWrapper>
-                <Carousel<Trip>
-                  item={trips}
-                  renderItem={(trip) => {
-                    const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
-                    const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
+            {upcomingTrips?.length > 0 ? (
+              <>
+                <UpcomingTripsInfo>
+                  <TripsCount>{upcomingTrips.length} upcoming trips</TripsCount>
+                  {daysUntilNextTrip !== null && (
+                    <NextTripInfo>This adventure starts in {daysUntilNextTrip} days</NextTripInfo>
+                  )}
+                </UpcomingTripsInfo>
+                <CarouselWrapper>
+                  <Carousel<Trip>
+                    item={upcomingTrips}
+                    currentIndex={currentIndex}
+                    onChange={handleSlideChange}
+                    renderItem={(trip) => {
+                      const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
+                      const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
 
-                    return (
+                      return (
+                        <CardWrapper>
+                          <CardHeader>
+                            <IconWrapper>
+                              <PublishWrapper onClick={() => handlePublishClick(trip.id)}>
+                                <PublishIcon />
+                                Publish
+                              </PublishWrapper>
+                              <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
+                              {openMenuTripId === trip.id && (
+                                <Menu>
+                                  <MenuItem>
+                                    <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
+                                    Delete
+                                  </MenuItem>
+                                </Menu>
+                              )}
+                            </IconWrapper>
+                          </CardHeader>
+                          <CardContent onClick={() => handleTripClick(trip.id)}>
+                            <TripImg src={trip.imageUrl} />
+                            <CardDetails>
+                              <TripName>{trip.tripTitle}</TripName>
+                              <TripDate>
+                                {formattedStartDate} - {formattedEndDate}
+                              </TripDate>
+                            </CardDetails>
+                          </CardContent>
+                        </CardWrapper>
+                      );
+                    }}
+                  />
+                </CarouselWrapper>
+              </>
+            ) : (
+              <NoPlannedContainer>
+                <NoPlannedTitle>Create your first trip</NoPlannedTitle>
+                <NoPlannedTitleDescription>
+                  Planning is where the adventure starts. Plan a new trip and start yours! 🚀
+                </NoPlannedTitleDescription>
+                <ButtonWrapper>
+                  <Button onClick={() => openModal('trip')}>Create new trip</Button>
+                </ButtonWrapper>
+              </NoPlannedContainer>
+            )}
+            {Object.keys(pastTripsByYear).map((year) => (
+              <YearSection key={year}>
+                <YearSeparator>
+                  <YearTitle>
+                    {year} • {pastTripsByYear[year].length} trips
+                  </YearTitle>
+                </YearSeparator>
+                {pastTripsByYear[year].map((trip, index) => {
+                  const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
+                  const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
+
+                  return (
+                    <YearWrapper key={index}>
                       <CardWrapper>
                         <CardHeader>
                           <IconWrapper>
-                            <PublishWrapper onClick={() => handlePublishClick(trip.id)}>
-                              <PublishIcon />
-                              Publish
-                            </PublishWrapper>
                             <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
                             {openMenuTripId === trip.id && (
                               <Menu>
@@ -236,23 +322,13 @@ const ProfilePage = () => {
                           </CardDetails>
                         </CardContent>
                       </CardWrapper>
-                    );
-                  }}
-                />
-              </CarouselWrapper>
-            ) : (
-              <NoPlannedContainer>
-                <NoPlannedTitle>Create your first trip</NoPlannedTitle>
-                <NoPlannedTitleDescription>
-                  Planning is where the adventure starts. Plan a new trip and start yours! 🚀
-                </NoPlannedTitleDescription>
-                <ButtonWrapper>
-                  <Button onClick={() => openModal('trip')}>Create new trip</Button>
-                </ButtonWrapper>
-              </NoPlannedContainer>
-            )}
-          </TripContainer>
-          <ArticleContainer>
+                    </YearWrapper>
+                  );
+                })}
+              </YearSection>
+            ))}
+          </TripContainer> */}
+      {/* <ArticleContainer>
             <Separator>
               <Title>Travel Memories</Title>
             </Separator>
@@ -290,55 +366,79 @@ const ProfilePage = () => {
             ) : (
               <div></div>
             )}
-          </ArticleContainer>
-        </MainContent>
-      </Container>
+          </ArticleContainer> */}
+      {/* </MainContent>
+      </Container> */}
     </>
   );
 };
 
 export default ProfilePage;
 
-const NoPlannedContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 40px;
-`;
+// const NoPlannedContainer = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: center;
+//   padding: 40px;
+// `;
 
-const NoPlannedTitle = styled.h1`
-  font-size: 24px;
-  font-weight: bold;
-  color: #34495e;
-  margin-bottom: 10px;
-`;
+// const NoPlannedTitle = styled.h1`
+//   font-size: 24px;
+//   font-weight: bold;
+//   color: #34495e;
+//   margin-bottom: 10px;
+// `;
 
-const NoPlannedTitleDescription = styled.p`
-  font-size: 16px;
-  color: #7f8c8d;
-  text-align: center;
-  margin-bottom: 30px;
-`;
+// const NoPlannedTitleDescription = styled.p`
+//   font-size: 16px;
+//   color: #7f8c8d;
+//   text-align: center;
+//   margin-bottom: 30px;
+// `;
 
-const Button = styled.button`
-  background-color: #78b7cc;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  padding: 8px 16px;
-  font-size: 16px;
-  cursor: pointer;
-  font-weight: 700;
-  &:hover {
-    background-color: #e0e7ea;
-  }
-`;
+// const UpcomingTripsInfo = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   flex-direction: column;
+//   margin-bottom: 20px;
+// `;
 
-const ButtonWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
+// const TripsCount = styled.div`
+//   font-size: 16px;
+//   font-weight: bold;
+//   color: #6c757d;
+// `;
+
+// const NextTripInfo = styled.div`
+//   background-color: #78b7cc;
+//   color: white;
+//   padding: 10px 20px;
+//   border-radius: 20px;
+//   font-weight: bold;
+//   font-size: 16px;
+//   margin-top: 10px;
+// `;
+
+// const Button = styled.button`
+//   background-color: #78b7cc;
+//   color: white;
+//   border: none;
+//   border-radius: 20px;
+//   padding: 8px 16px;
+//   font-size: 16px;
+//   cursor: pointer;
+//   font-weight: 700;
+//   &:hover {
+//     background-color: #e0e7ea;
+//   }
+// `;
+
+// const ButtonWrapper = styled.div`
+//   display: flex;
+//   align-items: center;
+// `;
 
 const Container = styled.div`
   display: flex;
@@ -347,339 +447,387 @@ const Container = styled.div`
   margin-top: 60px;
 `;
 
-const Sidebar = styled.div`
-  width: 250px;
-  background-color: #f9fcfd;
-  border-right: 1px solid #dde9ed;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 24px;
-  height: calc(100vh - 54px);
-`;
+// const Sidebar = styled.div`
+//   width: 250px;
+//   background-color: #f9fcfd;
+//   border-right: 1px solid #dde9ed;
+//   display: flex;
+//   flex-direction: column;
+//   align-items: center;
+//   justify-content: space-between;
+//   padding: 16px 24px;
+//   height: calc(100vh - 54px);
+// `;
 
-const UserName = styled.h1`
-  margin-top: 25px;
-  font-weight: 700;
-  font-size: 20px;
-`;
+// const UserName = styled.h1`
+//   margin-top: 25px;
+//   font-weight: 700;
+//   font-size: 20px;
+// `;
 
-const ImgWrapper = styled.div`
-  box-shadow: 0 2px 3px #00000017;
-  border: 4px solid #ffffff;
-  background: #ecf6f9;
-  border-radius: 50%;
-  margin-top: 40px;
-  width: 96px;
-  height: 96px;
-`;
+// const ImgWrapper = styled.div`
+//   box-shadow: 0 2px 3px #00000017;
+//   border: 4px solid #ffffff;
+//   background: #ecf6f9;
+//   border-radius: 50%;
+//   margin-top: 40px;
+//   width: 96px;
+//   height: 96px;
+// `;
 
-const ProfileImg = styled.img`
-  border-radius: 50%;
-  width: 100%;
-  height: 100%;
-  /* border: 2px solid #a19a9a; */
-  object-fit: cover;
-`;
+// const ProfileImg = styled.img`
+//   border-radius: 50%;
+//   width: 100%;
+//   height: 100%;
+//   /* border: 2px solid #a19a9a; */
+//   object-fit: cover;
+// `;
 
-const InfoSection = styled.div`
-  padding: 20px;
-`;
+// const InfoSection = styled.div`
+//   padding: 20px;
+// `;
 
-const InfoItem = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #ecf6f9;
-  padding: 10px 20px;
-  border-radius: 15px;
-  margin: 30px 0px;
-  width: 180px;
-  font-size: 16px;
-  font-weight: 600;
-  &:nth-child(2) {
-    background-color: #f9fcfd;
-  }
-`;
+// const InfoItem = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: space-between;
+//   background: #ecf6f9;
+//   padding: 10px 20px;
+//   border-radius: 15px;
+//   margin: 30px 0px;
+//   width: 180px;
+//   font-size: 16px;
+//   font-weight: 600;
+//   &:nth-child(2) {
+//     background-color: #f9fcfd;
+//   }
+// `;
 
-const TripsIcon = styled(IoEarthOutline)`
-  font-size: 14px;
-  color: #0f3e4a;
-`;
+// const TripsIcon = styled(IoEarthOutline)`
+//   font-size: 14px;
+//   color: #0f3e4a;
+// `;
 
-const ArticlesIcon = styled(PiArticleNyTimes)`
-  font-size: 14px;
-  color: #0f3e4a;
-`;
+// const ArticlesIcon = styled(PiArticleNyTimes)`
+//   font-size: 14px;
+//   color: #0f3e4a;
+// `;
 
-const InfoText = styled.span`
-  font-size: 16px;
-  color: #333;
-  flex-grow: 1;
-  margin-left: 10px;
-`;
+// const InfoText = styled.span`
+//   font-size: 16px;
+//   color: #333;
+//   flex-grow: 1;
+//   margin-left: 10px;
+// `;
 
-const InfoCount = styled.span`
-  font-size: 16px;
-  color: #6c757d;
-`;
+// const InfoCount = styled.span`
+//   font-size: 16px;
+//   color: #6c757d;
+// `;
 
-const LogoutWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  margin-top: auto;
-  margin-bottom: 15px;
+// const LogoutWrapper = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   width: 100%;
+//   margin-top: auto;
+//   margin-bottom: 15px;
 
-  /* &:hover {
-    background-color: #78b7cc;
-  } */
-`;
+//   /* &:hover {
+//     background-color: #78b7cc;
+//   } */
+// `;
 
-const LogoutButton = styled.button`
-  width: 80px;
-  font-weight: 700;
-  font-size: 16px;
-  padding: 5px 10px;
-  cursor: pointer;
-  color: #0f3e4a;
-  background-color: #f9fcfd;
-  border: none;
-`;
+// const LogoutButton = styled.button`
+//   width: 80px;
+//   font-weight: 700;
+//   font-size: 16px;
+//   padding: 5px 10px;
+//   cursor: pointer;
+//   color: #0f3e4a;
+//   background-color: #f9fcfd;
+//   border: none;
+// `;
 
-const LogoutIcon = styled(TbLogout2)`
-  font-size: 14px;
-  color: #0f3e4a;
-`;
+// const LogoutIcon = styled(TbLogout2)`
+//   font-size: 14px;
+//   color: #0f3e4a;
+// `;
 
 const MainContent = styled.div`
   flex: 1;
-  padding: 10px 0px;
+  padding: 30px 0px;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;
   align-items: center;
 `;
 
-const Separator = styled.div`
-  display: flex;
-  justify-content: center;
-  margin: 20px 0px 20px 30px;
-  position: relative;
-`;
+// // const Separator = styled.div`
+// //   display: flex;
+// //   justify-content: center;
+// //   margin: 20px 0px 20px 30px;
+// //   position: relative;
+// // `;
 
-const Title = styled.div`
-  font-size: 30px;
-  font-weight: 800;
-  color: #658c96;
-  background: #fff;
-  letter-spacing: 5px;
-`;
+// // const Title = styled.div`
+// //   font-size: 30px;
+// //   font-weight: 800;
+// //   color: #658c96;
+// //   background: #fff;
+// //   letter-spacing: 5px;
+// // `;
 
-const TripImg = styled.img`
-  background-color: #efefef;
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  border-radius: 10px;
-`;
+// const TripImg = styled.img`
+//   background-color: #efefef;
+//   width: 100%;
+//   height: 250px;
+//   object-fit: cover;
+//   border-radius: 10px;
+// `;
 
-const CardWrapper = styled.div`
-  width: 100%;
-  cursor: pointer;
-  border-radius: 15px;
-  overflow: hidden;
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
-`;
+// const CardWrapper = styled.div`
+//   width: 100%;
+//   cursor: pointer;
+//   border-radius: 15px;
+//   overflow: hidden;
+//   /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+// `;
 
-const CardDetails = styled.div`
-  padding: 10px 20px;
-  color: #333;
-`;
+// const CardDetails = styled.div`
+//   padding: 10px 20px;
+//   color: #333;
+// `;
 
-const CardHeader = styled.div`
-  width: 100%;
-  height: 50px;
-  padding: 5px 20px;
-  display: flex;
-  justify-content: end;
-`;
+// const CardHeader = styled.div`
+//   width: 100%;
+//   height: 50px;
+//   padding: 5px 20px;
+//   display: flex;
+//   justify-content: end;
+// `;
 
-const ArticleHeader = styled.div`
-  width: 100%;
-  height: 20px;
-  padding: 5px 20px;
-  display: flex;
-  justify-content: end;
-`;
+// const ArticleHeader = styled.div`
+//   width: 100%;
+//   height: 20px;
+//   padding: 5px 20px;
+//   display: flex;
+//   justify-content: end;
+// `;
 
-const CardContent = styled.div`
-  width: 100%;
-`;
+// const CardContent = styled.div`
+//   width: 100%;
+//   padding: 0px 20px;
+// `;
 
-const TripName = styled.h3`
-  color: #0f3e4a;
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 10px;
-`;
+// const TripName = styled.h3`
+//   color: #0f3e4a;
+//   font-size: 20px;
+//   font-weight: 700;
+//   margin-bottom: 10px;
+// `;
 
-const TripDate = styled.div`
-  font-weight: 400;
-  color: #658c96;
-  font-size: 14px;
-`;
+// const TripDate = styled.div`
+//   font-weight: 400;
+//   color: #658c96;
+//   font-size: 14px;
+// `;
 
-const IconWrapper = styled.div`
-  display: flex;
-  align-items: center;
-`;
+// const IconWrapper = styled.div`
+//   display: flex;
+//   align-items: center;
+// `;
 
-const PublishWrapper = styled.div`
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  border-radius: 8px;
-  padding: 5px 10px;
-  &:hover {
-    background-color: #d5eff7;
-  }
-`;
+// const PublishWrapper = styled.div`
+//   font-size: 13px;
+//   font-weight: 600;
+//   display: flex;
+//   align-items: center;
+//   border-radius: 8px;
+//   padding: 5px 10px;
+//   &:hover {
+//     background-color: #d5eff7;
+//   }
+// `;
 
-const PublishIcon = styled(GoShare)`
-  cursor: pointer;
-  font-size: 18px;
-  margin-right: 5px;
-`;
+// const PublishIcon = styled(GoShare)`
+//   cursor: pointer;
+//   font-size: 18px;
+//   margin-right: 5px;
+// `;
 
-const DeleteWrapper = styled.div`
-  cursor: pointer;
-  width: 100%;
-  display: flex;
-  align-items: center;
-`;
+// const DeleteWrapper = styled.div`
+//   cursor: pointer;
+//   width: 100%;
+//   display: flex;
+//   align-items: center;
+// `;
 
-const DeleteIcon = styled(AiOutlineDelete)`
-  font-size: 18px;
-  margin-right: 5px;
-`;
+// const DeleteIcon = styled(AiOutlineDelete)`
+//   font-size: 18px;
+//   margin-right: 5px;
+// `;
 
-const Menu = styled.div`
-  position: absolute;
-  top: 40px;
-  right: 0;
-  background-color: white;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-`;
+// const Menu = styled.div`
+//   position: absolute;
+//   top: 40px;
+//   right: 0;
+//   background-color: white;
+//   border-radius: 8px;
+//   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+//   z-index: 1000;
+// `;
 
-const MenuItem = styled.div`
-  padding: 10px 20px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  font-size: 13px;
-  font-weight: 600;
-  border-radius: 8px;
-  &:hover {
-    background-color: #f0f0f0;
-  }
-`;
+// const MenuItem = styled.div`
+//   padding: 10px 20px;
+//   cursor: pointer;
+//   display: flex;
+//   align-items: center;
+//   font-size: 13px;
+//   font-weight: 600;
+//   border-radius: 8px;
+//   &:hover {
+//     background-color: #f0f0f0;
+//   }
+// `;
 
-const OptionIcon = styled(SlOptions)`
-  cursor: pointer;
-  font-size: 15px;
-  margin-left: 10px;
-  position: relative;
-`;
+// const OptionIcon = styled(SlOptions)`
+//   cursor: pointer;
+//   font-size: 15px;
+//   margin-left: 10px;
+//   position: relative;
+// `;
 
-const TripContainer = styled.div`
-  margin: 0px 20px;
-  position: relative;
-`;
+// const TripContainer = styled.div`
+//   margin: 0px 20px;
+//   position: relative;
+// `;
 
-const CarouselWrapper = styled.div`
-  width: 800px;
-  margin: 0px 25px;
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -5px;
-    height: 100%;
-    width: 100px;
-    background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-    z-index: 1;
-  }
+// const CarouselWrapper = styled.div`
+//   width: 800px;
+//   margin: 0px 25px;
+//   &::before {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     left: -5px;
+//     height: 35%;
+//     width: 100px;
+//     background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+//     pointer-events: none;
+//     z-index: 1;
+//   }
 
-  &::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: -5px;
-    height: 100%;
-    width: 100px;
-    background: linear-gradient(-90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
-    pointer-events: none;
-    z-index: 1;
-  }
-`;
+//   &::after {
+//     content: '';
+//     position: absolute;
+//     top: 0;
+//     right: -5px;
+//     height: 35%;
+//     width: 100px;
+//     background: linear-gradient(-90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
+//     pointer-events: none;
+//     z-index: 1;
+//   }
+// `;
 
-const ArticleContainer = styled.div`
-  margin: 0;
-  position: relative;
-`;
+// const YearSection = styled.div`
+//   margin: 5px 0;
+// `;
 
-const ArticleWrapper = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 20px;
-  height: 250px;
-  cursor: pointer;
-  align-items: center;
-`;
+// const YearSeparator = styled.div`
+//   display: flex;
+//   align-items: center;
+//   justify-content: center;
+//   margin: 40px 0;
+//   position: relative;
+//   width: 100%;
 
-const ArticleContent = styled.div`
-  display: flex;
-  flex-direction: column;
-  width: 350px;
-  margin: 10px 15px;
-  justify-content: space-between;
-  height: 100%;
-`;
+//   &:after {
+//     content: '';
+//     height: 1px;
+//     width: 100%;
+//     position: absolute;
+//     top: 50%;
+//     left: 0;
+//     background: #dde9ed;
+//     z-index: 0;
+//   }
+// `;
 
-const ArticleTitle = styled.h2`
-  font-size: 20px;
-  margin-bottom: 15px;
-`;
+// const YearTitle = styled.div`
+//   background-color: #e9f5fb;
+//   padding: 10px 20px;
+//   border-radius: 20px;
+//   font-weight: bold;
+//   font-size: 18px;
+//   color: #2c3e50;
+//   display: inline-block;
+//   z-index: 1;
+// `;
 
-const ArticleDescription = styled.p`
-  font-size: 16px;
-  color: #555;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-bottom: auto;
-  margin-top: 15px;
-`;
+// const YearWrapper = styled.div`
+//   margin: 0px 25px;
+//   width: 94%;
+//   padding: 10px 5px;
 
-const PublishedDate = styled.p`
-  margin-top: 10px;
-  font-size: 12px;
-  color: #999;
-`;
+//   &:hover {
+//     opacity: 1;
+//     background: #ecf6f9;
+//     border-radius: 10px;
+//   }
+// `;
 
-const ArticleImage = styled.img`
-  width: 250px;
-  height: auto;
-  object-fit: cover;
-  height: 90%;
-  border-radius: 10px;
-`;
+// const ArticleContainer = styled.div`
+//   margin: 0;
+//   position: relative;
+// `;
+
+// const ArticleWrapper = styled.div`
+//   display: flex;
+//   justify-content: space-between;
+//   padding: 20px;
+//   height: 250px;
+//   cursor: pointer;
+//   align-items: center;
+// `;
+
+// const ArticleContent = styled.div`
+//   display: flex;
+//   flex-direction: column;
+//   width: 350px;
+//   margin: 10px 15px;
+//   justify-content: space-between;
+//   height: 100%;
+// `;
+
+// const ArticleTitle = styled.h2`
+//   font-size: 20px;
+//   margin-bottom: 15px;
+// `;
+
+// const ArticleDescription = styled.p`
+//   font-size: 16px;
+//   color: #555;
+//   display: -webkit-box;
+//   -webkit-line-clamp: 3;
+//   -webkit-box-orient: vertical;
+//   overflow: hidden;
+//   text-overflow: ellipsis;
+//   margin-bottom: auto;
+//   margin-top: 15px;
+// `;
+
+// const PublishedDate = styled.p`
+//   margin-top: 10px;
+//   font-size: 12px;
+//   color: #999;
+// `;
+
+// const ArticleImage = styled.img`
+//   width: 250px;
+//   height: auto;
+//   object-fit: cover;
+//   height: 90%;
+//   border-radius: 10px;
+// `;

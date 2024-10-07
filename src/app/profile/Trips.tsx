@@ -440,7 +440,7 @@ const YearSeparator = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 40px 0;
+  margin: 20px 0;
   position: relative;
   width: 100%;
 

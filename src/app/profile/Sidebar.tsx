@@ -37,11 +37,11 @@ const Sidebar = ({ setCurrentTab }) => {
       </ImgWrapper>
       {userData?.userName && <UserName>{userData?.userName}</UserName>}
       <InfoSection>
-        <InfoItem onClick={() => handleTabClick('trips')} active={activeTab === 'trips'}>
+        <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
           <TripsIcon />
           <InfoText>Trips</InfoText>
         </InfoItem>
-        <InfoItem onClick={() => handleTabClick('articles')} active={activeTab === 'articles'}>
+        <InfoItem onClick={() => handleTabClick('articles')} isActive={activeTab === 'articles'}>
           <ArticlesIcon />
           <InfoText>Articles</InfoText>
         </InfoItem>
@@ -96,11 +96,11 @@ const InfoSection = styled.div`
   padding: 20px;
 `;
 
-const InfoItem = styled.div<{ active: boolean }>`
+const InfoItem = styled.div<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: ${({ active }) => (active ? '#d5eff7' : '#ffffff')};
+  background: ${({ isActive }) => (isActive ? '#ecf6f9' : '#f9fcfd')};
   padding: 10px 20px;
   border-radius: 15px;
   margin: 30px 0px;
@@ -111,7 +111,7 @@ const InfoItem = styled.div<{ active: boolean }>`
   transition: background-color 0.3s ease;
 
   &:hover {
-    background-color: #d5eff7;
+    background-color: #ecf6f9;
   }
 `;
 

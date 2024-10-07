@@ -211,7 +211,9 @@ const Button = styled.button`
   cursor: pointer;
   font-weight: 700;
   &:hover {
-    background-color: #e0e7ea;
+    background-color: white;
+    color: #78b7cc;
+    border: 2px solid #78b7cc;
   }
 `;
 

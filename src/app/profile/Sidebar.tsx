@@ -11,7 +11,11 @@ import { useUserStore } from '@/lib/store';
 import defaultProfileImg from '@/public/earth-profile.png';
 import { auth } from '../../lib/firebaseConfig';
 
-const Sidebar = ({ setCurrentTab }) => {
+interface SidebarProps {
+  setCurrentTab: (tab: 'trips' | 'articles') => void;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
   const { userData, setUserData } = useUserStore();
   const [activeTab, setActiveTab] = useState<'trips' | 'articles' | null>(null);
   const router = useRouter();
@@ -25,7 +29,7 @@ const Sidebar = ({ setCurrentTab }) => {
     }
   };
 
-  const handleTabClick = (tab) => {
+  const handleTabClick = (tab: 'trips' | 'articles') => {
     setActiveTab(tab);
     setCurrentTab(tab);
   };

@@ -710,7 +710,7 @@ const handleDateRangeChange = async (
   await batch.commit();
 };
 
-export const updateDepartureTime = async (tripId: string, dayId: string, newTime: Date) => {
+export const updateDepartureTime = async (tripId: string, dayId: string, newTime: string) => {
   const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
   await updateDoc(dayDocRef, {
     departureTime: newTime,

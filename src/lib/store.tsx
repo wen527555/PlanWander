@@ -37,6 +37,11 @@ interface ModalStore {
   closeModal: () => void;
 }
 
+interface LoadingStore {
+  isLoading: boolean;
+  setLoading: (isLoading: boolean) => void;
+}
+
 export const usePlaceStore = create<PlaceStore>((set) => ({
   selectedPlace: null,
   placeDetail: null,
@@ -54,4 +59,9 @@ export const useModalStore = create<ModalStore>((set) => ({
   modalType: null,
   openModal: (type) => set({ isModalOpen: true, modalType: type }),
   closeModal: () => set({ isModalOpen: false }),
+}));
+
+export const useLoadingStore = create<LoadingStore>((set) => ({
+  isLoading: false,
+  setLoading: (isLoading) => set({ isLoading }),
 }));

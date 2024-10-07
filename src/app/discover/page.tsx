@@ -1,9 +1,11 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useTransition } from 'react';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
 import { fetchAllPublishedArticles } from '@/lib/firebaseApi';
 
 interface Article {
@@ -20,48 +22,53 @@ interface Article {
 }
 
 export default function ArticleList() {
-  const [articles, setArticles] = useState<Article[]>([]);
   const router = useRouter();
-  console.log('articles', articles);
-  useEffect(() => {
-    const fetchArticles = async () => {
-      const data = await fetchAllPublishedArticles();
-      setArticles(data);
-    };
-    fetchArticles();
-  }, []);
+  const [isPending, startTransition] = useTransition();
+  const { data: articles = [], isLoading } = useQuery<Article[]>({
+    queryKey: ['publishedArticles'],
+    queryFn: fetchAllPublishedArticles,
+  });
 
   const handleArticleClick = (articleId: string) => {
-    router.push(`articles/${articleId}/view`);
+    startTransition(() => {
+      router.push(`articles/${articleId}/view`);
+    });
   };
 
+  if (isLoading) {
+    return <LoadingAnimation />;
+  }
+
   return (
-    <Container>
-      <ArticleContainer>
-        {articles.length > 0 ? (
-          articles.map((article) => (
-            <ArticleWrapper key={article.id} onClick={() => handleArticleClick(article.id)}>
-              <ArticleContent>
-                <PublishUserWrapper>
-                  <UserImg src={article?.photoURL} />
-                  <UserName>{article?.userName} </UserName>
-                </PublishUserWrapper>
-                <ArticleTitle>{article.title}</ArticleTitle>
-                <ArticleDescription>{article.description}</ArticleDescription>
-                <PublishedDate>
-                  Published on {new Date(article.createdAt.seconds * 1000).toLocaleDateString()}
-                </PublishedDate>
-              </ArticleContent>
-              {article.coverImage && (
-                <ArticleImage src={article.coverImage} alt={article.title} width={150} height={100} />
-              )}
-            </ArticleWrapper>
-          ))
-        ) : (
-          <p></p>
-        )}
-      </ArticleContainer>
-    </Container>
+    <>
+      {isPending && <LoadingAnimation />}
+      <Container>
+        <ArticleContainer>
+          {articles.length > 0 ? (
+            articles.map((article) => (
+              <ArticleWrapper key={article.id} onClick={() => handleArticleClick(article.id)}>
+                <ArticleContent>
+                  <PublishUserWrapper>
+                    <UserImg src={article?.photoURL} />
+                    <UserName>{article?.userName} </UserName>
+                  </PublishUserWrapper>
+                  <ArticleTitle>{article.title}</ArticleTitle>
+                  <ArticleDescription>{article.description}</ArticleDescription>
+                  <PublishedDate>
+                    Published on {new Date(article.createdAt.seconds * 1000).toLocaleDateString()}
+                  </PublishedDate>
+                </ArticleContent>
+                {article.coverImage && (
+                  <ArticleImage src={article.coverImage} alt={article.title} width={150} height={100} />
+                )}
+              </ArticleWrapper>
+            ))
+          ) : (
+            <p></p>
+          )}
+        </ArticleContainer>
+      </Container>
+    </>
   );
 }
 

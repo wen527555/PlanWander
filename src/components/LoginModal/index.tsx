@@ -75,8 +75,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
           photoURL: user.photoURL ?? '',
         };
         await saveUserData(userInfo);
+        addAlert('Sign up successful! Please login');
+        setIsLogIn(true);
+        setEmail('');
+        setPassword('');
       } catch (error) {
-        addAlert('Sign up. Please try again');
+        addAlert('Error sign up. Please try again');
         console.error('Error during login', error);
       }
     }
@@ -97,8 +101,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
                 <Divider>
                   <span>or</span>
                 </Divider>
-                <Input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-                <Input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+                <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  type="password"
+                  value={password}
+                  placeholder="Password"
+                  onChange={(e) => setPassword(e.target.value)}
+                />
                 <LoginButton type="submit">Log in</LoginButton>
               </form>
             </>
@@ -109,8 +118,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
                 <Divider>
                   <span>or</span>
                 </Divider>
-                <Input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
-                <Input placeholder="Password" onChange={(e) => setPassword(e.target.value)} />
+                <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
                 <LoginButton type="submit">Sign up</LoginButton>
               </form>
             </>

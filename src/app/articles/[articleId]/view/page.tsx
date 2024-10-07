@@ -3,10 +3,11 @@
 import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useTransition } from 'react';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
 import { fetchArticleData } from '@/lib/firebaseApi';
 import { processDays } from '@/lib/processDays';
 import ViewList from '../ViewList';
@@ -19,6 +20,7 @@ const ArticlesPage = () => {
   const { articleId } = useParams<{ articleId: string }>();
   const [visiblePlace, setVisiblePlace] = useState<string | null>(null);
   const [manualScroll, setManualScroll] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const { data: articleData, isLoading } = useQuery({
     queryKey: ['articleData', articleId],
     queryFn: () => fetchArticleData(articleId as string),
@@ -26,7 +28,9 @@ const ArticlesPage = () => {
   });
   const router = useRouter();
   const handleBackHome = () => {
-    router.push('/discover');
+    startTransition(() => {
+      router.push('/discover');
+    });
   };
 
   const handlePlaceVisible = (placeId: string) => {
@@ -40,31 +44,38 @@ const ArticlesPage = () => {
     setVisiblePlace(placeId);
   };
 
-  if (isLoading || !articleData) return <p></p>;
+  if (isLoading) {
+    return <LoadingAnimation />;
+  }
+
+  if (!articleData) return <p></p>;
   const { places, route } = processDays(articleData?.days as any);
   return (
-    <Container>
-      <ListContainer>
-        <ListHeader>
-          <HomeIcon onClick={handleBackHome} />
-        </ListHeader>
-        <ViewList
-          articleData={articleData}
-          articleId={articleId}
-          onPlaceVisible={handlePlaceVisible}
-          visiblePlace={visiblePlace}
-          setManualScroll={setManualScroll}
-        />
-      </ListContainer>
-      <MapContainer>
-        <MapComponent
-          places={places as any}
-          routes={route as any}
-          visiblePlace={visiblePlace}
-          onMarkerClick={handleMarkerClick}
-        />
-      </MapContainer>
-    </Container>
+    <>
+      {isPending && <LoadingAnimation />}
+      <Container>
+        <ListContainer>
+          <ListHeader>
+            <HomeIcon onClick={handleBackHome} />
+          </ListHeader>
+          <ViewList
+            articleData={articleData}
+            articleId={articleId}
+            onPlaceVisible={handlePlaceVisible}
+            visiblePlace={visiblePlace}
+            setManualScroll={setManualScroll}
+          />
+        </ListContainer>
+        <MapContainer>
+          <MapComponent
+            places={places as any}
+            routes={route as any}
+            visiblePlace={visiblePlace}
+            onMarkerClick={handleMarkerClick}
+          />
+        </MapContainer>
+      </Container>
+    </>
   );
 };
 

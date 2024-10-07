@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useTransition } from 'react';
 import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
@@ -12,6 +12,7 @@ import { RiEdit2Fill } from 'react-icons/ri';
 // import { PiPencilLine } from 'react-icons/pi';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import { processDays } from '@/lib/processDays';
 import { useModalStore, usePlaceStore } from '@/lib/store';
@@ -99,6 +100,7 @@ const TripPage: React.FC = () => {
   const queryClient = useQueryClient();
   const modalRef = useRef<HTMLDivElement | null>(null);
   const { isModalOpen, openModal, closeModal } = useModalStore();
+  const [isPending, startTransition] = useTransition();
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
@@ -261,12 +263,18 @@ const TripPage: React.FC = () => {
 
   const deletePlaceMutation = useMutation({
     mutationFn: async ({ tripId, dayId, placeId }: { tripId: string; dayId: string; placeId: string }) => {
+      const placesBeforeDelete: Place[] = await getPlaceForDay(tripId, dayId);
+      console.log('placesBeforeDelete', placesBeforeDelete);
+      const placeIndex = placesBeforeDelete.findIndex((place: { id: string }) => place.id === placeId);
+      console.log('placeIndex', placeIndex);
+      const prevPlace = placeIndex > 0 ? placesBeforeDelete[placeIndex - 1] : null;
+      const nextPlace = placeIndex < placesBeforeDelete.length ? placesBeforeDelete[placeIndex + 1] : null;
+      console.log('nextPlace', nextPlace);
       await deletePlace(tripId, dayId, placeId);
-      const remainingPlaces: Place[] = await getPlaceForDay(tripId, dayId);
-      const placeIndex = remainingPlaces.findIndex((place: { id: string }) => place.id === placeId);
-      const prevPlace = placeIndex > 0 ? remainingPlaces[placeIndex - 1] : null;
-      const nextPlace = placeIndex < remainingPlaces.length ? remainingPlaces[placeIndex + 1] : null;
-      if (prevPlace && nextPlace) {
+
+      if (placeIndex === 0 && nextPlace) {
+        await updatePlaceRoute(tripId, dayId, nextPlace.id, null, 'driving');
+      } else if (prevPlace && nextPlace) {
         const newRoute = await getRoute(prevPlace, nextPlace, 'driving');
         console.log('newRoute', newRoute);
         await updatePlaceRoute(tripId, dayId, nextPlace.id, newRoute, 'driving');
@@ -285,96 +293,104 @@ const TripPage: React.FC = () => {
   };
 
   const handleBackProfile = () => {
-    router.push('/profile');
+    startTransition(() => {
+      router.push('/profile');
+    });
   };
 
-  if (isLoading || !tripData) {
-    return <div>Loading...</div>;
+  if (isLoading) {
+    return <LoadingAnimation />;
+  }
+
+  if (!tripData) {
+    return <div></div>;
   }
   const { places, route } = processDays(tripData.days as any);
 
   return (
-    <Container>
-      <ListContainer>
-        <ListHeader>
-          <HomeIcon onClick={handleBackProfile} />
-          <TripName>{tripData.tripTitle}</TripName>
-          <TripDate>
-            <CalendarIcon />
-            {formattedStartDate}-{formattedEndDate}
-          </TripDate>
-          <EditIcon onClick={() => openModal('trip')} />
-        </ListHeader>
-        {/* <Sidebar days={tripData.days as any} activeDate={activeDate} onDateClick={handleDateClick} /> */}
-        <List
-          days={tripData.days as any}
-          // activeDate={activeDate}
-          onPlaceAdded={handleAddPlace}
-          onDaysUpdate={handleDaysUpdate}
-          onModeUpdate={handleModeChange}
-          onPlaceDelete={handlePlaceDelete}
-          tripId={tripId}
-        />
-      </ListContainer>
-      <MapContainer>
-        <MapComponent places={places as any} routes={route as any} />
-        {selectedPlace && (
-          <PlaceInfoModal ref={modalRef}>
-            <ModalHeader>
-              <PlaceName>{selectedPlace.name}</PlaceName>
-            </ModalHeader>
+    <>
+      {isPending && <LoadingAnimation />}
+      <Container>
+        <ListContainer>
+          <ListHeader>
+            <HomeIcon onClick={handleBackProfile} />
+            <TripName>{tripData.tripTitle}</TripName>
+            <TripDate>
+              <CalendarIcon />
+              {formattedStartDate}-{formattedEndDate}
+            </TripDate>
+            <EditIcon onClick={() => openModal('trip')} />
+          </ListHeader>
+          <List
+            days={tripData.days as any}
+            // activeDate={activeDate}
+            onPlaceAdded={handleAddPlace}
+            onDaysUpdate={handleDaysUpdate}
+            onModeUpdate={handleModeChange}
+            onPlaceDelete={handlePlaceDelete}
+            tripId={tripId}
+          />
+        </ListContainer>
+        <MapContainer>
+          <MapComponent places={places as any} routes={route as any} />
+          {selectedPlace && (
+            <PlaceInfoModal ref={modalRef}>
+              <ModalHeader>
+                <PlaceName>{selectedPlace.name}</PlaceName>
+              </ModalHeader>
 
-            {selectedPlace?.rating && (
-              <RatingWrapper>
-                <RatingIcon />
-                <Rating>{selectedPlace.rating}</Rating>
-              </RatingWrapper>
-            )}
+              {selectedPlace?.rating && (
+                <RatingWrapper>
+                  <RatingIcon />
+                  <Rating>{selectedPlace.rating}</Rating>
+                </RatingWrapper>
+              )}
 
-            {selectedPlace?.address && (
-              <Wrapper>
-                <AddressIcon />
-                <PlaceAddress>{selectedPlace.address}</PlaceAddress>
-              </Wrapper>
-            )}
+              {selectedPlace?.address && (
+                <Wrapper>
+                  <AddressIcon />
+                  <PlaceAddress>{selectedPlace.address}</PlaceAddress>
+                </Wrapper>
+              )}
 
-            {formattedOpeningHours?.length > 0 && (
-              <OpeningHoursWrapper>
-                <ClockIcon />
-                <OpeningHoursList>
-                  {formattedOpeningHours.map((time, index) => (
-                    <OpeningHourItem key={index}>
-                      <DayCircle>{time.day}</DayCircle>
-                      {/* <DayLabel>{time.day}</DayLabel> */}
-                      <HoursLabel>{time.hours}</HoursLabel>
-                    </OpeningHourItem>
-                  ))}
-                </OpeningHoursList>
-              </OpeningHoursWrapper>
-            )}
+              {formattedOpeningHours?.length > 0 && (
+                <OpeningHoursWrapper>
+                  <ClockIcon />
+                  <OpeningHoursList>
+                    {formattedOpeningHours.map((time, index) => (
+                      <OpeningHourItem key={index}>
+                        <DayCircle>{time.day}</DayCircle>
+                        {/* <DayLabel>{time.day}</DayLabel> */}
+                        <HoursLabel>{time.hours}</HoursLabel>
+                      </OpeningHourItem>
+                    ))}
+                  </OpeningHoursList>
+                </OpeningHoursWrapper>
+              )}
 
-            {selectedPlace.phone && (
-              <Wrapper>
-                <FaPhoneAlt />
-                {selectedPlace.phone}
-              </Wrapper>
-            )}
+              {selectedPlace.phone && (
+                <Wrapper>
+                  <PhoneIcon />
+                  {selectedPlace.phone}
+                </Wrapper>
+              )}
 
-            {selectedPlace.website && (
-              <Wrapper>
-                <FaGlobe />
-                <a href={selectedPlace.website} target="_blank" rel="noopener noreferrer">
-                  {selectedPlace.website}
-                </a>
-              </Wrapper>
-            )}
-          </PlaceInfoModal>
+              {selectedPlace.website && (
+                <Wrapper>
+                  <WebsiteIcon />
+                  <a href={selectedPlace.website} target="_blank" rel="noopener noreferrer">
+                    {selectedPlace.website}
+                  </a>
+                </Wrapper>
+              )}
+            </PlaceInfoModal>
+          )}
+        </MapContainer>
+        {isModalOpen && (
+          <TripModal onClose={closeModal} isEditing={true} initialData={tripData} onSubmit={handleUpdateTrip} />
         )}
-      </MapContainer>
-      {isModalOpen && (
-        <TripModal onClose={closeModal} isEditing={true} initialData={tripData} onSubmit={handleUpdateTrip} />
-      )}
-    </Container>
+      </Container>
+    </>
   );
 };
 
@@ -477,13 +493,12 @@ const PlaceName = styled.h1`
 `;
 
 const RatingWrapper = styled.div`
-  margin-bottom: 10px;
   display: flex;
   align-items: center;
 `;
 
 const Rating = styled.div`
-  font-size: 16px;
+  font-size: 14px;
   color: #ff9800;
   display: flex;
   align-items: center;
@@ -492,9 +507,9 @@ const Rating = styled.div`
 `;
 
 const RatingIcon = styled(FaStar)`
-  font-size: 16px;
+  font-size: 14px;
   color: #ff9800;
-  margin-right: 10px;
+  margin-right: 5px;
 `;
 
 const Wrapper = styled.div`
@@ -513,7 +528,7 @@ const Wrapper = styled.div`
 `;
 
 const PlaceAddress = styled.div`
-  font-size: 16px;
+  font-size: 14px;
 `;
 
 const OpeningHoursWrapper = styled.div`
@@ -523,7 +538,7 @@ const OpeningHoursWrapper = styled.div`
 `;
 
 const ClockIcon = styled(FaClock)`
-  font-size: 16px;
+  font-size: 14px;
   margin-right: 8px;
 `;
 
@@ -540,8 +555,8 @@ const OpeningHourItem = styled.li`
 `;
 
 const DayCircle = styled.div`
-  width: 25px;
-  height: 25px;
+  width: 20px;
+  height: 20px;
   background-color: #f0f0f0;
   border-radius: 50%;
   display: flex;
@@ -549,16 +564,26 @@ const DayCircle = styled.div`
   align-items: center;
   font-weight: bold;
   margin-right: 10px;
-  font-size: 12px;
+  font-size: 10px;
 `;
 
 const HoursLabel = styled.span`
   color: #888;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 500;
 `;
 
 const AddressIcon = styled(FaMapPin)`
-  font-size: 16px;
+  font-size: 14px;
+  margin-right: 15px;
+`;
+
+const PhoneIcon = styled(FaPhoneAlt)`
+  font-size: 14px;
+  margin-right: 15px;
+`;
+
+const WebsiteIcon = styled(FaGlobe)`
+  font-size: 14px;
   margin-right: 15px;
 `;

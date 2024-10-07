@@ -1,12 +1,14 @@
 'use client';
 
 import Image from 'next/image';
-import Link from 'next/link';
+// import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { RiCompassDiscoverLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
+// import Loading from '@/app/loading';
 import TripModal from '@/components/TripModal';
 import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
 import { useModalStore, useUserStore } from '@/lib/store';
@@ -28,6 +30,8 @@ const Header = () => {
   const pathname = usePathname();
   const isProfileActive = pathname === '/profile';
   const isDiscoverActive = pathname === '/discover';
+  const [isPending, startTransition] = useTransition();
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -41,11 +45,22 @@ const Header = () => {
   }, [router]);
 
   const handleToProfile = () => {
-    router.push('/profile');
+    startTransition(() => {
+      router.push('/profile');
+    });
   };
 
   const handleToDiscover = () => {
-    router.push('/discover');
+    startTransition(() => {
+      router.push('/discover');
+    });
+  };
+
+  const handleLogoClick = (e: any) => {
+    e.preventDefault();
+    startTransition(() => {
+      router.push('/');
+    });
   };
 
   const handleCreateTrip = async (
@@ -54,47 +69,61 @@ const Header = () => {
     endDate: Date,
     selectedCountries: SelectedOption[]
   ) => {
-    const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
-    console.log('Trip created successfully');
-    router.push(`/trips/${tripId}`);
+    setLoading(true);
+    try {
+      const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
+      router.push(`/trips/${tripId}`);
+    } catch (error) {
+      console.error('Error creating trip:', error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Container>
-      <Link href="/" passHref>
-        <Image src={Logo} alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
-      </Link>
-      {userData ? (
-        <>
-          <IconWrapper>
-            <ProfileWrapper isActive={isProfileActive} onClick={handleToProfile}>
-              <ProfileIcon src={userData?.photoURL || defaultProfileImg.src} />
-              <IconText>You</IconText>
-            </ProfileWrapper>
-            <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
-              <DiscoverIcon />
-              <IconText>Discover</IconText>
-            </DiscoverWrapper>
-          </IconWrapper>
-          {/* <Button onClick={handleLogout}>Logout</Button> */}
+    <>
+      {isPending && <LoadingAnimation />}
+      {loading && <LoadingAnimation />}
+      <Container>
+        <LogoLink href="/" onClick={handleLogoClick}>
+          <Image src={Logo} alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
+        </LogoLink>
+        {userData ? (
+          <>
+            <IconWrapper>
+              <ProfileWrapper isActive={isProfileActive} onClick={handleToProfile}>
+                <ProfileIcon src={userData?.photoURL || defaultProfileImg.src} />
+                <IconText>{userData?.userName || 'You'}</IconText>
+              </ProfileWrapper>
+              <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
+                <DiscoverIcon />
+                <IconText>Discover</IconText>
+              </DiscoverWrapper>
+            </IconWrapper>
+            <ButtonWrapper>
+              <Button onClick={() => openModal('trip')}>+ Plan</Button>
+            </ButtonWrapper>
+          </>
+        ) : (
           <ButtonWrapper>
-            <Button onClick={() => openModal('trip')}>+ Plan</Button>
+            <Button onClick={() => openModal('login')}>LogIn</Button>
           </ButtonWrapper>
-        </>
-      ) : (
-        <ButtonWrapper>
-          <Button onClick={() => openModal('login')}>LogIn</Button>
-        </ButtonWrapper>
-      )}
-      {isModalOpen && modalType === 'trip' && (
-        <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
-      )}
-      {isModalOpen && modalType === 'login' && <LoginModal onClose={closeModal} onLoginSuccess={handleToProfile} />}
-    </Container>
+        )}
+        {isModalOpen && modalType === 'trip' && (
+          <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
+        )}
+        {isModalOpen && modalType === 'login' && <LoginModal onClose={closeModal} onLoginSuccess={handleToProfile} />}
+      </Container>
+    </>
   );
 };
 
 export default Header;
+
+const LogoLink = styled.a`
+  cursor: pointer;
+  display: inline-block;
+`;
 
 const Container = styled.div`
   width: 100%;
@@ -204,7 +233,9 @@ const Button = styled.button`
   cursor: pointer;
   font-weight: 700;
   &:hover {
-    background-color: #e0e7ea;
+    background-color: white;
+    color: #78b7cc;
+    border: 2px solid #78b7cc;
   }
 `;
 

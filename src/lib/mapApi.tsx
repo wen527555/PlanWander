@@ -44,7 +44,7 @@ export const getRoute = async (start: any, end: any, mode: string = 'driving') =
     const res = await fetch(url);
     const data = await res.json();
     const route = data.routes[0];
-    const duration = formatDuration(route.duration);
+    const duration = route.duration;
     const distance = (route.distance / 1000).toFixed(2);
 
     return {
@@ -56,16 +56,6 @@ export const getRoute = async (start: any, end: any, mode: string = 'driving') =
   } catch (error) {
     console.error('Error fetching route:', error);
     return null;
-  }
-};
-
-const formatDuration = (duration: any) => {
-  const hours = Math.floor(duration / 3600);
-  const min = Math.floor((duration % 3600) / 60);
-  if (hours > 0) {
-    return `${hours}hr ${min}min`;
-  } else {
-    return `${min}min`;
   }
 };
 

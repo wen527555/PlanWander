@@ -287,15 +287,17 @@ export const updatePlaceRoute = async (
       if (place.id === placeId) {
         return {
           ...place,
-          route: {
-            type: newRoute.type,
-            transportMode,
-            coordinates: newRoute.coordinates.map((coord: [number, number]) => ({
-              lat: coord[1],
-              lng: coord[0],
-            })),
-            duration: newRoute.duration,
-          },
+          route: newRoute
+            ? {
+                type: newRoute.type,
+                transportMode,
+                coordinates: newRoute.coordinates.map((coord: [number, number]) => ({
+                  lat: coord[1],
+                  lng: coord[0],
+                })),
+                duration: newRoute.duration,
+              }
+            : null,
         };
       }
       return place;
@@ -335,13 +337,7 @@ export const deletePlace = async (
   }
 };
 
-export const updatePlaceStayTime = async (
-  tripId: string,
-  dayId: string,
-  placeId: any,
-  startTime: string,
-  endTime: string
-) => {
+export const updatePlaceStayTime = async (tripId: string, dayId: string, placeId: any, stayDuration: number) => {
   const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
   const dayDoc = await getDoc(dayDocRef);
   if (!dayDoc.exists()) {
@@ -352,8 +348,7 @@ export const updatePlaceStayTime = async (
     if (place.id === placeId) {
       return {
         ...place,
-        startTime: startTime,
-        endTime: endTime,
+        stayDuration: stayDuration,
       };
     }
     return place;
@@ -713,4 +708,11 @@ const handleDateRangeChange = async (
   }
 
   await batch.commit();
+};
+
+export const updateDepartureTime = async (tripId: string, dayId: string, newTime: Date) => {
+  const dayDocRef = doc(db, 'trips', tripId, 'days', dayId);
+  await updateDoc(dayDocRef, {
+    departureTime: newTime,
+  });
 };

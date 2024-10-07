@@ -1,17 +1,17 @@
-// import Lottie from 'react-lottie-player';
+import Lottie from 'react-lottie-player';
 import styled from 'styled-components';
 
-// import loadingGif from '@/public/earth.json';
+import loadingGif from '@/public/earth.json';
 
 const LoadingAnimation = () => {
   return (
     <LoadingContainer>
-      <iframe
+      {/* <iframe
         src="https://lottie.host/embed/40f5fa89-03f1-4b9b-ab1c-97730792e4e3/ZI9ThIosNU.json"
         width="400"
         height="400"
-      ></iframe>
-      {/* <Lottie loop animationData={loadingGif} play style={{ width: 300, height: 300 }} /> */}
+      ></iframe> */}
+      <Lottie loop animationData={loadingGif} play style={{ width: 400, height: 400 }} />
     </LoadingContainer>
   );
 };

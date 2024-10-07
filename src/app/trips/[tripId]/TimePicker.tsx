@@ -88,6 +88,12 @@ const TimePickerComponent: React.FC<TimePickerProps> = ({
   onClose,
 }) => {
   const [stayDuration, setStayDuration] = useState<number>(initialStayDuration);
+
+  const hours = Math.floor(stayDuration / 3600);
+  const minutes = Math.floor((stayDuration % 3600) / 60);
+  const initialTime = new Date();
+  initialTime.setHours(hours);
+  initialTime.setMinutes(minutes);
   const handleSave = () => {
     onSave(place.id, dayId, stayDuration);
   };
@@ -97,13 +103,13 @@ const TimePickerComponent: React.FC<TimePickerProps> = ({
       <Label>Stay Duration</Label>
       <Flatpickr
         id="start-time-picker"
-        value={new Date(stayDuration * 1000)}
+        value={initialTime}
         options={{
           enableTime: true,
           noCalendar: true,
           dateFormat: 'H:i',
           time_24hr: true,
-          allowInput: true,
+          // allowInput: true,
         }}
         onChange={(selectedTime: Date[]) => {
           if (selectedTime.length > 0) {

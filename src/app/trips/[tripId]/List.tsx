@@ -281,7 +281,7 @@ const List: React.FC<ListProps> = ({
                                             <TimePicker
                                               place={place}
                                               dayId={day.date}
-                                              initialStayDuration={place.stayDuration || 0}
+                                              initialStayDuration={place.stayDuration || 3600}
                                               onSave={handleSaveTimePicker}
                                               onClose={handleCloseTimePicker}
                                             />

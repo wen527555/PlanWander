@@ -319,7 +319,7 @@ const List: React.FC<ListProps> = ({
 export default List;
 
 const ListContainer = styled.div`
-  margin: 60px 30px 100px 30px;
+  margin: 60px 30px 150px 30px;
 `;
 
 const ItemContainer = styled.div`

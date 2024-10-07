@@ -287,15 +287,17 @@ export const updatePlaceRoute = async (
       if (place.id === placeId) {
         return {
           ...place,
-          route: {
-            type: newRoute.type,
-            transportMode,
-            coordinates: newRoute.coordinates.map((coord: [number, number]) => ({
-              lat: coord[1],
-              lng: coord[0],
-            })),
-            duration: newRoute.duration,
-          },
+          route: newRoute
+            ? {
+                type: newRoute.type,
+                transportMode,
+                coordinates: newRoute.coordinates.map((coord: [number, number]) => ({
+                  lat: coord[1],
+                  lng: coord[0],
+                })),
+                duration: newRoute.duration,
+              }
+            : null,
         };
       }
       return place;

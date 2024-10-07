@@ -261,12 +261,18 @@ const TripPage: React.FC = () => {
 
   const deletePlaceMutation = useMutation({
     mutationFn: async ({ tripId, dayId, placeId }: { tripId: string; dayId: string; placeId: string }) => {
+      const placesBeforeDelete: Place[] = await getPlaceForDay(tripId, dayId);
+      console.log('placesBeforeDelete', placesBeforeDelete);
+      const placeIndex = placesBeforeDelete.findIndex((place: { id: string }) => place.id === placeId);
+      console.log('placeIndex', placeIndex);
+      const prevPlace = placeIndex > 0 ? placesBeforeDelete[placeIndex - 1] : null;
+      const nextPlace = placeIndex < placesBeforeDelete.length ? placesBeforeDelete[placeIndex + 1] : null;
+      console.log('nextPlace', nextPlace);
       await deletePlace(tripId, dayId, placeId);
-      const remainingPlaces: Place[] = await getPlaceForDay(tripId, dayId);
-      const placeIndex = remainingPlaces.findIndex((place: { id: string }) => place.id === placeId);
-      const prevPlace = placeIndex > 0 ? remainingPlaces[placeIndex - 1] : null;
-      const nextPlace = placeIndex < remainingPlaces.length ? remainingPlaces[placeIndex + 1] : null;
-      if (prevPlace && nextPlace) {
+
+      if (placeIndex === 0 && nextPlace) {
+        await updatePlaceRoute(tripId, dayId, nextPlace.id, null, 'driving');
+      } else if (prevPlace && nextPlace) {
         const newRoute = await getRoute(prevPlace, nextPlace, 'driving');
         console.log('newRoute', newRoute);
         await updatePlaceRoute(tripId, dayId, nextPlace.id, newRoute, 'driving');

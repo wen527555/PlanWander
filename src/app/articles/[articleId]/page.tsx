@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
 import { fetchArticleData } from '@/lib/firebaseApi';
 import { processDays } from '../../../lib/processDays';
 import EditList from './EditList';
@@ -37,6 +38,10 @@ const ArticlesPage = () => {
     setManualScroll(true);
     setVisiblePlace(placeId);
   };
+
+  if (isLoading) {
+    return <LoadingAnimation />;
+  }
 
   if (isLoading || !articleData) return;
   const { places, route } = processDays(articleData?.days as any);

@@ -2,24 +2,36 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
 import { fetchDeleteArticle, fetchUserAllArticles } from '@/lib/firebaseApi';
 
+type Article = {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: string;
+  coverImage: string;
+};
+
 const ArticlesContainer = () => {
-  const { data: articles = [] } = useQuery<any>({
+  const { data: articles = [], isLoading: loadingArticles } = useQuery<any>({
     queryKey: ['userArticles'],
     queryFn: fetchUserAllArticles,
   });
   const router = useRouter();
   const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);
-
+  const [isPending, startTransition] = useTransition();
   const queryClient = useQueryClient();
+
   const handleArticleClick = (articleId: string) => {
-    router.push(`articles/${articleId}`);
+    startTransition(() => {
+      router.push(`articles/${articleId}`);
+    });
   };
   const handleArticleOptionClick = (ArticleId: string) => {
     if (openMenuArticleId === ArticleId) {
@@ -46,38 +58,45 @@ const ArticlesContainer = () => {
     }
   };
 
+  if (loadingArticles) {
+    return <LoadingAnimation />;
+  }
+
   if (!articles.length) {
     return <div>No articles available</div>;
   }
 
   return (
-    <ArticleContainer>
-      {articles.map((article) => (
-        <CardWrapper key={article.id}>
-          <ArticleHeader>
-            <OptionIcon onClick={() => handleArticleOptionClick(article.id)} />
-            {openMenuArticleId === article.id && (
-              <Menu>
-                <MenuItem>
-                  <DeleteWrapper onClick={() => handleDeleteArticleClick(article.id)}>
-                    <DeleteIcon />
-                    Delete
-                  </DeleteWrapper>
-                </MenuItem>
-              </Menu>
-            )}
-          </ArticleHeader>
-          <ArticleWrapper onClick={() => handleArticleClick(article.id)}>
-            <ArticleContent>
-              <ArticleTitle>{article.title}</ArticleTitle>
-              <ArticleDescription>{article.description}</ArticleDescription>
-              <PublishedDate>Published on {article.createdAt}</PublishedDate>
-            </ArticleContent>
-            <ArticleImage src={article.coverImage} alt={article.title} />
-          </ArticleWrapper>
-        </CardWrapper>
-      ))}
-    </ArticleContainer>
+    <>
+      {isPending && <LoadingAnimation />}
+      <ArticleContainer>
+        {articles.map((article: Article) => (
+          <CardWrapper key={article.id}>
+            <ArticleHeader>
+              <OptionIcon onClick={() => handleArticleOptionClick(article.id)} />
+              {openMenuArticleId === article.id && (
+                <Menu>
+                  <MenuItem>
+                    <DeleteWrapper onClick={() => handleDeleteArticleClick(article.id)}>
+                      <DeleteIcon />
+                      Delete
+                    </DeleteWrapper>
+                  </MenuItem>
+                </Menu>
+              )}
+            </ArticleHeader>
+            <ArticleWrapper onClick={() => handleArticleClick(article.id)}>
+              <ArticleContent>
+                <ArticleTitle>{article.title}</ArticleTitle>
+                <ArticleDescription>{article.description}</ArticleDescription>
+                <PublishedDate>Published on {article.createdAt}</PublishedDate>
+              </ArticleContent>
+              <ArticleImage src={article.coverImage} alt={article.title} />
+            </ArticleWrapper>
+          </CardWrapper>
+        ))}
+      </ArticleContainer>
+    </>
   );
 };
 

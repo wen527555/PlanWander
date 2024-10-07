@@ -3,12 +3,13 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { GoShare } from 'react-icons/go';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import { createArticleFromTrip, createNewTrip, fetchDeleteTrip, fetchUserAllTrips } from '@/lib/firebaseApi';
 import { useModalStore } from '@/lib/store';
@@ -33,10 +34,11 @@ const TripsContainer = () => {
     queryFn: fetchUserAllTrips,
   });
   const today = dayjs();
+  const [isPending, startTransition] = useTransition();
   const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
-  const upcomingTrips = trips?.filter((trip) => dayjs(trip.startDate).isAfter(today));
-  const pastTrips = trips?.filter((trip) => dayjs(trip.endDate).isBefore(today));
-  const pastTripsByYear = pastTrips.reduce((acc, trip) => {
+  const upcomingTrips = trips?.filter((trip: Trip) => dayjs(trip.startDate).isAfter(today));
+  const pastTrips = trips?.filter((trip: Trip) => dayjs(trip.endDate).isBefore(today));
+  const pastTripsByYear = pastTrips.reduce((acc: { [key: string]: Trip[] }, trip: Trip) => {
     const year = dayjs(trip.startDate).year();
     if (!acc[year]) acc[year] = [];
     acc[year].push(trip);
@@ -47,15 +49,15 @@ const TripsContainer = () => {
   const currentTrip = upcomingTrips[currentIndex];
   const daysUntilNextTrip = currentTrip ? dayjs(currentTrip.startDate).diff(today, 'day') : null;
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
-  console.log('currentTrip', currentTrip);
-  const handleSlideChange = (newIndex) => {
+  const handleSlideChange = (newIndex: number) => {
     setCurrentIndex(newIndex);
   };
-
   const handlePublishClick = async (tripId: string) => {
     try {
       await createArticleFromTrip(tripId);
-      router.push(`/articles/${tripId}`);
+      startTransition(() => {
+        router.push(`/articles/${tripId}`);
+      });
     } catch (error) {
       console.error('Error publishing article:', error);
     }
@@ -76,13 +78,17 @@ const TripsContainer = () => {
     selectedCountries: SelectedOption[]
   ) => {
     const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
-    console.log('Trip created successfully');
-    router.push(`/trips/${tripId}`);
+    startTransition(() => {
+      router.push(`/trips/${tripId}`);
+    });
   };
 
   const handleTripClick = (tripId: string) => {
-    router.push(`trips/${tripId}`);
+    startTransition(() => {
+      router.push(`trips/${tripId}`);
+    });
   };
+
   const queryClient = useQueryClient();
   const deleteTripMutation = useMutation({
     mutationFn: fetchDeleteTrip,
@@ -102,7 +108,7 @@ const TripsContainer = () => {
   };
 
   if (loadingTrips) {
-    return <p>Loading</p>;
+    return <LoadingAnimation />;
   }
 
   return (
@@ -110,7 +116,7 @@ const TripsContainer = () => {
       {isModalOpen && modalType === 'trip' && (
         <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
       )}
-
+      {isPending && <LoadingAnimation />}
       <TripContainer>
         {upcomingTrips?.length > 0 ? (
           <>
@@ -180,7 +186,7 @@ const TripsContainer = () => {
                 {year} • {pastTripsByYear[year].length} trips
               </YearTitle>
             </YearSeparator>
-            {pastTripsByYear[year].map((trip, index) => {
+            {pastTripsByYear[year].map((trip: Trip, index: number) => {
               const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
               const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
 

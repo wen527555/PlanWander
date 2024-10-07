@@ -63,7 +63,7 @@ interface PlaceContainerProps {
 interface UpdateDepartureTimeParams {
   tripId: string;
   dayId: string;
-  newDate: Date;
+  newDate: string;
 }
 
 const List: React.FC<ListProps> = ({
@@ -281,6 +281,7 @@ const List: React.FC<ListProps> = ({
                                             <TimePicker
                                               place={place}
                                               dayId={day.date}
+                                              initialStayDuration={place.stayDuration || 0}
                                               onSave={handleSaveTimePicker}
                                               onClose={handleCloseTimePicker}
                                             />

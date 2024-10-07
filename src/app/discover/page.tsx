@@ -113,6 +113,12 @@ const ArticleWrapper = styled.div`
   height: 250px;
   cursor: pointer;
   align-items: center;
+  margin-bottom: 20px;
+  &:hover {
+    opacity: 1;
+    background: #ecf6f9;
+    border-radius: 10px;
+  }
 `;
 
 const ArticleContent = styled.div`

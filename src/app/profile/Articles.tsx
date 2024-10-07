@@ -106,12 +106,6 @@ const ArticleContainer = styled.div`
   margin: 0;
   width: 70%;
   padding: 10px 5px;
-
-  &:hover {
-    opacity: 1;
-    background: #ecf6f9;
-    border-radius: 10px;
-  }
 `;
 
 const CardWrapper = styled.div`
@@ -119,7 +113,14 @@ const CardWrapper = styled.div`
   cursor: pointer;
   border-radius: 15px;
   overflow: hidden;
+  margin-bottom: 20px;
   /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+
+  &:hover {
+    opacity: 1;
+    background: #ecf6f9;
+    border-radius: 10px;
+  }
 `;
 
 const ArticleHeader = styled.div`

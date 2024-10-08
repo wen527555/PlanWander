@@ -109,14 +109,14 @@ const HomePage = () => {
           <StyledVideo autoPlay loop muted>
             <source src="/articleVideo.mp4" type="video/mp4" />
           </StyledVideo>
-          <Details>
+          <Detail3>
             <Heading>Read stories along with map</Heading>
             <br />
             <Description>
               Browse the map alongside travel stories, following in the footsteps of each attraction as if you were
               experiencing every part of the journey firsthand.
             </Description>
-          </Details>
+          </Detail3>
         </DetailSection>
       </DetailWrapper>
       <Section4>
@@ -172,6 +172,13 @@ const Detail2 = styled.div`
   width: 500px;
   position: absolute;
   left: 0;
+  color: white;
+`;
+
+const Detail3 = styled.div`
+  width: 500px;
+  position: absolute;
+  right: 0;
   color: white;
 `;
 

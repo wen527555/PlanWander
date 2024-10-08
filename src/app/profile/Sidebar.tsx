@@ -8,7 +8,6 @@ import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
 import { useUserStore } from '@/lib/store';
-import defaultProfileImg from '@/public/earth-profile.png';
 import { auth } from '../../lib/firebaseConfig';
 
 interface SidebarProps {
@@ -36,9 +35,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
 
   return (
     <Container>
-      <ImgWrapper>
-        <ProfileImg src={userData?.photoURL || defaultProfileImg.src} />
-      </ImgWrapper>
+      <ImgWrapper>{userData?.photoURL ? <ProfileImg src={userData?.photoURL} /> : <NoProfileImg />}</ImgWrapper>
       {userData?.userName && <UserName>{userData?.userName}</UserName>}
       <InfoSection>
         <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
@@ -83,11 +80,17 @@ const ImgWrapper = styled.div`
 `;
 
 const ProfileImg = styled.img`
-  border-radius: 50%;
   width: 100%;
   height: 100%;
-  /* border: 2px solid #a19a9a; */
   object-fit: cover;
+  border-radius: 50%;
+`;
+
+const NoProfileImg = styled.div`
+  width: 100%;
+  height: 100%;
+  background-color: #edebeb;
+  border-radius: 50%;
 `;
 
 const UserName = styled.h1`

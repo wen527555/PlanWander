@@ -109,6 +109,7 @@ const ArticleContainer = styled.div`
 const ArticleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  gap: 60px;
   padding: 20px;
   height: 250px;
   cursor: pointer;
@@ -124,8 +125,6 @@ const ArticleWrapper = styled.div`
 const ArticleContent = styled.div`
   display: flex;
   flex-direction: column;
-  width: 600px;
-  justify-content: space-between;
   height: 100%;
   padding: 20px;
 `;

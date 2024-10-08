@@ -64,6 +64,7 @@ const ArticlesPage = () => {
             onPlaceVisible={handlePlaceVisible}
             visiblePlace={visiblePlace}
             setManualScroll={setManualScroll}
+            manualScroll={manualScroll}
           />
         </ListContainer>
         <MapContainer>

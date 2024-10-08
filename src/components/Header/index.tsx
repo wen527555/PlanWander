@@ -13,7 +13,6 @@ import TripModal from '@/components/TripModal';
 import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
 import { useModalStore, useUserStore } from '@/lib/store';
 // import { BsPersonCircle } from 'react-icons/bs';
-import defaultProfileImg from '@/public/earth-profile.png';
 import Logo from '@/public/PlanwanderLogo.png';
 import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
 import LoginModal from '../LoginModal';
@@ -92,7 +91,7 @@ const Header = () => {
           <>
             <IconWrapper>
               <ProfileWrapper isActive={isProfileActive} onClick={handleToProfile}>
-                <ProfileIcon src={userData?.photoURL || defaultProfileImg.src} />
+                {userData?.photoURL ? <ProfileIcon src={userData?.photoURL} /> : <NoProfileImg />}
                 <IconText>{userData?.userName || 'You'}</IconText>
               </ProfileWrapper>
               <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
@@ -106,7 +105,7 @@ const Header = () => {
           </>
         ) : (
           <ButtonWrapper>
-            <Button onClick={() => openModal('login')}>LogIn</Button>
+            <LoginButton onClick={() => openModal('login')}>LogIn</LoginButton>
           </ButtonWrapper>
         )}
         {isModalOpen && modalType === 'trip' && (
@@ -151,6 +150,13 @@ const ProfileIcon = styled.img`
   &:hover {
     color: #d9d9d9;
   }
+`;
+
+const NoProfileImg = styled.div`
+  width: 30px;
+  height: 30px;
+  background-color: #dcdada;
+  border-radius: 50%;
 `;
 
 const IconWrapper = styled.div`
@@ -236,6 +242,21 @@ const Button = styled.button`
     background-color: white;
     color: #78b7cc;
     border: 2px solid #78b7cc;
+  }
+`;
+
+const LoginButton = styled.button`
+  border-radius: 20px;
+  padding: 8px 16px;
+  color: #333;
+  font-size: 14px;
+  cursor: pointer;
+  font-weight: 700;
+  background-color: white;
+  border: none;
+  &:hover {
+    background-color: #78b7cc;
+    color: white;
   }
 `;
 

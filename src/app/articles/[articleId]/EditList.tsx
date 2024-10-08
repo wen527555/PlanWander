@@ -159,7 +159,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       addAlert('Please upload coverImage.');
       return;
     }
-    if (!articleTitle || articleDescription) {
+    if (!articleTitle || !articleDescription) {
       addAlert("Please enter the article's title and description.");
       return;
     }

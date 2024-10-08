@@ -2,15 +2,52 @@
 
 import Head from 'next/head';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useRef, useTransition } from 'react';
 import styled from 'styled-components';
 
-import planGif from '@/public/list.gif';
-import planImg from '@/public/planMap.png';
+import LoadingAnimation from '@/components/Loading';
+import LoginModal from '@/components/LoginModal';
+import { useModalStore } from '@/lib/store';
 import bgImage from '@/public/travel.jpg';
 
 const HomePage = () => {
+  const router = useRouter();
+  const sectionOneRef = useRef<HTMLDivElement | null>(null);
+  const sectionTwoRef = useRef<HTMLDivElement | null>(null);
+  const sectionThreeRef = useRef<HTMLDivElement | null>(null);
+  const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
+  const [isPending, startTransition] = useTransition();
+  const handleToProfile = () => {
+    startTransition(() => {
+      router.push('/profile');
+    });
+  };
+  useEffect(() => {
+    function handleScroll() {
+      const windowPos = window.scrollY;
+
+      if (sectionOneRef.current && windowPos > 150) {
+        sectionOneRef.current.style.opacity = '1';
+      }
+
+      if (sectionTwoRef.current && windowPos > 200 + 605 * 0.85 + 150) {
+        sectionTwoRef.current.style.opacity = '1';
+      }
+
+      if (sectionThreeRef.current && windowPos > 200 + 605 * 0.85 + 200 + 658 * 0.85 + 150) {
+        sectionThreeRef.current.style.opacity = '1';
+      }
+    }
+
+    window.removeEventListener('scroll', () => handleScroll());
+    window.addEventListener('scroll', () => handleScroll());
+
+    return () => window.removeEventListener('scroll', () => handleScroll());
+  }, []);
   return (
     <>
+      {isPending && <LoadingAnimation />}
       <Head>
         <title>PlanWander - 為每個人設計的旅行規劃工具</title>
         <meta name="description" content="PlanWander 是一個免費的旅行規劃網站，讓您輕鬆安排並規劃旅程。" />
@@ -24,13 +61,12 @@ const HomePage = () => {
       <PageWrapper>
         <ContentWrapper>
           <TextSection>
-            <Heading>隨心所欲規劃你的下一次冒險！</Heading>
+            <Heading>A travel planner for everyone</Heading>
             <Description>
-              PlanWander
-              是為每個人設計的旅行規劃工具，不論是輕鬆的週末遊還是長途冒險，這裡讓你輕鬆安排旅程，出發無負擔！
+              Organize your trip and map it out on a free travel website designed for vacation planning.
             </Description>
             <ButtonGroup>
-              <StartButton>Start planning</StartButton>
+              <StartButton onClick={() => openModal('login')}>Start planning</StartButton>
             </ButtonGroup>
           </TextSection>
         </ContentWrapper>
@@ -38,38 +74,58 @@ const HomePage = () => {
           <Image src={bgImage} alt="Travel planning" layout="fill" objectFit="cover" quality={100} />
         </ImageSection>
       </PageWrapper>
-      <Section2>
-        <ImageSection2>
-          <StyledImage src={planImg} alt="Travel plan image" quality={100} />
-          <OverlayGif src={planGif} alt="Travel plan gif" quality={100} />
-        </ImageSection2>
-        <ContentWrapper2>
-          <TextSection>
-            <Heading>一站式旅程安排和地圖操作</Heading>
-            <Description>告別繁瑣的工具切換，PlanWander 讓你輕鬆規劃旅行，地圖和行程一目了然。</Description>
-          </TextSection>
-        </ContentWrapper2>
-      </Section2>
-      <Section3>
-        <ContentWrapper2>
-          <TextSection>
-            <Heading>互動式旅程分享，地圖與內容一目了然</Heading>
-            <Description>隨著行程文章瀏覽地圖，跟隨每個景點的步伐，仿佛親身走過每一段旅程。</Description>
-          </TextSection>
-        </ContentWrapper2>
-        <ImageSection2>
+
+      <DetailWrapper>
+        <DetailSection ref={sectionOneRef}>
+          <StyledVideo autoPlay loop muted>
+            <source src="/searchVideo.mp4" type="video/mp4" />
+          </StyledVideo>
+          <Details>
+            <Heading>
+              Your itinerary and your map <br />
+              in one view
+            </Heading>
+            <br />
+            <Description>
+              No more switching between different apps, tabs, and tools to keep track of your travel plans.
+            </Description>
+          </Details>
+        </DetailSection>
+
+        <DetailSection style={{ justifyContent: 'flex-end' }} ref={sectionTwoRef}>
+          <Detail2>
+            <div style={{ width: '100%', height: '45px' }}></div>
+            <Heading>
+              Easily Edit Your Itinerary with <br /> Drag-and-Drop
+            </Heading>
+            <br />
+            <Description>Quickly organize your trip by dragging and dropping to adjust your itinerary.</Description>
+          </Detail2>
+          <StyledVideo autoPlay loop muted>
+            <source src="/dropVideo.mp4" type="video/mp4" style={{ objectFit: 'cover' }} />
+          </StyledVideo>
+        </DetailSection>
+        <DetailSection ref={sectionThreeRef}>
           <StyledVideo autoPlay loop muted>
             <source src="/articleVideo.mp4" type="video/mp4" />
-            您的瀏覽器不支援影片播放。
           </StyledVideo>
-        </ImageSection2>
-      </Section3>
+          <Details>
+            <Heading>Read stories along with map</Heading>
+            <br />
+            <Description>
+              Browse the map alongside travel stories, following in the footsteps of each attraction as if you were
+              experiencing every part of the journey firsthand.
+            </Description>
+          </Details>
+        </DetailSection>
+      </DetailWrapper>
       <Section4>
-        <Section4Title>準備好用一半的時間完成你的旅行計劃了嗎？</Section4Title>
+        <Section4Title>Ready to plan your trip in half the time?</Section4Title>
         <ButtonGroup>
-          <StartButton>Start planning</StartButton>
+          <StartButton onClick={() => openModal('login')}>Start planning</StartButton>
         </ButtonGroup>
       </Section4>
+      {isModalOpen && modalType === 'login' && <LoginModal onClose={closeModal} onLoginSuccess={handleToProfile} />}
     </>
   );
 };
@@ -84,6 +140,41 @@ const PageWrapper = styled.div`
   overflow: hidden;
 `;
 
+const DetailWrapper = styled.div`
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+`;
+
+const DetailSection = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  position: relative;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  opacity: 0;
+  transition: all 1s ease-in-out;
+`;
+
+const Details = styled.div`
+  width: 500px;
+  position: absolute;
+  right: -50px;
+  color: white;
+`;
+
+const Detail2 = styled.div`
+  width: 500px;
+  position: absolute;
+  left: 0;
+  color: white;
+`;
+
 const ContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -91,7 +182,6 @@ const ContentWrapper = styled.div`
   align-items: center;
   padding: 0 50px;
   width: 50%;
-  /* background-color: white; */
 `;
 
 const TextSection = styled.div`
@@ -142,67 +232,9 @@ const ImageSection = styled.div`
   overflow: hidden;
 `;
 
-const ImageSection2 = styled.div`
-  position: relative;
-  width: 55%;
-  height: 100vh;
-  overflow: hidden;
-`;
-
-const StyledImage = styled(Image)`
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 100%;
-  height: 450px;
-  object-fit: contain;
-  border-radius: 20px;
-  z-index: 5;
-`;
-
-const OverlayGif = styled(Image)`
-  position: absolute;
-  top: 35%;
-  width: 360px;
-  height: 300px;
-  object-fit: cover;
-  border-radius: 10px;
-  z-index: 10;
-`;
-
-const Section2 = styled.section`
-  display: flex;
-  padding: 20px 50px;
-  background-color: #fafafa;
-  justify-content: center;
-`;
-
-const Section3 = styled.section`
-  display: flex;
-  padding: 20px 50px;
-  background-color: #ffffff;
-  justify-content: center;
-`;
-
-const ContentWrapper2 = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 0 50px;
-  width: 45%;
-`;
-
 const StyledVideo = styled.video`
-  position: absolute;
   width: 100%;
-  object-fit: cover;
-  border-radius: 10px;
-  z-index: 5;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  height: auto;
 `;
 
 const Section4 = styled.section`
@@ -214,11 +246,12 @@ const Section4 = styled.section`
   background-color: #f9f9f9;
   text-align: center;
   height: 500px;
+  gap: 50px;
 `;
 
 const Section4Title = styled.div`
   color: #2c3e50;
-  font-size: 36px;
+  font-size: 40px;
   font-weight: 700;
   margin-bottom: 20px;
 `;

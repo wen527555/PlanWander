@@ -199,6 +199,13 @@ const Input = styled.input`
   &:hover {
     border-color: #94c3d2;
   }
+
+  &:focus {
+    box-shadow:
+      inset 0 1px 1px rgba(0, 0, 0, 0.075),
+      0 0 0 0.2rem rgba(58, 202, 234, 0.25);
+    outline: none;
+  }
 `;
 
 const GoogleButton = styled.button`
@@ -212,8 +219,11 @@ const GoogleButton = styled.button`
   width: 100%;
   font-size: 14px;
   font-weight: 600;
+
   &:hover {
-    background: #f3f4f5;
+    background-color: white;
+    color: #78b7cc;
+    border: 2px solid #78b7cc;
   }
 `;
 
@@ -229,9 +239,11 @@ const LoginButton = styled.button`
   font-weight: 600;
   color: white;
   cursor: pointer;
-  border: none;
+  border: 2px solid transparent;
   &:hover {
-    background-color: #e0e7ea;
+    background-color: white;
+    color: #78b7cc;
+    border-color: #78b7cc;
   }
 `;
 
@@ -262,8 +274,9 @@ const ToggleLink = styled.span`
   cursor: pointer;
   text-decoration: none;
   margin-top: 1rem;
-
+  font-size: 16px;
+  font-weight: 500;
   &:hover {
-    color: #a7d6e6;
+    color: #78b7cc;
   }
 `;

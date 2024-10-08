@@ -13,7 +13,7 @@ import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import { createArticleFromTrip, createNewTrip, fetchDeleteTrip, fetchUserAllTrips } from '@/lib/firebaseApi';
 import { useModalStore } from '@/lib/store';
-import Carousel from '../../components/Carousel';
+import Carousel from './Carousel';
 
 interface Trip {
   imageUrl: string | undefined;
@@ -36,8 +36,15 @@ const TripsContainer = () => {
   const today = dayjs();
   const [isPending, startTransition] = useTransition();
   const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
-  const upcomingTrips = trips?.filter((trip: Trip) => dayjs(trip.startDate).isAfter(today));
-  const pastTrips = trips?.filter((trip: Trip) => dayjs(trip.endDate).isBefore(today));
+
+  const sortTrips = trips?.sort((a: Trip, b: Trip) => {
+    const diffA = Math.abs(dayjs(a.startDate).diff(today));
+    const diffB = Math.abs(dayjs(b.startDate).diff(today));
+    return diffA - diffB;
+  });
+
+  const upcomingTrips = sortTrips?.filter((trip: Trip) => dayjs(trip.startDate).isAfter(today));
+  const pastTrips = sortTrips?.filter((trip: Trip) => dayjs(trip.endDate).isBefore(today));
   const pastTripsByYear = pastTrips.reduce((acc: { [key: string]: Trip[] }, trip: Trip) => {
     const year = dayjs(trip.startDate).year();
     if (!acc[year]) acc[year] = [];
@@ -46,8 +53,12 @@ const TripsContainer = () => {
   }, {});
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
-  const currentTrip = upcomingTrips[currentIndex];
-  const daysUntilNextTrip = currentTrip ? dayjs(currentTrip.startDate).diff(today, 'day') : null;
+
+  const daysUntilNextTrip = (tripDate: Date) => {
+    const today = dayjs();
+    const tripStartDate = dayjs(tripDate);
+    return tripStartDate.diff(today, 'day');
+  };
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
   const handleSlideChange = (newIndex: number) => {
     setCurrentIndex(newIndex);
@@ -122,9 +133,9 @@ const TripsContainer = () => {
           <>
             <UpcomingTripsInfo>
               <TripsCount>{upcomingTrips.length} upcoming trips</TripsCount>
-              {daysUntilNextTrip !== null && (
-                <NextTripInfo>This adventure starts in {daysUntilNextTrip} days</NextTripInfo>
-              )}
+              <NextTripInfo>
+                This adventure starts in {daysUntilNextTrip(upcomingTrips[currentIndex].startDate)} days
+              </NextTripInfo>
             </UpcomingTripsInfo>
             <CarouselWrapper>
               <Carousel<Trip>
@@ -179,48 +190,50 @@ const TripsContainer = () => {
             </ButtonWrapper>
           </NoPlannedContainer>
         )}
-        {Object.keys(pastTripsByYear).map((year) => (
-          <YearSection key={year}>
-            <YearSeparator>
-              <YearTitle>
-                {year} • {pastTripsByYear[year].length} trips
-              </YearTitle>
-            </YearSeparator>
-            {pastTripsByYear[year].map((trip: Trip, index: number) => {
-              const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
-              const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
+        {Object.keys(pastTripsByYear)
+          .sort((a, b) => Number(b) - Number(a))
+          .map((year) => (
+            <YearSection key={year}>
+              <YearSeparator>
+                <YearTitle>
+                  {year} • {pastTripsByYear[year].length} trips
+                </YearTitle>
+              </YearSeparator>
+              {pastTripsByYear[year].map((trip: Trip, index: number) => {
+                const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
+                const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
 
-              return (
-                <YearWrapper key={index}>
-                  <CardWrapper>
-                    <CardHeader>
-                      <IconWrapper>
-                        <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
-                        {openMenuTripId === trip.id && (
-                          <Menu>
-                            <MenuItem>
-                              <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
-                              Delete
-                            </MenuItem>
-                          </Menu>
-                        )}
-                      </IconWrapper>
-                    </CardHeader>
-                    <CardContent onClick={() => handleTripClick(trip.id)}>
-                      <TripImg src={trip.imageUrl} />
-                      <CardDetails>
-                        <TripName>{trip.tripTitle}</TripName>
-                        <TripDate>
-                          {formattedStartDate} - {formattedEndDate}
-                        </TripDate>
-                      </CardDetails>
-                    </CardContent>
-                  </CardWrapper>
-                </YearWrapper>
-              );
-            })}
-          </YearSection>
-        ))}
+                return (
+                  <YearWrapper key={index}>
+                    <CardWrapper>
+                      <CardHeader>
+                        <IconWrapper>
+                          <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
+                          {openMenuTripId === trip.id && (
+                            <Menu>
+                              <MenuItem>
+                                <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
+                                Delete
+                              </MenuItem>
+                            </Menu>
+                          )}
+                        </IconWrapper>
+                      </CardHeader>
+                      <CardContent onClick={() => handleTripClick(trip.id)}>
+                        <TripImg src={trip.imageUrl} />
+                        <CardDetails>
+                          <TripName>{trip.tripTitle}</TripName>
+                          <TripDate>
+                            {formattedStartDate} - {formattedEndDate}
+                          </TripDate>
+                        </CardDetails>
+                      </CardContent>
+                    </CardWrapper>
+                  </YearWrapper>
+                );
+              })}
+            </YearSection>
+          ))}
       </TripContainer>
     </>
   );
@@ -348,6 +361,7 @@ const TripDate = styled.div`
 const IconWrapper = styled.div`
   display: flex;
   align-items: center;
+  position: relative;
 `;
 
 const PublishWrapper = styled.div`
@@ -382,12 +396,12 @@ const DeleteIcon = styled(AiOutlineDelete)`
 
 const Menu = styled.div`
   position: absolute;
-  top: 40px;
+  top: 30px;
   right: 0;
   background-color: white;
   border-radius: 8px;
   box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  z-index: 10;
 `;
 
 const MenuItem = styled.div`
@@ -411,14 +425,15 @@ const OptionIcon = styled(SlOptions)`
 `;
 
 const CarouselWrapper = styled.div`
-  width: 800px;
+  width: 100%;
+  max-width: 800px;
   margin: 0px 25px;
   &::before {
     content: '';
     position: absolute;
     top: 0;
     left: -5px;
-    height: 35%;
+    height: 30%;
     width: 100px;
     background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
@@ -430,11 +445,19 @@ const CarouselWrapper = styled.div`
     position: absolute;
     top: 0;
     right: -5px;
-    height: 35%;
-    width: 100px;
+    height: 30%;
+    width: 180px;
     background: linear-gradient(-90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
     z-index: 1;
+  }
+
+  @media (max-width: 1920px) {
+    width: 1000px;
+  }
+
+  @media (max-width: 1280px) {
+    max-width: 800px;
   }
 `;
 

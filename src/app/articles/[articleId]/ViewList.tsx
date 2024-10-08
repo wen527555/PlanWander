@@ -21,7 +21,13 @@ interface ListProps {
   setManualScroll: (placeId: boolean) => void;
 }
 
-const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePlace, setManualScroll }) => {
+const ViewList: React.FC<ListProps> = ({
+  articleData,
+  onPlaceVisible,
+  visiblePlace,
+  setManualScroll,
+  manualScroll,
+}) => {
   const [articleTitle, setArticleTitle] = useState('');
   const [articleDescription, setArticleDescription] = useState('');
   const [descriptions, setDescriptions] = useState<{ [key: string]: string }>({});
@@ -29,13 +35,19 @@ const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePla
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const placeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+  const handleScroll = (placeId: string) => {
+    if (!manualScroll) {
+      onPlaceVisible(placeId);
+    }
+  };
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const placeId = entry.target.getAttribute('data-place-id');
           if (entry.isIntersecting && placeId) {
-            onPlaceVisible(placeId);
+            handleScroll(placeId);
           }
         });
       },
@@ -43,7 +55,6 @@ const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePla
     );
 
     const placeItems = document.querySelectorAll('.place-item');
-    // observer.observe(placeItems[0]);
     placeItems.forEach((item) => observer.observe(item));
 
     return () => {
@@ -74,23 +85,20 @@ const ViewList: React.FC<ListProps> = ({ articleData, onPlaceVisible, visiblePla
   }, [articleData]);
 
   useEffect(() => {
-    if (visiblePlace && placeRefs.current[visiblePlace]) {
+    if (manualScroll && visiblePlace && placeRefs.current[visiblePlace]) {
       placeRefs.current[visiblePlace].scrollIntoView({
         behavior: 'smooth',
-        block: 'center',
+        block: 'end',
       });
     }
 
     setTimeout(() => {
       setManualScroll(false);
     }, 500);
-  }, [visiblePlace]);
+  }, [visiblePlace, manualScroll, setManualScroll]);
 
   return (
     <>
-      {/* <ListHeader>
-        <HomeIcon onClick={handleBackProfile} />
-      </ListHeader> */}
       <Container>
         <CoverImageWrapper>
           <CoverImage src={coverImage || defaultCoverImg.src} />
@@ -218,7 +226,7 @@ const PlaceItem = styled.div<{ visible: boolean }>`
   margin: 20px 0px;
   padding: 10px 12px;
   /* transition: background-color 0.3s ease; */
-  /* min-height: 500px; */
+  /* min-height: 450px; */
   ${({ visible }) =>
     visible
       ? `

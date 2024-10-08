@@ -174,6 +174,7 @@ const DeleteIcon = styled(AiOutlineDelete)`
 
 const ArticleWrapper = styled.div`
   display: flex;
+  gap: 50px;
   justify-content: space-between;
   padding: 20px;
   height: 250px;
@@ -184,9 +185,7 @@ const ArticleWrapper = styled.div`
 const ArticleContent = styled.div`
   display: flex;
   flex-direction: column;
-  width: 350px;
   margin: 10px 15px;
-  justify-content: space-between;
   height: 100%;
 `;
 

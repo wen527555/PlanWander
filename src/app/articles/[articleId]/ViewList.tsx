@@ -19,6 +19,7 @@ interface ListProps {
   onPlaceVisible: (placeId: string) => void;
   visiblePlace: string | null;
   setManualScroll: (placeId: boolean) => void;
+  manualScroll: boolean;
 }
 
 const ViewList: React.FC<ListProps> = ({

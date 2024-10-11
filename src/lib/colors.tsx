@@ -1,13 +1,13 @@
 // utils/colors.ts
 const colors = [
+  '#7B90D2',
+  '#FAD689',
+  '#F4A7B9',
+  '#7DB9DE',
+  '#EBB471',
   '#a9a9e1',
   '#78C2C4',
-  '#7B90D2',
-  '#7DB9DE',
-  '#FAD689',
-  '#EBB471',
   '#F8C3CD',
-  '#F4A7B9',
   '#5DAC81',
   '#dc9a61',
 ];

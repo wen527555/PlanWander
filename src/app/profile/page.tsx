@@ -38,7 +38,12 @@ const Container = styled.div`
   width: 100%;
   height: calc(100vh - 54px);
   margin-top: 60px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
+
 const MainContent = styled.div`
   flex: 1;
   padding: 45px 0px;

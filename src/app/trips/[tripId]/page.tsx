@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef, useTransition } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
@@ -12,10 +12,12 @@ import { RiEdit2Fill } from 'react-icons/ri';
 // import { PiPencilLine } from 'react-icons/pi';
 import styled from 'styled-components';
 
+import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
+import useAlert from '@/lib/hooks/useAlertMessage';
 import { processDays } from '@/lib/processDays';
-import { useModalStore, usePlaceStore } from '@/lib/store';
+import { useConfirmModalStore, useModalStore, usePlaceStore } from '@/lib/store';
 import {
   addPlaceToDay,
   deletePlace,
@@ -106,7 +108,12 @@ const TripPage: React.FC = () => {
     queryFn: () => fetchTripData(tripId as string),
     staleTime: 5000,
   });
-
+  const [isMapVisible, setIsMapVisible] = useState(false);
+  const openConfirmModal = useConfirmModalStore((state) => state.openModal);
+  const toggleMapListView = () => {
+    setIsMapVisible((prev) => !prev);
+  };
+  const { addAlert, AlertMessage } = useAlert();
   const formattedStartDate = dayjs(tripData?.startDate).format('M/D');
   const formattedEndDate = dayjs(tripData?.endDate).format('M/D');
 
@@ -114,7 +121,7 @@ const TripPage: React.FC = () => {
     mutationFn: fetchUpdateTrip,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['tripData', tripId as string] });
-      console.log('Trip updated successfully');
+      addAlert('Update saved successfully!');
     },
     onError: (error: any) => {
       console.error('Error updating trip:', error);
@@ -131,6 +138,8 @@ const TripPage: React.FC = () => {
     const isStartDateChanged = dayjs(startDate).format('YYYY-MM-DD') !== tripData?.startDate;
     const isEndDateChanged = dayjs(endDate).format('YYYY-MM-DD') !== tripData?.endDate;
     const isCountriesChanged = JSON.stringify(selectedCountries) !== JSON.stringify(tripData?.countries);
+    const originalDays = dayjs(tripData?.endDate).diff(tripData?.startDate, 'day') + 1;
+    const newDays = dayjs(endDate).diff(startDate, 'day') + 1;
 
     if (isTitleChanged || isStartDateChanged || isEndDateChanged || isCountriesChanged) {
       const updateData: UpdateTripParams = {
@@ -142,7 +151,18 @@ const TripPage: React.FC = () => {
         originalTripData: tripData,
       };
 
-      updateTripMutation.mutate(updateData);
+      if (newDays < originalDays) {
+        const dayToDelete = originalDays - newDays;
+        const datesToDelete = Array.from({ length: dayToDelete }, (_, i) =>
+          dayjs(tripData?.endDate).subtract(i, 'day').format('MM/DD')
+        ).reverse();
+        const deleteWarningMessage = `The following days will be removed: ${datesToDelete.join(', ')}. Move any places you want to keep to other days.`;
+        openConfirmModal(deleteWarningMessage, () => {
+          updateTripMutation.mutate(updateData);
+        });
+      } else {
+        updateTripMutation.mutate(updateData);
+      }
     } else {
       console.log('No changes detected, no update required');
     }
@@ -209,7 +229,6 @@ const TripPage: React.FC = () => {
             return { ...place, route: null };
           }
           const prevPlace = places[index - 1];
-          // const prevPlace =places[index+1];
           const transportMode = place.route?.transportMode || 'driving';
           const route = await getRoute(prevPlace, place, transportMode);
           return {
@@ -264,12 +283,9 @@ const TripPage: React.FC = () => {
   const deletePlaceMutation = useMutation({
     mutationFn: async ({ tripId, dayId, placeId }: { tripId: string; dayId: string; placeId: string }) => {
       const placesBeforeDelete: Place[] = await getPlaceForDay(tripId, dayId);
-      console.log('placesBeforeDelete', placesBeforeDelete);
       const placeIndex = placesBeforeDelete.findIndex((place: { id: string }) => place.id === placeId);
-      console.log('placeIndex', placeIndex);
       const prevPlace = placeIndex > 0 ? placesBeforeDelete[placeIndex - 1] : null;
       const nextPlace = placeIndex < placesBeforeDelete.length ? placesBeforeDelete[placeIndex + 1] : null;
-      console.log('nextPlace', nextPlace);
       await deletePlace(tripId, dayId, placeId);
 
       if (placeIndex === 0 && nextPlace) {
@@ -310,8 +326,11 @@ const TripPage: React.FC = () => {
   return (
     <>
       {isPending && <LoadingAnimation />}
+      <ConfirmModal />
+      <AlertMessage />
       <Container>
-        <ListContainer>
+        <ToggleButton onClick={toggleMapListView}>{isMapVisible ? 'List View' : 'Map View'}</ToggleButton>
+        <ListContainer isMapVisible={isMapVisible}>
           <ListHeader>
             <HomeIcon onClick={handleBackProfile} />
             <TripName>{tripData.tripTitle}</TripName>
@@ -323,7 +342,6 @@ const TripPage: React.FC = () => {
           </ListHeader>
           <List
             days={tripData.days as any}
-            // activeDate={activeDate}
             onPlaceAdded={handleAddPlace}
             onDaysUpdate={handleDaysUpdate}
             onModeUpdate={handleModeChange}
@@ -331,7 +349,7 @@ const TripPage: React.FC = () => {
             tripId={tripId}
           />
         </ListContainer>
-        <MapContainer>
+        <MapContainer isMapVisible={isMapVisible}>
           <MapComponent places={places as any} routes={route as any} />
           {selectedPlace && (
             <PlaceInfoModal ref={modalRef}>
@@ -396,11 +414,34 @@ const TripPage: React.FC = () => {
 
 export default TripPage;
 
+const ToggleButton = styled.button`
+  position: absolute;
+  bottom: 20px;
+  padding: 10px 20px;
+  background-color: #212529;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  z-index: 3;
+  font-weight: 600;
+  font-size: 14px;
+
+  left: 50%;
+  transform: translateX(-50%);
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
 const Container = styled.div`
   display: flex;
   height: 100vh;
-  /* overflow-y: auto; */
   overflow: hidden;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const ListHeader = styled.div`
@@ -415,6 +456,10 @@ const ListHeader = styled.div`
   background-color: white;
   padding: 5px 20px;
   z-index: 2;
+
+  @media (max-width: 768px) {
+    width: 100%;
+  }
 `;
 
 const HomeIcon = styled(IoArrowBackCircleOutline)`
@@ -455,17 +500,27 @@ const EditIcon = styled(RiEdit2Fill)`
   }
 `;
 
-const ListContainer = styled.div`
+const ListContainer = styled.div<{ isMapVisible: boolean }>`
   width: 45%;
   overflow-y: auto;
   box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
+
+  @media (max-width: 768px) {
+    width: 100%;
+    display: ${(props) => (props.isMapVisible ? 'none' : 'block')};
+  }
 `;
 
-const MapContainer = styled.div`
+const MapContainer = styled.div<{ isMapVisible: boolean }>`
   width: 55%;
   height: 100vh;
   position: sticky;
   top: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    display: ${(props) => (props.isMapVisible ? 'block' : 'none')};
+  }
 `;
 
 const PlaceInfoModal = styled.div`

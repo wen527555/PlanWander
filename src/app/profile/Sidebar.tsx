@@ -67,6 +67,11 @@ const Container = styled.div`
   justify-content: space-between;
   padding: 16px 24px;
   height: calc(100vh - 54px);
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: auto;
+  }
 `;
 
 const ImgWrapper = styled.div`
@@ -77,6 +82,10 @@ const ImgWrapper = styled.div`
   margin-top: 40px;
   width: 96px;
   height: 96px;
+
+  @media (max-width: 768px) {
+    margin-top: 5px;
+  }
 `;
 
 const ProfileImg = styled.img`
@@ -101,6 +110,12 @@ const UserName = styled.h1`
 
 const InfoSection = styled.div`
   padding: 20px;
+
+  @media (max-width: 768px) {
+    margin-top: 5px;
+    display: flex;
+    text-align: center;
+  }
 `;
 
 const InfoItem = styled.div<{ isActive: boolean }>`
@@ -119,6 +134,10 @@ const InfoItem = styled.div<{ isActive: boolean }>`
 
   &:hover {
     background-color: #ecf6f9;
+  }
+
+  @media (max-width: 768px) {
+    margin: 0;
   }
 `;
 

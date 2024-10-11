@@ -7,8 +7,10 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
+import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
 import { fetchDeleteArticle, fetchUserAllArticles } from '@/lib/firebaseApi';
+import { useConfirmModalStore } from '@/lib/store';
 
 type Article = {
   id: string;
@@ -27,7 +29,7 @@ const ArticlesContainer = () => {
   const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const queryClient = useQueryClient();
-
+  const openConfirmModal = useConfirmModalStore((state) => state.openModal);
   const handleArticleClick = (articleId: string) => {
     startTransition(() => {
       router.push(`articles/${articleId}`);
@@ -53,9 +55,9 @@ const ArticlesContainer = () => {
   });
 
   const handleDeleteArticleClick = (articleId: string) => {
-    if (window.confirm('Are you sure you want to delete this article?')) {
+    openConfirmModal('Are you sure you want to delete this article? This action is not reversible!', () => {
       deleteArticleMutation.mutate(articleId);
-    }
+    });
   };
 
   if (loadingArticles) {
@@ -69,6 +71,7 @@ const ArticlesContainer = () => {
   return (
     <>
       {isPending && <LoadingAnimation />}
+      <ConfirmModal />
       <ArticleContainer>
         {articles.map((article: Article) => (
           <CardWrapper key={article.id}>
@@ -180,6 +183,12 @@ const ArticleWrapper = styled.div`
   height: 250px;
   cursor: pointer;
   align-items: center;
+
+  @media (max-width: 1200px) {
+    flex-direction: column;
+    height: auto;
+    gap: 20px;
+  }
 `;
 
 const ArticleContent = styled.div`
@@ -218,4 +227,8 @@ const ArticleImage = styled.img`
   object-fit: cover;
   height: 90%;
   border-radius: 10px;
+  @media (max-width: 1200px) {
+    width: 100%;
+    order: -1;
+  }
 `;

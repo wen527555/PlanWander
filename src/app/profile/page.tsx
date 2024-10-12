@@ -13,7 +13,6 @@ import TripsContainer from './Trips';
 const ProfilePage = () => {
   const [currentTab, setCurrentTab] = useState<'trips' | 'articles'>('trips');
   const router = useRouter();
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {

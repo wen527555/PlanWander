@@ -1,12 +1,15 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import React, { useEffect, useRef, useState } from 'react';
+import { FaPencilAlt } from 'react-icons/fa';
 import { IoEarthOutline } from 'react-icons/io5';
 import { PiArticleNyTimes } from 'react-icons/pi';
 import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
+import { updateUserProfile, uploadProfileImage } from '@/lib/firebaseApi';
+import useAlert from '@/lib/hooks/useAlertMessage';
 import { useUserStore } from '@/lib/store';
 import { auth } from '../../lib/firebaseConfig';
 
@@ -17,7 +20,14 @@ interface SidebarProps {
 const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
   const { userData, setUserData } = useUserStore();
   const [activeTab, setActiveTab] = useState<'trips' | 'articles' | null>(null);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const { addAlert, AlertMessage } = useAlert();
+  const allowImgFormats = ['image/jpeg', 'image/png', 'image/jpg'];
+  const maxImgSize = 5 * 1024 * 1024;
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -28,34 +38,172 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
     }
   };
 
+  const handleProfileImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (!userData) {
+        addAlert('No user data available. Please log in.');
+        return;
+      }
+
+      if (!allowImgFormats.includes(file.type)) {
+        addAlert('Invalid file format. Please upload a JPEG or PNG image.');
+        return;
+      }
+
+      if (file.size > maxImgSize) {
+        addAlert('Image size exceeds 5MB. Please upload a smaller image.');
+        return;
+      }
+      const localImageUrl = URL.createObjectURL(file);
+      setIsUploading(true);
+      setUserData({ ...userData, photoURL: localImageUrl });
+      try {
+        const uploadImageUrl = await uploadProfileImage(userData.uid, file);
+        await updateUserProfile(userData.uid, null, uploadImageUrl);
+        addAlert('Profile image uploaded successfully!');
+      } catch {
+        addAlert('Failed to upload image. Please try again.');
+      } finally {
+        setIsUploading(false);
+      }
+    }
+  };
+
+  const handleNameUpdate = async () => {
+    if (!userData) {
+      addAlert('No user data available. Please log in.');
+      return;
+    }
+
+    try {
+      await updateUserProfile(userData.uid, userData.userName, null);
+      setIsEditingName(false);
+      addAlert('Username updated successfully!');
+    } catch (error) {
+      console.error('error', error);
+      addAlert('Failed to update username. Please try again.');
+    }
+  };
+
   const handleTabClick = (tab: 'trips' | 'articles') => {
     setActiveTab(tab);
     setCurrentTab(tab);
+
+    const newSearchParams = new URLSearchParams(searchParams);
+    newSearchParams.set('tab', tab);
+    router.push(`/profile?${newSearchParams.toString()}`);
   };
 
+  const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (userData) {
+      setUserData({ ...userData, userName: e.target.value });
+    }
+  };
+
+  useEffect(() => {
+    const tabParam = searchParams.get('tab');
+    if (tabParam === 'articles') {
+      setActiveTab('articles');
+      setCurrentTab('articles');
+    } else {
+      setActiveTab('trips');
+      setCurrentTab('trips');
+    }
+  }, [searchParams]);
+
   return (
-    <Container>
-      <ImgWrapper>{userData?.photoURL ? <ProfileImg src={userData?.photoURL} /> : <NoProfileImg />}</ImgWrapper>
-      {userData?.userName && <UserName>{userData?.userName}</UserName>}
-      <InfoSection>
-        <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
-          <TripsIcon />
-          <InfoText>Trips</InfoText>
-        </InfoItem>
-        <InfoItem onClick={() => handleTabClick('articles')} isActive={activeTab === 'articles'}>
-          <ArticlesIcon />
-          <InfoText>Articles</InfoText>
-        </InfoItem>
-      </InfoSection>
-      <LogoutWrapper>
-        <LogoutIcon />
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-      </LogoutWrapper>
-    </Container>
+    <>
+      <AlertMessage />
+      <Container>
+        <ImgWrapper>
+          {userData?.photoURL ? <ProfileImg src={userData?.photoURL} /> : <NoProfileImg />}
+          <EditButton onClick={() => fileInputRef.current?.click()}>
+            <EditIcon />
+          </EditButton>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            style={{ display: 'none' }}
+            onChange={handleProfileImageChange}
+          />
+          {isUploading && <p>Uploading...</p>}
+        </ImgWrapper>
+        {isEditingName ? (
+          <NameInput
+            type="text"
+            value={userData?.userName || ''}
+            onChange={handleNameChange}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleNameUpdate();
+              }
+            }}
+          />
+        ) : (
+          <UserName onClick={() => setIsEditingName(true)}>{userData?.userName || 'No name set'}</UserName>
+        )}
+        <InfoSection>
+          <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
+            <TripsIcon />
+            <InfoText>Trips</InfoText>
+          </InfoItem>
+          <InfoItem onClick={() => handleTabClick('articles')} isActive={activeTab === 'articles'}>
+            <ArticlesIcon />
+            <InfoText>Articles</InfoText>
+          </InfoItem>
+        </InfoSection>
+        <LogoutWrapper>
+          <LogoutIcon />
+          <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+        </LogoutWrapper>
+      </Container>
+    </>
   );
 };
 
 export default Sidebar;
+
+const NameInput = styled.input`
+  margin-top: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ddd;
+  outline: none;
+  &:hover {
+    border-color: #94c3d2;
+  }
+`;
+
+const EditButton = styled.button`
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  background-color: rgba(33, 37, 41, 0.502);
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+
+  &:hover {
+    background-color: #1b1b1b;
+  }
+`;
+
+const EditIcon = styled(FaPencilAlt)`
+  color: #ffff;
+  font-size: 16px;
+`;
 
 const Container = styled.div`
   width: 250px;
@@ -82,7 +230,7 @@ const ImgWrapper = styled.div`
   margin-top: 40px;
   width: 96px;
   height: 96px;
-
+  position: relative;
   @media (max-width: 768px) {
     margin-top: 5px;
   }
@@ -106,6 +254,11 @@ const UserName = styled.h1`
   margin-top: 25px;
   font-weight: 700;
   font-size: 20px;
+  cursor: pointer;
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: gray;
+  }
 `;
 
 const InfoSection = styled.div`
@@ -155,7 +308,8 @@ const InfoText = styled.span`
   font-size: 16px;
   color: #333;
   flex-grow: 1;
-  margin-left: 10px;
+  margin-left: 20px;
+  font-weight: 700;
 `;
 
 const LogoutWrapper = styled.div`

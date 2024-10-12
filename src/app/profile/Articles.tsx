@@ -47,7 +47,6 @@ const ArticlesContainer = () => {
     mutationFn: fetchDeleteArticle,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userArticles'] });
-      alert('delete article successfully!');
     },
     onError: (error) => {
       console.error('Error deleting trip:', error);

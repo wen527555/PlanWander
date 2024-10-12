@@ -731,3 +731,39 @@ export const updateDepartureTime = async (tripId: string, dayId: string, newTime
     departureTime: newTime,
   });
 };
+
+export const uploadProfileImage = async (userId: string, file: File) => {
+  try {
+    const imageRef = ref(storage, `users/${userId}/${file.name}`);
+    const uploadResult = await uploadBytes(imageRef, file);
+    const downloadURL = await getDownloadURL(uploadResult.ref);
+    console.log('Image uploaded successfully:', downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw new Error('Failed to upload image.');
+  }
+};
+
+export const updateUserProfile = async (userId: string, userName: string | null, photoURL: string | null) => {
+  const updates: Partial<{ userName: string; photoURL: string }> = {};
+
+  if (userName) {
+    updates.userName = userName;
+  }
+
+  if (photoURL) {
+    updates.photoURL = photoURL;
+  }
+
+  if (Object.keys(updates).length > 0) {
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      await updateDoc(userDocRef, updates);
+      console.log('User profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw new Error('Failed to update user profile');
+    }
+  }
+};

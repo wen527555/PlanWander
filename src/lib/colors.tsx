@@ -1,4 +1,3 @@
-// utils/colors.ts
 const colors = [
   '#7B90D2',
   '#FAD689',

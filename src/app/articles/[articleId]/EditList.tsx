@@ -173,7 +173,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   });
   const router = useRouter();
   const handleBackProfile = () => {
-    router.push('/profile');
+    router.push('/profile?tab=articles');
   };
 
   const handleSaveArticle = async () => {
@@ -357,7 +357,7 @@ const EditButton = styled.button`
   height: 40px;
 
   &:hover {
-    background-color: #444444;
+    background-color: #1b1b1b;
   }
 `;
 

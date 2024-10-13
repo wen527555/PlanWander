@@ -1,14 +1,13 @@
 'use client';
 
 import { useRouter, useSearchParams } from 'next/navigation';
-import React, { Suspense, useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { FaPencilAlt } from 'react-icons/fa';
 import { IoEarthOutline } from 'react-icons/io5';
 import { PiArticleNyTimes } from 'react-icons/pi';
 import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
-import LoadingAnimation from '@/components/Loading';
 import { updateUserProfile, uploadProfileImage } from '@/lib/firebaseApi';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { useUserStore } from '@/lib/store';
@@ -91,7 +90,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
     setActiveTab(tab);
     setCurrentTab(tab);
 
-    const newSearchParams = new URLSearchParams(searchParams);
+    const newSearchParams = new URLSearchParams(searchParams?.toString());
     newSearchParams.set('tab', tab);
     router.push(`/profile?${newSearchParams.toString()}`);
   };
@@ -103,15 +102,21 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
   };
 
   useEffect(() => {
+    let isMounted = true;
     const tabParam = searchParams.get('tab');
-    if (tabParam === 'articles') {
-      setActiveTab('articles');
-      setCurrentTab('articles');
-    } else {
-      setActiveTab('trips');
-      setCurrentTab('trips');
+    if (isMounted) {
+      if (tabParam === 'articles') {
+        setActiveTab('articles');
+        setCurrentTab('articles');
+      } else {
+        setActiveTab('trips');
+        setCurrentTab('trips');
+      }
+      return () => {
+        isMounted = false;
+      };
     }
-  }, [searchParams]);
+  }, [searchParams, setCurrentTab]);
 
   return (
     <>
@@ -146,18 +151,14 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
           <UserName onClick={() => setIsEditingName(true)}>{userData?.userName || 'No name set'}</UserName>
         )}
         <InfoSection>
-          <Suspense fallback={<LoadingAnimation />}>
-            <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
-              <TripsIcon />
-              <InfoText>Trips</InfoText>
-            </InfoItem>
-          </Suspense>
-          <Suspense fallback={<LoadingAnimation />}>
-            <InfoItem onClick={() => handleTabClick('articles')} isActive={activeTab === 'articles'}>
-              <ArticlesIcon />
-              <InfoText>Articles</InfoText>
-            </InfoItem>
-          </Suspense>
+          <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
+            <TripsIcon />
+            <InfoText>Trips</InfoText>
+          </InfoItem>
+          <InfoItem onClick={() => handleTabClick('articles')} isActive={activeTab === 'articles'}>
+            <ArticlesIcon />
+            <InfoText>Articles</InfoText>
+          </InfoItem>
         </InfoSection>
         <LogoutWrapper>
           <LogoutIcon />

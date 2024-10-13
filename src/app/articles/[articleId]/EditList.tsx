@@ -3,7 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { FaMapMarker } from 'react-icons/fa';
+import { FaMapMarker, FaPencilAlt } from 'react-icons/fa';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
 // import { MdPlace } from 'react-icons/md';
 import styled from 'styled-components';
@@ -19,6 +19,7 @@ interface ListProps {
     title: string;
     description: string;
     days: any;
+    imageUrl: string;
   };
   articleId: any;
   onPlaceVisible: (placeId: string) => void;
@@ -33,6 +34,8 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const { userData } = useUserStore();
   const coverImageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+  const allowImgFormats = ['image/jpeg', 'image/png', 'image/jpg'];
+  const maxImgSize = 5 * 1024 * 1024;
   const { addAlert, AlertMessage } = useAlert();
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -58,6 +61,15 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   }, [articleData, onPlaceVisible]);
 
   const handleCoverImageUpload = async (file: File) => {
+    if (!allowImgFormats.includes(file.type)) {
+      addAlert('Please upload an image in JPG or PNG format.');
+      return;
+    }
+
+    if (file.size > maxImgSize) {
+      addAlert('The image size should not exceed 5MB.');
+      return;
+    }
     const localCoverImageUrl = URL.createObjectURL(file);
     setCoverImage(localCoverImageUrl);
     URL.revokeObjectURL(localCoverImageUrl);
@@ -66,9 +78,10 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       setCoverImage(imageUrl);
     } catch (error) {
       console.error('Error uploading cover image:', error);
-      alert('上傳圖片失敗，請重新上傳');
+      addAlert('Image upload failed, please try again.');
     }
   };
+
   const handleDescriptionChange = (placeId: string, value: string) => {
     setDescriptions((prev) => ({
       ...prev,
@@ -84,7 +97,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
     if (articleData) {
       setArticleTitle(articleData.title);
       setArticleDescription(articleData.description);
-      setCoverImage(articleData.coverImage);
+      setCoverImage(articleData.coverImage || articleData.imageUrl);
       const initialDescriptions: { [key: string]: string } = {};
       const initialImages: { [key: string]: string } = {};
 
@@ -103,6 +116,15 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   }, [articleData]);
 
   const handleImageUpload = async (placeId: string, file: File) => {
+    if (!allowImgFormats.includes(file.type)) {
+      addAlert('Please upload an image in JPG or PNG format.');
+      return;
+    }
+
+    if (file.size > maxImgSize) {
+      addAlert('The image size should not exceed 5MB.');
+      return;
+    }
     const localImageUrl = URL.createObjectURL(file);
     setImages((prev) => ({
       ...prev,
@@ -151,7 +173,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   });
   const router = useRouter();
   const handleBackProfile = () => {
-    router.push('/profile');
+    router.push('/profile?tab=articles');
   };
 
   const handleSaveArticle = async () => {
@@ -192,16 +214,14 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
               }
             }}
           />
-        </ImageUploadWrapper>
-        <ButtonWrapper>
-          <Button
+          <EditButton
             onClick={() => {
               coverImageInputRef.current?.click();
             }}
           >
-            Upload
-          </Button>
-        </ButtonWrapper>
+            <EditIcon />
+          </EditButton>
+        </ImageUploadWrapper>
         <ArticleTitleInput value={articleTitle} onChange={handleTitleChange} placeholder="Enter article title..." />
         <DescriptionInput
           value={articleDescription}
@@ -242,16 +262,14 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
                         }
                       }}
                     />
-                  </ImageUploadWrapper>
-                  <ButtonWrapper>
-                    <Button
+                    <EditButton
                       onClick={() => {
                         fileInputRefs.current[place.id]?.click();
                       }}
                     >
-                      Upload
-                    </Button>
-                  </ButtonWrapper>
+                      <EditIcon />
+                    </EditButton>
+                  </ImageUploadWrapper>
                   <Description
                     value={descriptions[place.id] || ''}
                     placeholder="Enter a description..."
@@ -262,7 +280,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
           </ItemContainer>
         ))
       ) : (
-        <p>No trip days found.</p>
+        <div></div>
       )}
     </Container>
   );
@@ -290,6 +308,10 @@ const ListHeader = styled.div`
   padding: 5px 10px;
   margin: 0px 10px;
   z-index: 2;
+  @media (max-width: 768px) {
+    width: 100%;
+    padding: 5px 25px;
+  }
 `;
 
 const HomeIcon = styled(IoArrowBackCircleOutline)`
@@ -301,15 +323,6 @@ const SaveWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: end;
-`;
-
-//跟 Add button一樣
-
-const ButtonWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: start;
-  margin-top: 10px;
 `;
 
 const Button = styled.div`
@@ -324,6 +337,33 @@ const Button = styled.div`
   &:hover {
     background-color: #dde9ed;
   }
+`;
+
+const EditButton = styled.button`
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: rgba(33, 37, 41, 0.502);
+  border: none;
+  border-radius: 50%;
+  padding: 10px;
+  cursor: pointer;
+  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+
+  &:hover {
+    background-color: #1b1b1b;
+  }
+`;
+
+const EditIcon = styled(FaPencilAlt)`
+  color: #ffff;
+  font-size: 16px;
 `;
 
 const EditWrapper = styled.div`
@@ -390,6 +430,7 @@ const ItemName = styled.h3`
 `;
 
 const ImageUploadWrapper = styled.div`
+  position: relative;
   background-color: #f3f3f3;
   height: 200px;
   border-radius: 8px;

@@ -49,7 +49,7 @@ const CarouselContainer = styled.div`
   position: relative;
   display: flex;
   overflow-x: auto;
-  gap: 16px;
+  /* gap: 16px; */
   /* padding: 20px 30px; */
   max-width: 1000px;
   scroll-behavior: smooth;

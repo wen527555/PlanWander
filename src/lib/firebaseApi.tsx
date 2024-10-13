@@ -417,24 +417,38 @@ export const createArticleFromTrip = async (tripId: string) => {
     if (!userId) {
       throw new Error('No authenticated user found');
     }
+
+    const tripRef = doc(db, `trips/${tripId}`);
+    const tripSnapshot = await getDoc(tripRef);
+    const tripData = tripSnapshot.data();
+    const imageUrl = tripData?.imageUrl;
+    const articleRef = doc(db, `articles/${tripId}`);
+    const articleSnapshot = await getDoc(articleRef);
     const tripDaysCollectionRef = collection(db, `trips/${tripId}/days`);
     const daysSnapshot = await getDocs(tripDaysCollectionRef);
-    const articleRef = doc(db, `articles/${tripId}`);
-    await setDoc(articleRef, {
-      tripId,
-      createdAt: new Date(),
-      title: '',
-      description: '',
-      uid: userId,
-    });
 
-    daysSnapshot.forEach(async (dayDoc) => {
-      const dayData = dayDoc.data();
-      const articleDayRef = doc(collection(db, `articles/${tripId}/days`), dayDoc.id);
-      await setDoc(articleDayRef, dayData);
-    });
+    if (articleSnapshot.exists()) {
+      daysSnapshot.forEach(async (dayDoc) => {
+        const dayData = dayDoc.data();
+        const articleDayRef = doc(collection(db, `articles/${tripId}/days`), dayDoc.id);
+        await setDoc(articleDayRef, dayData, { merge: true });
+      });
+    } else {
+      await setDoc(articleRef, {
+        tripId,
+        createdAt: new Date(),
+        title: '',
+        description: '',
+        uid: userId,
+        imageUrl,
+      });
 
-    console.log('Article and days created successfully!');
+      daysSnapshot.forEach(async (dayDoc) => {
+        const dayData = dayDoc.data();
+        const articleDayRef = doc(collection(db, `articles/${tripId}/days`), dayDoc.id);
+        await setDoc(articleDayRef, dayData);
+      });
+    }
   } catch (error) {
     console.error('Error creating article from trip:', error);
     throw new Error('Failed to create article from trip');
@@ -453,6 +467,7 @@ export const fetchArticleData = async (articleId: string) => {
     const coverImage = articleData?.coverImage || '';
     const title = articleData?.title || '';
     const description = articleData?.description || '';
+    const imageUrl = articleData?.imageUrl || '';
     const daysCollection = collection(db, `articles/${articleId}/days`);
     const daysSnapshot = await getDocs(daysCollection);
     const daysData = daysSnapshot.docs.map((doc) => ({
@@ -464,6 +479,7 @@ export const fetchArticleData = async (articleId: string) => {
       title,
       description,
       days: daysData,
+      imageUrl,
     };
   } catch (error) {
     console.error('Error fetching trip days:', error);
@@ -635,7 +651,6 @@ export const fetchUpdateTrip = async (updateData: UpdateTripParams): Promise<voi
   const tripRef = doc(db, 'trips', tripId);
   await updateDoc(tripRef, updatedTripData);
   await handleDateRangeChange(tripRef, startDate, endDate, originalTripData);
-  console.log('Trip updated successfully with date changes and imageUrl in Firebase');
 };
 
 //改成更好的寫法
@@ -715,4 +730,40 @@ export const updateDepartureTime = async (tripId: string, dayId: string, newTime
   await updateDoc(dayDocRef, {
     departureTime: newTime,
   });
+};
+
+export const uploadProfileImage = async (userId: string, file: File) => {
+  try {
+    const imageRef = ref(storage, `users/${userId}/${file.name}`);
+    const uploadResult = await uploadBytes(imageRef, file);
+    const downloadURL = await getDownloadURL(uploadResult.ref);
+    console.log('Image uploaded successfully:', downloadURL);
+    return downloadURL;
+  } catch (error) {
+    console.error('Error uploading image:', error);
+    throw new Error('Failed to upload image.');
+  }
+};
+
+export const updateUserProfile = async (userId: string, userName: string | null, photoURL: string | null) => {
+  const updates: Partial<{ userName: string; photoURL: string }> = {};
+
+  if (userName) {
+    updates.userName = userName;
+  }
+
+  if (photoURL) {
+    updates.photoURL = photoURL;
+  }
+
+  if (Object.keys(updates).length > 0) {
+    try {
+      const userDocRef = doc(db, 'users', userId);
+      await updateDoc(userDocRef, updates);
+      console.log('User profile updated successfully!');
+    } catch (error) {
+      console.error('Error updating user profile:', error);
+      throw new Error('Failed to update user profile');
+    }
+  }
 };

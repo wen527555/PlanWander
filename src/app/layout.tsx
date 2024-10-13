@@ -1,53 +1,35 @@
-// import { Metadata } from 'next';
-'use client';
-
-//! layout應該是不能用use client的
-import { createTheme, ThemeProvider } from '@mui/material';
-import { usePathname } from 'next/navigation';
-
-import StyledComponentsRegistry from '../lib/registry';
+import StyledComponentsRegistry from '@/lib/registry';
 
 import './globals.css';
 
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import dynamic from 'next/dynamic';
 import { Inter } from 'next/font/google';
 
-import Header from '../components/Header';
 import QueryProvider from '../lib/queryProvider';
 
+export const metadata = {
+  title: 'PlanWander',
+  description: 'PlanWander 是一個免費的旅行規劃網站，讓您輕鬆安排並規劃旅程。',
+};
+
+const Header = dynamic(() => import('../components/Header/HeaderWrapper'), { ssr: false });
 const inter = Inter({ subsets: ['latin'] });
-
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: '#F9FCFD',
-    },
-    secondary: {
-      main: '#e3e1e7',
-    },
-  },
-});
-// export const metadata: Metadata = {
-//   title: `planwander`,
-//   description: `planwander`,
-// };
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname();
-  //*隱藏header的方式可以再研究
-  const hideHeader = /^(?:\/trips(?:\/[a-zA-Z0-9\-]+)?|\/articles\/[a-zA-Z0-9\-]+(?:\/view)?)$/.test(pathname);
   return (
     <QueryProvider>
       <html lang="en">
+        <head>
+          <link rel="icon" href="/planWanderIcon.png" sizes="any" />
+          <meta name="description" content="PlanWander 是一個免費的旅行規劃網站，讓您輕鬆安排並規劃旅程。" />
+        </head>
         <body className={inter.className}>
-          <ThemeProvider theme={theme}>
-            <StyledComponentsRegistry>
-              {!hideHeader && <Header />}
-              {children}
-              <ReactQueryDevtools initialIsOpen={false} />
-              <div id="modal-root"></div>
-            </StyledComponentsRegistry>
-          </ThemeProvider>
+          <StyledComponentsRegistry>
+            <Header />
+            {children}
+            <ReactQueryDevtools initialIsOpen={false} />
+            <div id="modal-root"></div>
+          </StyledComponentsRegistry>
         </body>
       </html>
     </QueryProvider>

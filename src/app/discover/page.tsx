@@ -64,7 +64,7 @@ export default function ArticleList() {
               </ArticleWrapper>
             ))
           ) : (
-            <p></p>
+            <div></div>
           )}
         </ArticleContainer>
       </Container>

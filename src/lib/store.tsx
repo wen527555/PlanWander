@@ -37,9 +37,12 @@ interface ModalStore {
   closeModal: () => void;
 }
 
-interface LoadingStore {
-  isLoading: boolean;
-  setLoading: (isLoading: boolean) => void;
+interface ModalConfirmStore {
+  isModalOpen: boolean;
+  message: string;
+  onConfirm: () => void;
+  openModal: (message: string, onConfirm: () => void) => void;
+  closeModal: () => void;
 }
 
 export const usePlaceStore = create<PlaceStore>((set) => ({
@@ -61,7 +64,11 @@ export const useModalStore = create<ModalStore>((set) => ({
   closeModal: () => set({ isModalOpen: false }),
 }));
 
-export const useLoadingStore = create<LoadingStore>((set) => ({
-  isLoading: false,
-  setLoading: (isLoading) => set({ isLoading }),
+export const useConfirmModalStore = create<ModalConfirmStore>((set) => ({
+  isModalOpen: false,
+  message: '',
+  onConfirm: () => {},
+
+  openModal: (message: string, onConfirm: () => void) => set({ isModalOpen: true, message, onConfirm }),
+  closeModal: () => set({ isModalOpen: false, message: '', onConfirm: () => {} }),
 }));

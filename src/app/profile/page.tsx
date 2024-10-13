@@ -1,19 +1,20 @@
 'use client';
 
 import { onAuthStateChanged } from 'firebase/auth';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 
 import { auth } from '../../lib/firebaseConfig';
 import ArticlesContainer from './Articles';
-import Sidebar from './Sidebar';
 import TripsContainer from './Trips';
+
+const Sidebar = dynamic(() => import('./Sidebar'), { ssr: false });
 
 const ProfilePage = () => {
   const [currentTab, setCurrentTab] = useState<'trips' | 'articles'>('trips');
   const router = useRouter();
-
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (!user) {
@@ -38,7 +39,12 @@ const Container = styled.div`
   width: 100%;
   height: calc(100vh - 54px);
   margin-top: 60px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
+
 const MainContent = styled.div`
   flex: 1;
   padding: 45px 0px;

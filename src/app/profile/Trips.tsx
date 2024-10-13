@@ -9,10 +9,11 @@ import { GoShare } from 'react-icons/go';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
+import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import { createArticleFromTrip, createNewTrip, fetchDeleteTrip, fetchUserAllTrips } from '@/lib/firebaseApi';
-import { useModalStore } from '@/lib/store';
+import { useConfirmModalStore, useModalStore } from '@/lib/store';
 import Carousel from './Carousel';
 
 interface Trip {
@@ -36,13 +37,12 @@ const TripsContainer = () => {
   const today = dayjs();
   const [isPending, startTransition] = useTransition();
   const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
-
   const sortTrips = trips?.sort((a: Trip, b: Trip) => {
     const diffA = Math.abs(dayjs(a.startDate).diff(today));
     const diffB = Math.abs(dayjs(b.startDate).diff(today));
     return diffA - diffB;
   });
-
+  const openConfirmModal = useConfirmModalStore((state) => state.openModal);
   const upcomingTrips = sortTrips?.filter((trip: Trip) => dayjs(trip.startDate).isAfter(today));
   const pastTrips = sortTrips?.filter((trip: Trip) => dayjs(trip.endDate).isBefore(today));
   const pastTripsByYear = pastTrips.reduce((acc: { [key: string]: Trip[] }, trip: Trip) => {
@@ -105,7 +105,6 @@ const TripsContainer = () => {
     mutationFn: fetchDeleteTrip,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['userTrips'] });
-      alert('delete trip successfully!');
     },
     onError: (error) => {
       console.error('Error deleting trip:', error);
@@ -113,9 +112,9 @@ const TripsContainer = () => {
   });
 
   const handleDeleteTripClick = (tripId: string) => {
-    if (window.confirm('Are you sure you want to delete this trip?')) {
+    openConfirmModal('Are you sure you want to delete this trip plan? This action is not reversible!', () => {
       deleteTripMutation.mutate(tripId);
-    }
+    });
   };
 
   if (loadingTrips) {
@@ -128,6 +127,7 @@ const TripsContainer = () => {
         <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
       )}
       {isPending && <LoadingAnimation />}
+      <ConfirmModal />
       <TripContainer>
         {upcomingTrips?.length > 0 ? (
           <>
@@ -208,12 +208,18 @@ const TripsContainer = () => {
                     <CardWrapper>
                       <CardHeader>
                         <IconWrapper>
+                          <PublishWrapper onClick={() => handlePublishClick(trip.id)}>
+                            <PublishIcon />
+                            Publish
+                          </PublishWrapper>
                           <OptionIcon onClick={() => handleTripOptionClick(trip.id)} />
                           {openMenuTripId === trip.id && (
                             <Menu>
                               <MenuItem>
-                                <DeleteIcon onClick={() => handleDeleteTripClick(trip.id)} />
-                                Delete
+                                <DeleteWrapper onClick={() => handleDeleteTripClick(trip.id)}>
+                                  <DeleteIcon />
+                                  Delete
+                                </DeleteWrapper>
                               </MenuItem>
                             </Menu>
                           )}
@@ -382,12 +388,12 @@ const PublishIcon = styled(GoShare)`
   margin-right: 5px;
 `;
 
-// const DeleteWrapper = styled.div`
-//   cursor: pointer;
-//   width: 100%;
-//   display: flex;
-//   align-items: center;
-// `;
+const DeleteWrapper = styled.div`
+  cursor: pointer;
+  width: 100%;
+  display: flex;
+  align-items: center;
+`;
 
 const DeleteIcon = styled(AiOutlineDelete)`
   font-size: 18px;
@@ -444,7 +450,7 @@ const CarouselWrapper = styled.div`
     content: '';
     position: absolute;
     top: 0;
-    right: -5px;
+    right: -30px;
     height: 30%;
     width: 180px;
     background: linear-gradient(-90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
@@ -452,12 +458,12 @@ const CarouselWrapper = styled.div`
     z-index: 1;
   }
 
-  @media (max-width: 1920px) {
-    width: 1000px;
+  @media (max-width: 1280px) {
+    max-width: 960px;
   }
 
-  @media (max-width: 1280px) {
-    max-width: 800px;
+  @media (max-width: 1920px) {
+    max-width: 1000px;
   }
 `;
 

@@ -17,7 +17,8 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint --ignore-path .gitignore \"src/**/*.+(ts|js|tsx)\"",
     "format": "prettier --ignore-path .gitignore \"src/**/*.+(ts|js|tsx)\" --write",
-    "postinstall": "husky"
+    "postinstall": "husky",
+    "postbuild": "next-sitemap"
   },
   "lint-staged": {
     "./src/**/*.{ts,js,jsx,tsx}": [
@@ -40,6 +41,7 @@
     "lodash.debounce": "4.0.8",
     "mapbox-gl": "3.6.0",
     "next": "14.2.13",
+    "next-sitemap": "4.2.3",
     "rc-picker": "4.6.15",
     "react": "18.3.1",
     "react-beautiful-dnd": "13.1.1",

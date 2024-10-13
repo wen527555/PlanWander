@@ -1,0 +1,47 @@
+.pageWrapper {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 50px;
+  width: 50%;
+}
+
+.textSection {
+  max-width: 600px;
+}
+
+.heading {
+  font-size: 48px;
+  color: #2c3e50;
+  font-weight: bold;
+}
+
+.description {
+  font-size: 20px;
+  font-weight: 500;
+  color: #6c757d;
+  margin: 30px 0;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+}
+
+.buttonGroup {
+  display: flex;
+  gap: 20px;
+}
+
+.imageSection {
+  position: relative;
+  width: 50%;
+  height: 100vh;
+  overflow: hidden;
+}

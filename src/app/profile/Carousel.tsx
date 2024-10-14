@@ -12,7 +12,7 @@ interface CarouselProp<T> {
 const Carousel = <T,>({ item, renderItem, currentIndex, onChange }: CarouselProp<T>): React.ReactElement => {
   const [startX, setStartX] = useState(0);
   const carouselRef = useRef<HTMLDivElement>(null);
-  console.log('currentIndex', currentIndex);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     setStartX(e.touches[0].clientX);
     console.log('Touch Start at', e.touches[0].clientX);
@@ -21,14 +21,10 @@ const Carousel = <T,>({ item, renderItem, currentIndex, onChange }: CarouselProp
   const handleTouchEnd = (e: React.TouchEvent) => {
     const endX = e.changedTouches[0].clientX;
     const diffX = startX - endX;
-    console.log('Touch End at', e.changedTouches[0].clientX);
-    console.log('Swipe distance', diffX);
 
     if (diffX > 30 && currentIndex < item.length - 1) {
-      console.log('Swipe left');
       onChange(currentIndex + 1);
     } else if (diffX < -30 && currentIndex > 0) {
-      console.log('Swipe right');
       onChange(currentIndex - 1);
     }
   };
@@ -53,7 +49,7 @@ const CarouselContainer = styled.div`
   /* padding: 20px 30px; */
   max-width: 1000px;
   scroll-behavior: smooth;
-  scroll-snap-type: x mandatory;
+  /* scroll-snap-type: x mandatory; */
 
   &::-webkit-scrollbar {
     display: none;
@@ -61,7 +57,7 @@ const CarouselContainer = styled.div`
 `;
 
 const CarouselItem = styled.div`
-  scroll-snap-align: start;
+  /* scroll-snap-align: start; */
   border-radius: 10px;
   position: relative;
   flex-shrink: 0;

@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import React, { useState, useTransition } from 'react';
 import { AiOutlineDelete } from 'react-icons/ai';
 import { GoShare } from 'react-icons/go';
+import { PiClockCountdown } from 'react-icons/pi';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
@@ -54,7 +55,7 @@ const TripsContainer = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const router = useRouter();
 
-  const daysUntilNextTrip = (tripDate: Date) => {
+  const daysUntilNextTrip = (tripDate: string | Date) => {
     const today = dayjs();
     const tripStartDate = dayjs(tripDate);
     return tripStartDate.diff(today, 'day');
@@ -132,10 +133,7 @@ const TripsContainer = () => {
         {upcomingTrips?.length > 0 ? (
           <>
             <UpcomingTripsInfo>
-              <TripsCount>{upcomingTrips.length} upcoming trips</TripsCount>
-              <NextTripInfo>
-                This adventure starts in {daysUntilNextTrip(upcomingTrips[currentIndex].startDate)} days
-              </NextTripInfo>
+              <NextTripInfo>{upcomingTrips.length} upcoming trips</NextTripInfo>
             </UpcomingTripsInfo>
             <CarouselWrapper>
               <Carousel<Trip>
@@ -165,7 +163,14 @@ const TripsContainer = () => {
                         </IconWrapper>
                       </CardHeader>
                       <CardContent onClick={() => handleTripClick(trip.id)}>
-                        <TripImg src={trip.imageUrl} />
+                        <ImageContainer>
+                          <CountdownWrapper>
+                            <PiClockCountdown style={{ marginRight: '5px' }} />
+                            <CountdownLabel>in {daysUntilNextTrip(trip.startDate)} days </CountdownLabel>
+                          </CountdownWrapper>
+                          <TripImg src={trip.imageUrl} />
+                        </ImageContainer>
+                        {/* <TripImg src={trip.imageUrl} /> */}
                         <CardDetails>
                           <TripName>{trip.tripTitle}</TripName>
                           <TripDate>
@@ -272,6 +277,15 @@ const NoPlannedTitleDescription = styled.p`
 const TripContainer = styled.div`
   margin: 0px 20px;
   position: relative;
+  max-width: 800px;
+
+  @media (max-width: 1280px) {
+    max-width: 800px;
+  }
+
+  @media (min-width: 1280px) {
+    max-width: 960px;
+  }
 `;
 
 const UpcomingTripsInfo = styled.div`
@@ -279,14 +293,13 @@ const UpcomingTripsInfo = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  margin-bottom: 20px;
 `;
 
-const TripsCount = styled.div`
-  font-size: 16px;
-  font-weight: bold;
-  color: #6c757d;
-`;
+// const TripsCount = styled.div`
+//   font-size: 20px;
+//   font-weight: bold;
+//   color: #6c757d;
+// `;
 
 const NextTripInfo = styled.div`
   background-color: #78b7cc;
@@ -295,7 +308,6 @@ const NextTripInfo = styled.div`
   border-radius: 20px;
   font-weight: bold;
   font-size: 16px;
-  margin-top: 10px;
 `;
 
 const Button = styled.button`
@@ -315,6 +327,28 @@ const Button = styled.button`
 const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
+`;
+
+const ImageContainer = styled.div`
+  position: relative;
+`;
+
+const CountdownWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background-color: white;
+  font-weight: 500;
+  color: #0f3e4a;
+  border-radius: 5px;
+  padding: 5px 10px;
+`;
+
+const CountdownLabel = styled.div`
+  font-size: 14px;
+  font-weight: bold;
 `;
 
 const TripImg = styled.img`

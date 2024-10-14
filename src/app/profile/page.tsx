@@ -47,7 +47,7 @@ const Container = styled.div`
 
 const MainContent = styled.div`
   flex: 1;
-  padding: 45px 0px;
+  padding: 35px 0px;
   overflow-x: hidden;
   display: flex;
   flex-direction: column;

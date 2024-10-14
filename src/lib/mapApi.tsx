@@ -1,12 +1,24 @@
+'use client';
+
 import { Autocomplete, Libraries, LoadScript } from '@react-google-maps/api';
 import React, { useCallback, useState } from 'react';
 
-interface Country {
+interface CountryAPIResponse {
   name: {
     common: string;
   };
   cca3: string;
+  flags: {
+    png: string;
+  };
 }
+
+interface Country {
+  name: string;
+  code: string;
+  flag: string;
+}
+
 const libraries: Libraries = ['places'];
 export const LocationAutocomplete: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
@@ -59,16 +71,17 @@ export const getRoute = async (start: any, end: any, mode: string = 'driving') =
   }
 };
 
-export const fetchCountries = async (): Promise<{ name: string; code: string }[]> => {
+export const fetchCountries = async (): Promise<Country[]> => {
   try {
     const response = await fetch('https://restcountries.com/v3.1/all');
     if (!response.ok) {
       throw new Error('Failed to fetch countries');
     }
-    const data: Country[] = await response.json();
+    const data: CountryAPIResponse[] = await response.json();
     return data.map((country) => ({
       name: country.name.common,
       code: country.cca3,
+      flag: country.flags?.png,
     }));
   } catch (error) {
     console.error('Error fetching countries', error);

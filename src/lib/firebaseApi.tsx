@@ -41,6 +41,10 @@ interface Article {
     nanoseconds: number;
   };
   coverImage?: string;
+  photoURL?: string;
+  userName?: string;
+  imageUrl: string;
+  countries?: { name: string; code: string }[];
 }
 
 interface SelectedOption {
@@ -422,6 +426,7 @@ export const createArticleFromTrip = async (tripId: string) => {
     const tripSnapshot = await getDoc(tripRef);
     const tripData = tripSnapshot.data();
     const imageUrl = tripData?.imageUrl;
+    const countries = tripData?.countries || '';
     const articleRef = doc(db, `articles/${tripId}`);
     const articleSnapshot = await getDoc(articleRef);
     const tripDaysCollectionRef = collection(db, `trips/${tripId}/days`);
@@ -441,6 +446,7 @@ export const createArticleFromTrip = async (tripId: string) => {
         description: '',
         uid: userId,
         imageUrl,
+        countries,
       });
 
       daysSnapshot.forEach(async (dayDoc) => {
@@ -468,6 +474,7 @@ export const fetchArticleData = async (articleId: string) => {
     const title = articleData?.title || '';
     const description = articleData?.description || '';
     const imageUrl = articleData?.imageUrl || '';
+    const countries = articleData?.countries || '';
     const daysCollection = collection(db, `articles/${articleId}/days`);
     const daysSnapshot = await getDocs(daysCollection);
     const daysData = daysSnapshot.docs.map((doc) => ({
@@ -480,6 +487,7 @@ export const fetchArticleData = async (articleId: string) => {
       description,
       days: daysData,
       imageUrl,
+      countries,
     };
   } catch (error) {
     console.error('Error fetching trip days:', error);
@@ -589,6 +597,7 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
 
   return querySnapshot.docs.map((doc) => {
     const data = doc.data();
+    console.log('data', data);
     return {
       id: doc.id,
       title: data.title || '',
@@ -597,6 +606,8 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
       coverImage: data.coverImage || '',
       photoURL: data.photoURL,
       userName: data.userName,
+      imageUrl: data.imageUrl || '',
+      countries: data.countries || '',
     };
   });
 };

@@ -18,6 +18,7 @@ type Article = {
   description: string;
   createdAt: string;
   coverImage: string;
+  imageUrl: string;
 };
 
 const ArticlesContainer = () => {
@@ -93,7 +94,7 @@ const ArticlesContainer = () => {
                 <ArticleDescription>{article.description}</ArticleDescription>
                 <PublishedDate>Published on {article.createdAt}</PublishedDate>
               </ArticleContent>
-              <ArticleImage src={article.coverImage} alt={article.title} />
+              <ArticleImage src={article.coverImage || article.imageUrl} alt={article.title} />
             </ArticleWrapper>
           </CardWrapper>
         ))}

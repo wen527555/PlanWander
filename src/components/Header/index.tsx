@@ -90,14 +90,14 @@ const Header = () => {
         {userData ? (
           <>
             <IconWrapper>
-              <ProfileWrapper isActive={isProfileActive} onClick={handleToProfile}>
-                {userData?.photoURL ? <ProfileIcon src={userData?.photoURL} /> : <NoProfileImg />}
-                <IconText>{userData?.userName || 'You'}</IconText>
-              </ProfileWrapper>
               <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
                 <DiscoverIcon />
                 <IconText>Discover</IconText>
               </DiscoverWrapper>
+              <ProfileWrapper isActive={isProfileActive} onClick={handleToProfile}>
+                {userData?.photoURL ? <ProfileIcon src={userData?.photoURL} /> : <NoProfileImg />}
+                <IconText>{userData?.userName || 'You'}</IconText>
+              </ProfileWrapper>
             </IconWrapper>
             <ButtonWrapper>
               <Button onClick={() => openModal('trip')}>+ Plan</Button>

@@ -41,6 +41,10 @@ interface Article {
     nanoseconds: number;
   };
   coverImage?: string;
+  photoURL?: string;
+  userName?: string;
+  imageUrl: string;
+  countries?: { name: string; code: string }[];
 }
 
 interface SelectedOption {

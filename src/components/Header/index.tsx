@@ -104,9 +104,17 @@ const Header = () => {
             </ButtonWrapper>
           </>
         ) : (
-          <ButtonWrapper>
-            <LoginButton onClick={() => openModal('login')}>LogIn</LoginButton>
-          </ButtonWrapper>
+          <>
+            <IconWrapper>
+              <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
+                <DiscoverIcon />
+                <IconText>Discover</IconText>
+              </DiscoverWrapper>
+            </IconWrapper>
+            <ButtonWrapper>
+              <LoginButton onClick={() => openModal('login')}>LogIn</LoginButton>
+            </ButtonWrapper>
+          </>
         )}
         {isModalOpen && modalType === 'trip' && (
           <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
@@ -257,6 +265,15 @@ const DiscoverWrapper = styled.div<{ isActive: boolean }>`
     background-color: ${(props) => (props.isActive ? '#78b7cc' : 'transparent')};
     transition: background-color 0.3s ease;
   }
+`;
+
+const NoLoginDiscoverWrapper = styled.div`
+  display: flex;
+  align-items: end;
+  gap: 5px;
+  cursor: pointer;
+  color: #6c757d;
+  position: relative;
 `;
 
 const Button = styled.button`

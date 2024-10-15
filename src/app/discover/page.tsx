@@ -2,8 +2,8 @@ import ArticleList from '@/components/Discover/ArticleList';
 import { fetchAllPublishedArticles } from '@/lib/firebaseApi';
 
 export const metadata = {
-  title: 'Explore Travel Itineraries',
-  description: 'Discover travel itineraries tailored to your next adventure.',
+  title: 'Discover Your Next Adventure',
+  description: 'Get inspired, plan your trips, and explore new destinations all in one place.',
 };
 
 export default async function DisCoverPage() {

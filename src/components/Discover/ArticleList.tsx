@@ -185,14 +185,15 @@ const SidebarContainer = styled.div`
 const MainContent = styled.div`
   display: flex;
   width: 100%;
-  padding: 10px 100px;
 
-  @media (min-width: 1280px) {
-    padding: 10px 100px;
+  @media (min-width: 1920px) {
+    padding: 10px 100px 10px 80px;
+    gap: 20px;
   }
 
-  @media (max-width: 1280px) {
-    padding: 10px 80px;
+  @media (max-width: 1919px) {
+    padding: 10px 80px 10px 60px;
+    gap: 20px;
   }
   @media (max-width: 945px) {
     padding: 10px 50px;

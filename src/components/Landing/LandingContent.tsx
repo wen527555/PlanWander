@@ -9,8 +9,8 @@ const ClientAction = dynamic(() => import('@/components/Landing/ClientActions'),
 const LandingPageContent = () => {
   return (
     <>
-      {/* <DetailWrapper>
-        <DetailSection>
+      <DetailWrapper>
+        {/* <DetailSection>
           <StyledVideo autoPlay loop muted>
             <source src="/searchVideo.mp4" type="video/mp4" />
           </StyledVideo>
@@ -37,8 +37,8 @@ const LandingPageContent = () => {
           <StyledVideo autoPlay loop muted>
             <source src="/dropVideo.mp4" type="video/mp4" style={{ objectFit: 'cover' }} />
           </StyledVideo>
-        </DetailSection>
-        <DetailSection>
+        </DetailSection> */}
+        {/* <DetailSection>
           <StyledVideo autoPlay loop muted>
             <source src="/articleVideo.mp4" type="video/mp4" />
           </StyledVideo>
@@ -50,8 +50,8 @@ const LandingPageContent = () => {
               experiencing every part of the journey firsthand.
             </Description>
           </Detail3>
-        </DetailSection>
-      </DetailWrapper> */}
+        </DetailSection> */}
+      </DetailWrapper>
       <Section4>
         <Section4Title>Ready to plan your trip in half the time?</Section4Title>
         <ButtonGroup>
@@ -64,117 +64,117 @@ const LandingPageContent = () => {
 
 export default LandingPageContent;
 
-// const PageWrapper = styled.div`
-//   display: flex;
-//   height: 100vh;
-//   width: 100vw;
-//   position: relative;
-//   overflow: hidden;
-// `;
+const PageWrapper = styled.div`
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  overflow: hidden;
+`;
 
-// const DetailWrapper = styled.div`
-//   width: 100vw;
-//   display: flex;
-//   flex-direction: column;
-//   align-items: center;
-//   position: relative;
-// `;
+const DetailWrapper = styled.div`
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+`;
 
-// const DetailSection = styled.div`
-//   width: 100%;
-//   max-width: 1200px;
-//   display: flex;
-//   align-items: center;
-//   margin: 0 auto;
-//   position: relative;
-//   padding-top: 100px;
-//   padding-bottom: 100px;
-//   opacity: 0;
-//   transition: all 1s ease-in-out;
-// `;
+const DetailSection = styled.div`
+  width: 100%;
+  max-width: 1200px;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+  position: relative;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  opacity: 0;
+  transition: all 1s ease-in-out;
+`;
 
-// const Details = styled.div`
-//   width: 500px;
-//   position: absolute;
-//   right: -50px;
-//   color: white;
-// `;
+const Details = styled.div`
+  width: 500px;
+  position: absolute;
+  right: -50px;
+  color: white;
+`;
 
-// const Detail2 = styled.div`
-//   width: 500px;
-//   position: absolute;
-//   left: 0;
-//   color: white;
-// `;
+const Detail2 = styled.div`
+  width: 500px;
+  position: absolute;
+  left: 0;
+  color: white;
+`;
 
-// const Detail3 = styled.div`
-//   width: 500px;
-//   position: absolute;
-//   right: 0;
-//   color: white;
-// `;
+const Detail3 = styled.div`
+  width: 500px;
+  position: absolute;
+  right: 0;
+  color: white;
+`;
 
-// const ContentWrapper = styled.div`
-//   display: flex;
-//   flex-direction: column;
-//   justify-content: center;
-//   align-items: center;
-//   padding: 0 50px;
-//   width: 50%;
-// `;
+const ContentWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0 50px;
+  width: 50%;
+`;
 
-// const TextSection = styled.div`
-//   max-width: 600px;
-// `;
+const TextSection = styled.div`
+  max-width: 600px;
+`;
 
-// const Heading = styled.h1`
-//   font-size: 48px;
-//   color: #2c3e50;
-//   font-weight: bold;
-// `;
+const Heading = styled.h1`
+  font-size: 48px;
+  color: #2c3e50;
+  font-weight: bold;
+`;
 
-// const Description = styled.p`
-//   font-size: 20px;
-//   font-weight: 500;
-//   color: #6c757d;
-//   margin: 30px 0;
-//   line-height: 1.5;
-//   letter-spacing: 0.2px;
-// `;
+const Description = styled.p`
+  font-size: 20px;
+  font-weight: 500;
+  color: #6c757d;
+  margin: 30px 0;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+`;
 
 const ButtonGroup = styled.div`
   display: flex;
   gap: 20px;
 `;
 
-// const StartButton = styled.button`
-//   padding: 15px 20px;
-//   background-color: #78b7cc;
-//   color: white;
-//   border: none;
-//   border-radius: 25px;
-//   font-size: 18px;
-//   font-weight: 700;
-//   cursor: pointer;
+const StartButton = styled.button`
+  padding: 15px 20px;
+  background-color: #78b7cc;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  font-size: 18px;
+  font-weight: 700;
+  cursor: pointer;
 
-//   &:hover {
-//     background-color: white;
-//     color: #78b7cc;
-//     border: 2px solid #78b7cc;
-//   }
-// `;
+  &:hover {
+    background-color: white;
+    color: #78b7cc;
+    border: 2px solid #78b7cc;
+  }
+`;
 
-// const ImageSection = styled.div`
-//   position: relative;
-//   width: 50%;
-//   height: 100vh;
-//   overflow: hidden;
-// `;
+const ImageSection = styled.div`
+  position: relative;
+  width: 50%;
+  height: 100vh;
+  overflow: hidden;
+`;
 
-// const StyledVideo = styled.video`
-//   width: 100%;
-//   height: auto;
-// `;
+const StyledVideo = styled.video`
+  width: 100%;
+  height: auto;
+`;
 
 const Section4 = styled.section`
   display: flex;

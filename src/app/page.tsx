@@ -39,6 +39,28 @@ const HomePage = () => {
           <Image src={bgImage} alt="Travel planning" fill objectFit="cover" quality={100} />
         </div>
       </div>
+      <div className={styles.detailSection}>
+        <video className={styles.styledVideo} autoPlay loop muted>
+          <source src="/searchVideo.mp4" type="video/mp4" />
+        </video>
+        <div className={styles.detail2}>
+          <h1 className={styles.heading}>Your itinerary and your map in one view</h1>
+          <p className={styles.description}>
+            No more switching between different apps, tabs, and tools to keep track of your travel plans.
+          </p>
+        </div>
+      </div>
+      <div className={styles.detailSection}>
+        <div className={styles.detail3}>
+          <h1 className={styles.heading}>Read stories along with map</h1>
+          <p className={styles.description}>
+            Browse the map alongside travel stories, following in the footsteps of each attraction.
+          </p>
+        </div>
+        <video className={styles.styledVideo} autoPlay loop muted>
+          <source src="/articleVideo.mp4" type="video/mp4" />
+        </video>
+      </div>
       <LandingPageContent />
     </>
   );

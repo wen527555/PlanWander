@@ -267,15 +267,6 @@ const DiscoverWrapper = styled.div<{ isActive: boolean }>`
   }
 `;
 
-const NoLoginDiscoverWrapper = styled.div`
-  display: flex;
-  align-items: end;
-  gap: 5px;
-  cursor: pointer;
-  color: #6c757d;
-  position: relative;
-`;
-
 const Button = styled.button`
   background-color: #78b7cc;
   color: white;

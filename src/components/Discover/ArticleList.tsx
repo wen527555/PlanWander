@@ -13,10 +13,7 @@ interface Article {
   id: string;
   title: string;
   description: string;
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
+  createdAt: Date;
   coverImage?: string;
   photoURL?: string;
   userName?: string;
@@ -50,9 +47,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
     });
   };
 
-  const sortedArticles = articles.sort(
-    (a, b) => b.createdAt.seconds - a.createdAt.seconds || b.createdAt.nanoseconds - a.createdAt.nanoseconds
-  );
+  const sortedArticles = articles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const latestArticles = sortedArticles.slice(0, 3);
 
@@ -74,7 +69,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
                   <PostImage src={article.coverImage || article.imageUrl} alt={article.title} />
                   <PostInfo>
                     <PostTitle>{article.title}</PostTitle>
-                    <PostDate>{new Date(article.createdAt.seconds * 1000).toLocaleDateString()}</PostDate>
+                    <PostDate>{article.createdAt.toLocaleDateString()}</PostDate>
                   </PostInfo>
                 </PostItem>
               ))}
@@ -95,9 +90,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
                       <UserImg src={article?.photoURL} />
                       <UserDetails>
                         <UserName>{article?.userName} </UserName>
-                        <PublishedDate>
-                          Published on {new Date(article.createdAt.seconds * 1000).toLocaleDateString()}
-                        </PublishedDate>
+                        <PublishedDate>Published on {article.createdAt.toLocaleDateString()}</PublishedDate>
                       </UserDetails>
                       <ArrowIcon>
                         <MdArrowOutward />

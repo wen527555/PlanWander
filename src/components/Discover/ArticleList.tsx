@@ -61,7 +61,7 @@ export default function ArticleList({ initialArticles }: ArticleListProps) {
 
   const sortedArticles = articles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const latestArticles = sortedArticles.slice(0, 3);
+  const latestArticles = sortedArticles.slice(-3);
 
   return (
     <>
@@ -112,7 +112,12 @@ export default function ArticleList({ initialArticles }: ArticleListProps) {
                 </ArticleWrapper>
               ))
             ) : (
-              <div>No articles found for this country.</div>
+              <NoArticleContainer>
+                <NoArticleTitle>No articles found for this country.</NoArticleTitle>
+                <NoArticleTitleDescription>
+                  Planning is where the adventure starts. Plan a new trip and start yours! 🚀
+                </NoArticleTitleDescription>
+              </NoArticleContainer>
             )}
           </ArticleContainer>
         </MainContent>
@@ -120,6 +125,29 @@ export default function ArticleList({ initialArticles }: ArticleListProps) {
     </>
   );
 }
+
+const NoArticleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+`;
+
+const NoArticleTitle = styled.h1`
+  font-size: 30px;
+  font-weight: bold;
+  color: #34495e;
+  margin-bottom: 20px;
+`;
+
+const NoArticleTitleDescription = styled.p`
+  font-size: 18px;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 30px;
+`;
 
 const LatestPostsTitle = styled.h3`
   font-size: 16px;

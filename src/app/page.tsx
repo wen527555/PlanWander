@@ -5,7 +5,6 @@ import styles from '@/app/styles/HomePage.module.css';
 import bgImage from '@/public/travel.jpg';
 
 const ClientAction = dynamic(() => import('@/components/Landing/ClientActions'), { ssr: false });
-const LandingPageContent = dynamic(() => import('@/components/Landing/LandingContent'), { ssr: false });
 
 export const metadata = {
   title: 'PlanWander',
@@ -39,7 +38,35 @@ const HomePage = () => {
           <Image src={bgImage} alt="Travel planning" fill objectFit="cover" quality={100} />
         </div>
       </div>
-      <LandingPageContent />
+      <div className={styles.detailSection}>
+        <video className={styles.styledVideo} autoPlay loop muted>
+          <source src="/searchVideo.mp4" type="video/mp4" />
+        </video>
+        <div className={styles.detail2}>
+          <h1 className={styles.heading}>Your itinerary and your map in one view</h1>
+          <p className={styles.description}>
+            No more switching between different apps, tabs, and tools to keep track of your travel plans.
+          </p>
+        </div>
+      </div>
+      <div className={styles.detailSection}>
+        <div className={styles.detail3}>
+          <h1 className={styles.heading}>Read stories along with map</h1>
+          <p className={styles.description}>
+            Browse the map alongside travel stories, following in the footsteps of each attraction.
+          </p>
+        </div>
+        <video className={styles.styledVideo} autoPlay loop muted>
+          <source src="/articleVideo.mp4" type="video/mp4" />
+        </video>
+      </div>
+      <div className={styles.section4}>
+        <h3 className={styles.section4Title}>Ready to plan your trip in half the time?</h3>
+        <div className={styles.buttonGroup}>
+          <ClientAction />
+        </div>
+      </div>
+      {/* <LandingPageContent /> */}
     </>
   );
 };

@@ -104,9 +104,17 @@ const Header = () => {
             </ButtonWrapper>
           </>
         ) : (
-          <ButtonWrapper>
-            <LoginButton onClick={() => openModal('login')}>LogIn</LoginButton>
-          </ButtonWrapper>
+          <>
+            <IconWrapper>
+              <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>
+                <DiscoverIcon />
+                <IconText>Discover</IconText>
+              </DiscoverWrapper>
+            </IconWrapper>
+            <ButtonWrapper>
+              <LoginButton onClick={() => openModal('login')}>LogIn</LoginButton>
+            </ButtonWrapper>
+          </>
         )}
         {isModalOpen && modalType === 'trip' && (
           <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />

@@ -60,10 +60,10 @@ export default function ArticleList({ articles }: ArticleListProps) {
     <>
       {isPending && <LoadingAnimation />}
       <Container>
-        <SearchContainer>
+        {/* <SearchContainer>
           <SearchTitle>Discover Your Next Adventure</SearchTitle>
           <SearchSub>Get inspired, plan your trips, and explore new destinations all in one place.</SearchSub>
-        </SearchContainer>
+        </SearchContainer> */}
         <MainContent>
           <SidebarContainer>
             <CountrySelect onChange={handleCountryChange} />
@@ -185,14 +185,15 @@ const SidebarContainer = styled.div`
 const MainContent = styled.div`
   display: flex;
   width: 100%;
-  padding: 10px 100px;
-
-  @media (min-width: 1280px) {
-    padding: 10px 100px;
+  margin: 80px 0px;
+  @media (min-width: 1920px) {
+    padding: 10px 100px 10px 80px;
+    gap: 20px;
   }
 
-  @media (max-width: 1280px) {
-    padding: 10px 80px;
+  @media (max-width: 1919px) {
+    padding: 10px 80px 10px 60px;
+    gap: 20px;
   }
   @media (max-width: 945px) {
     padding: 10px 50px;
@@ -205,26 +206,26 @@ const Container = styled.div`
   width: 100%;
 `;
 
-const SearchContainer = styled.div`
-  display: flex;
-  width: 100%;
-  margin: 90px 0px 20px 0px;
-  flex-direction: column;
-  align-items: center;
-`;
+// const SearchContainer = styled.div`
+//   display: flex;
+//   width: 100%;
+//   margin: 90px 0px 20px 0px;
+//   flex-direction: column;
+//   align-items: center;
+// `;
 
-const SearchTitle = styled.h1`
-  font-size: 30px;
-  font-weight: 600;
-  margin-bottom: 10px;
-  color: #333;
-`;
+// const SearchTitle = styled.h1`
+//   font-size: 30px;
+//   font-weight: 600;
+//   margin-bottom: 10px;
+//   color: #333;
+// `;
 
-const SearchSub = styled.h3`
-  font-size: 14px;
-  font-weight: 600;
-  color: #6c757d;
-`;
+// const SearchSub = styled.h3`
+//   font-size: 14px;
+//   font-weight: 600;
+//   color: #6c757d;
+// `;
 
 const PublishUserWrapper = styled.div`
   display: flex;

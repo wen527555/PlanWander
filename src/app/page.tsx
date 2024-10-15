@@ -5,7 +5,6 @@ import styles from '@/app/styles/HomePage.module.css';
 import bgImage from '@/public/travel.jpg';
 
 const ClientAction = dynamic(() => import('@/components/Landing/ClientActions'), { ssr: false });
-const LandingPageContent = dynamic(() => import('@/components/Landing/LandingContent'), { ssr: false });
 
 export const metadata = {
   title: 'PlanWander',
@@ -61,7 +60,13 @@ const HomePage = () => {
           <source src="/articleVideo.mp4" type="video/mp4" />
         </video>
       </div>
-      <LandingPageContent />
+      <div className={styles.section4}>
+        <h3 className={styles.section4Title}>Ready to plan your trip in half the time?</h3>
+        <div className={styles.buttonGroup}>
+          <ClientAction />
+        </div>
+      </div>
+      {/* <LandingPageContent /> */}
     </>
   );
 };

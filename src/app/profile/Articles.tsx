@@ -226,6 +226,10 @@ const ArticleContent = styled.div`
   flex-direction: column;
   margin: 10px 15px;
   height: 100%;
+  width: 50%;
+  @media (max-width: 1200px) {
+    width: 100%;
+  }
 `;
 
 const ArticleTitle = styled.h2`
@@ -262,6 +266,7 @@ const ArticleImage = styled.img`
   object-fit: cover;
   height: 90%;
   border-radius: 10px;
+  max-height: 300px;
   @media (max-width: 1200px) {
     width: 100%;
     order: -1;

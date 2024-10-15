@@ -122,14 +122,14 @@ const NoArticleContainer = styled.div`
 `;
 
 const NoArticleTitle = styled.h1`
-  font-size: 40px;
+  font-size: 30px;
   font-weight: bold;
   color: #34495e;
   margin-bottom: 20px;
 `;
 
 const NoArticleTitleDescription = styled.p`
-  font-size: 24px;
+  font-size: 18px;
   color: #7f8c8d;
   text-align: center;
   margin-bottom: 30px;

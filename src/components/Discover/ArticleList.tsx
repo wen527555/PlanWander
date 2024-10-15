@@ -82,7 +82,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
           </SidebarContainer>
           <ArticleContainer>
             {filteredArticles?.length > 0 ? (
-              filteredArticles.map((article, index) => (
+              filteredArticles.map((article) => (
                 <ArticleWrapper key={article.id} onClick={() => handleArticleClick(article.id)}>
                   <ArticleImageWrapper>
                     <ArticleImage src={article.coverImage || article.imageUrl} alt={article.title} />

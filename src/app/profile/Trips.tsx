@@ -278,12 +278,12 @@ const TripContainer = styled.div`
   margin: 0px 20px;
   position: relative;
   width: 100%;
-  @media (max-width: 1280px) {
+  @media (max-width: 1919px) {
     width: 90%;
     max-width: 800px;
   }
 
-  @media (min-width: 1280px) {
+  @media (min-width: 1920px) {
     width: 100%;
     max-width: 960px;
   }

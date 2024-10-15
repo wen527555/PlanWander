@@ -122,6 +122,10 @@ export default Header;
 const LogoLink = styled.a`
   cursor: pointer;
   display: inline-block;
+
+  /* @media (max-width: 768px) {
+    display: none;
+  } */
 `;
 
 const Container = styled.div`
@@ -138,7 +142,15 @@ const Container = styled.div`
   left: 0;
   background-color: #fff;
   z-index: 1000;
-  /* box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); */
+
+  @media (max-width: 1024px) {
+    padding: 5px 20px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 5px 10px;
+    justify-content: center;
+  }
 `;
 
 const ProfileIcon = styled.img`
@@ -166,6 +178,16 @@ const IconWrapper = styled.div`
   gap: 20px;
   margin-left: 43%;
   transform: translate(-100%);
+
+  @media (max-width: 1024px) {
+    margin-left: 30%;
+    gap: 15px;
+  }
+
+  @media (max-width: 768px) {
+    gap: 10px;
+    margin-left: 20%;
+  }
 `;
 
 const ProfileWrapper = styled.div<{ isActive: boolean }>`
@@ -201,6 +223,10 @@ const IconText = styled.span`
   &:hover {
     color: #c7c4c4;
   }
+
+  @media (max-width: 768px) {
+    display: none;
+  }
 `;
 
 const DiscoverIcon = styled(RiCompassDiscoverLine)`
@@ -208,6 +234,10 @@ const DiscoverIcon = styled(RiCompassDiscoverLine)`
   margin-right: 5px;
   font-size: 20px;
   color: #658c96;
+
+  @media (max-width: 768px) {
+    font-size: 36px;
+  }
 `;
 
 const DiscoverWrapper = styled.div<{ isActive: boolean }>`
@@ -264,4 +294,12 @@ const ButtonWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-left: auto;
+  @media (max-width: 768px) {
+    margin-left: 0;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    margin-top: 10px;
+  }
 `;

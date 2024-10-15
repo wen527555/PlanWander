@@ -54,7 +54,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
     (a, b) => b.createdAt.seconds - a.createdAt.seconds || b.createdAt.nanoseconds - a.createdAt.nanoseconds
   );
 
-  const latestArticles = sortedArticles.slice(0, 5);
+  const latestArticles = sortedArticles.slice(0, 3);
 
   return (
     <>
@@ -67,7 +67,7 @@ export default function ArticleList({ articles }: ArticleListProps) {
         <MainContent>
           <SidebarContainer>
             <CountrySelect onChange={handleCountryChange} />
-            <LatestPostsTitle>Latest Posts</LatestPostsTitle>
+            <LatestPostsTitle>Recommend Reading</LatestPostsTitle>
             <PostList>
               {latestArticles.map((article) => (
                 <PostItem key={article.id} onClick={() => handleArticleClick(article.id)}>
@@ -82,17 +82,13 @@ export default function ArticleList({ articles }: ArticleListProps) {
           </SidebarContainer>
           <ArticleContainer>
             {filteredArticles?.length > 0 ? (
-              filteredArticles.map((article, index) => (
-                <ArticleWrapper
-                  key={article.id}
-                  onClick={() => handleArticleClick(article.id)}
-                  isFeatured={index === 0 || index % 5 === 0}
-                >
-                  <ArticleImageWrapper isFeatured={index === 0 || index % 5 === 0}>
+              filteredArticles.map((article) => (
+                <ArticleWrapper key={article.id} onClick={() => handleArticleClick(article.id)}>
+                  <ArticleImageWrapper>
                     <ArticleImage src={article.coverImage || article.imageUrl} alt={article.title} />
                   </ArticleImageWrapper>
-                  <ArticleContent isFeatured={index === 0 || index % 5 === 0}>
-                    <CountryTag>{article.countries?.[0]?.name || 'Unknown Country'}</CountryTag>
+                  <ArticleContent>
+                    {article.countries?.length ? <CountryTag>{article.countries[0].name}</CountryTag> : null}
                     <ArticleTitle>{article.title}</ArticleTitle>
                     <ArticleDescription>{article.description}</ArticleDescription>
                     <PublishUserWrapper>
@@ -124,7 +120,7 @@ const LatestPostsTitle = styled.h3`
   font-size: 16px;
   font-weight: bold;
   margin: 20px 0px;
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
 
   @media (max-width: 945px) {
     display: none;
@@ -189,8 +185,16 @@ const SidebarContainer = styled.div`
 const MainContent = styled.div`
   display: flex;
   width: 100%;
-  padding: 10px 80px;
-  @media (max-width: 1200px) {
+  padding: 10px 100px;
+
+  @media (min-width: 1280px) {
+    padding: 10px 100px;
+  }
+
+  @media (max-width: 1280px) {
+    padding: 10px 80px;
+  }
+  @media (max-width: 945px) {
     padding: 10px 50px;
     flex-direction: column;
   }
@@ -211,7 +215,7 @@ const SearchContainer = styled.div`
 
 const SearchTitle = styled.h1`
   font-size: 30px;
-  font-weight: 700;
+  font-weight: 600;
   margin-bottom: 10px;
   color: #333;
 `;
@@ -225,7 +229,7 @@ const SearchSub = styled.h3`
 const PublishUserWrapper = styled.div`
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-top: 15px;
 `;
 
 const UserImg = styled.img`
@@ -249,10 +253,10 @@ const UserName = styled.h3`
 
 const ArticleContainer = styled.div`
   display: grid;
-  grid-template-columns: repeat(2, 400px);
-  gap: 10px;
+  grid-template-columns: 1fr;
   justify-content: center;
-  width: 100%;
+  gap: 10px;
+  width: 75%;
   margin: 0 auto;
   @media (max-width: 1200px) {
     grid-template-columns: 1fr;
@@ -261,8 +265,9 @@ const ArticleContainer = styled.div`
 
 const CountryTag = styled.div`
   display: inline-block;
-  background-color: #dbdbf0;
   color: #3f51b5;
+  background-color: #eef2fe;
+  color: #827def;
   font-size: 15px;
   padding: 5px 10px;
   border-radius: 20px;
@@ -278,9 +283,8 @@ const ArticleContent = styled.div<{ isFeatured?: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: ${({ isFeatured }) => (isFeatured ? '0 20px' : '0px')};
-  width: ${({ isFeatured }) => (isFeatured ? '40%' : '100%')};
 
+  width: 100%;
   @media (max-width: 1200px) {
     padding: 0px;
     width: 100%;
@@ -291,13 +295,14 @@ const ArticleTitle = styled.h2`
   font-size: 20px;
   font-weight: 700;
   letter-spacing: 1.2px;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  line-height: 1.5;
 `;
 
 const ArticleDescription = styled.p`
   font-size: 14px;
   color: #696868;
-  margin-bottom: 15px;
+  margin-bottom: auto;
   letter-spacing: 2px;
   font-weight: 500;
   display: -webkit-box;
@@ -305,6 +310,7 @@ const ArticleDescription = styled.p`
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 1.2;
 `;
 
 const PublishedDate = styled.p`
@@ -329,14 +335,13 @@ const ArrowIcon = styled.div`
 const ArticleImageWrapper = styled.div<{ isFeatured?: boolean }>`
   overflow: hidden;
   margin-bottom: 15px;
-  width: ${({ isFeatured }) => (isFeatured ? '60%' : '100%')};
-  height: ${({ isFeatured }) => (isFeatured ? '250px' : '200px')};
-  margin-bottom: ${({ isFeatured }) => (isFeatured ? '0' : '15px')};
+  width: ${({ isFeatured }) => (isFeatured ? '55%' : '100%')};
   border-radius: 18px;
-
+  height: 100%;
+  width: 50%;
   @media (max-width: 1200px) {
     width: 100%;
-    height: 200px;
+    height: 250px;
     margin-bottom: 15px;
     border-radius: 15px;
   }
@@ -353,23 +358,20 @@ const ArticleImage = styled.img`
 `;
 const ArticleWrapper = styled.div<{ isFeatured?: boolean }>`
   display: flex;
-  flex-direction: ${({ isFeatured }) => (isFeatured ? 'row' : 'column')};
-  grid-column: ${({ isFeatured }) => (isFeatured ? 'span 2' : 'span 1')};
-  grid-row: ${({ isFeatured }) => (isFeatured ? 'span 2' : 'span 2')};
-  height: ${({ isFeatured }) => (isFeatured ? '300px' : 'auto')};
+  height: 250px;
   background-color: #fff;
   padding: 20px;
   border-radius: 10px;
   cursor: pointer;
   width: 100%;
+  gap: 30px;
   &:hover {
     background: #ecf6f9;
   }
 
   @media (max-width: 1200px) {
     flex-direction: column;
-    grid-column: span 1;
-    grid-row: span 1;
     height: auto;
+    gap: 0px;
   }
 `;

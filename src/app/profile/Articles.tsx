@@ -65,7 +65,14 @@ const ArticlesContainer = () => {
   }
 
   if (!articles.length) {
-    return <div>No articles available</div>;
+    return (
+      <NoArticleContainer>
+        <NoArticleTitle>Create your first article</NoArticleTitle>
+        <NoArticleTitleDescription>
+          Click the 「Publish」 button on the top right corner to create your first article.🚀
+        </NoArticleTitleDescription>
+      </NoArticleContainer>
+    );
   }
 
   return (
@@ -104,6 +111,29 @@ const ArticlesContainer = () => {
 };
 
 export default ArticlesContainer;
+
+const NoArticleContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+`;
+
+const NoArticleTitle = styled.h1`
+  font-size: 40px;
+  font-weight: bold;
+  color: #34495e;
+  margin-bottom: 20px;
+`;
+
+const NoArticleTitleDescription = styled.p`
+  font-size: 24px;
+  color: #7f8c8d;
+  text-align: center;
+  margin-bottom: 30px;
+`;
 
 const ArticleContainer = styled.div`
   margin: 0;
@@ -201,11 +231,13 @@ const ArticleContent = styled.div`
 const ArticleTitle = styled.h2`
   font-size: 20px;
   margin-bottom: 15px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
 `;
 
 const ArticleDescription = styled.p`
-  font-size: 16px;
-  color: #555;
+  font-size: 15px;
+  color: #696868;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -213,6 +245,9 @@ const ArticleDescription = styled.p`
   text-overflow: ellipsis;
   margin-bottom: auto;
   margin-top: 15px;
+
+  letter-spacing: 2px;
+  font-weight: 500;
 `;
 
 const PublishedDate = styled.p`

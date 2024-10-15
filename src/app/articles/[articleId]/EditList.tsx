@@ -34,7 +34,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const { userData } = useUserStore();
   const coverImageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
-  const allowImgFormats = ['image/jpeg', 'image/png', 'image/jpg'];
+  const allowImgFormats = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
   const maxImgSize = 5 * 1024 * 1024;
   const { addAlert, AlertMessage } = useAlert();
   useEffect(() => {
@@ -378,7 +378,7 @@ const EditWrapper = styled.div`
 const ArticleTitleInput = styled.input`
   font-size: 16px;
   padding: 10px;
-  background-color: #ececec;
+  background-color: #f2f4f7;
   border-radius: 5px;
   outline: none;
   border: none;
@@ -387,14 +387,14 @@ const ArticleTitleInput = styled.input`
 const DescriptionInput = styled.textarea`
   font-size: 14px;
   padding: 10px;
-  background-color: #ececec;
-  border-radius: 5px;
   outline: none;
   resize: none;
-  height: 100px;
   border: none;
   line-height: 1.6;
   letter-spacing: 0.5px;
+  background-color: #f2f4f7;
+  height: 100px;
+  border-radius: 5px;
 `;
 
 const ItemContainer = styled.div`
@@ -432,7 +432,7 @@ const ItemName = styled.h3`
 const ImageUploadWrapper = styled.div`
   position: relative;
   background-color: #f3f3f3;
-  height: 200px;
+  height: 300px;
   border-radius: 8px;
   display: flex;
   justify-content: center;
@@ -455,6 +455,10 @@ const Description = styled.textarea`
   outline: none;
   line-height: 1.6;
   letter-spacing: 0.5px;
+  background-color: #f9fafb;
+  height: 100px;
+  border-radius: 5px;
+  padding: 10px;
 `;
 
 const MarkerContainer = styled.div`

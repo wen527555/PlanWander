@@ -114,7 +114,7 @@ export default function CountrySelect({ onChange }: { onChange: (selectedOption:
       getOptionValue={(option: Country) => option.code}
       formatOptionLabel={formatOptionLabel}
       onChange={onChange}
-      placeholder="Search for a destination"
+      placeholder="Search destination..."
       isClearable
       isLoading={isLoading}
       components={{

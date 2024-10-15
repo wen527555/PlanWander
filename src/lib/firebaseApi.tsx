@@ -36,10 +36,7 @@ interface Article {
   id: string;
   title: string;
   description: string;
-  createdAt: {
-    seconds: number;
-    nanoseconds: number;
-  };
+  createdAt: Date;
   coverImage?: string;
   photoURL?: string;
   userName?: string;
@@ -597,12 +594,12 @@ export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
 
   return querySnapshot.docs.map((doc) => {
     const data = doc.data();
-    console.log('data', data);
+    const createdAt = data.createdAt?.seconds ? new Date(data.createdAt.seconds * 1000) : new Date();
     return {
       id: doc.id,
       title: data.title || '',
       description: data.description || '',
-      createdAt: data.createdAt || { seconds: 0, nanoseconds: 0 },
+      createdAt,
       coverImage: data.coverImage || '',
       photoURL: data.photoURL,
       userName: data.userName,

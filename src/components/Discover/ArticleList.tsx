@@ -3,11 +3,12 @@
 // import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { MdArrowOutward } from 'react-icons/md';
 import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
+import { fetchAllPublishedArticles } from '@/lib/firebaseApi';
 
 const CountrySelect = dynamic(() => import('./CountrySelect'), { ssr: false });
 
@@ -24,13 +25,22 @@ interface Article {
 }
 
 interface ArticleListProps {
-  articles: Article[];
+  initialArticles: Article[];
 }
 
-export default function ArticleList({ articles }: ArticleListProps) {
+export default function ArticleList({ initialArticles }: ArticleListProps) {
+  const [articles, setArticles] = useState(initialArticles);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchArticles = async () => {
+      const data = await fetchAllPublishedArticles();
+      setArticles(data);
+    };
+    fetchArticles();
+  }, []);
 
   const filteredArticles = selectedCountry
     ? articles.filter(

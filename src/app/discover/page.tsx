@@ -7,6 +7,6 @@ export const metadata = {
 };
 
 export default async function DisCoverPage() {
-  const articles = await fetchAllPublishedArticles();
-  return <ArticleList articles={articles} />;
+  const initialArticles = await fetchAllPublishedArticles();
+  return <ArticleList initialArticles={initialArticles} />;
 }

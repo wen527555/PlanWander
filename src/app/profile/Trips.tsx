@@ -277,13 +277,14 @@ const NoPlannedTitleDescription = styled.p`
 const TripContainer = styled.div`
   margin: 0px 20px;
   position: relative;
-  max-width: 800px;
-
+  width: 100%;
   @media (max-width: 1280px) {
+    width: 90%;
     max-width: 800px;
   }
 
   @media (min-width: 1280px) {
+    width: 100%;
     max-width: 960px;
   }
 `;
@@ -293,6 +294,7 @@ const UpcomingTripsInfo = styled.div`
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  margin-bottom: 10px;
 `;
 
 // const TripsCount = styled.div`
@@ -473,7 +475,7 @@ const CarouselWrapper = styled.div`
     position: absolute;
     top: 0;
     left: -5px;
-    height: 30%;
+    height: 100%;
     width: 100px;
     background: linear-gradient(90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
@@ -485,18 +487,18 @@ const CarouselWrapper = styled.div`
     position: absolute;
     top: 0;
     right: -30px;
-    height: 30%;
+    height: 100%;
     width: 180px;
     background: linear-gradient(-90deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
     z-index: 1;
   }
 
-  @media (max-width: 1280px) {
+  @media (min-width: 1280px) {
     max-width: 960px;
   }
 
-  @media (max-width: 1920px) {
+  @media (min-width: 1920px) {
     max-width: 1000px;
   }
 `;
@@ -539,7 +541,6 @@ const YearTitle = styled.div`
 const YearWrapper = styled.div`
   margin: 0px 25px;
   width: 94%;
-  padding: 10px 5px;
 
   &:hover {
     opacity: 1;

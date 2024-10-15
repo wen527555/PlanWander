@@ -3,8 +3,8 @@
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useEffect, useRef, useState } from 'react';
 import { FaPencilAlt } from 'react-icons/fa';
-import { IoEarthOutline } from 'react-icons/io5';
-import { PiArticleNyTimes } from 'react-icons/pi';
+import { IoEarthSharp } from 'react-icons/io5';
+import { PiArticleNyTimesBold } from 'react-icons/pi';
 import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
@@ -152,12 +152,12 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
         )}
         <InfoSection>
           <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
-            <TripsIcon />
-            <InfoText>Trips</InfoText>
+            <TripsIcon isActive={activeTab === 'trips'} />
+            <InfoText isActive={activeTab === 'trips'}>Trips</InfoText>
           </InfoItem>
           <InfoItem onClick={() => handleTabClick('articles')} isActive={activeTab === 'articles'}>
-            <ArticlesIcon />
-            <InfoText>Articles</InfoText>
+            <ArticlesIcon isActive={activeTab === 'articles'} />
+            <InfoText isActive={activeTab === 'articles'}>Articles</InfoText>
           </InfoItem>
         </InfoSection>
         <LogoutWrapper>
@@ -281,7 +281,7 @@ const InfoItem = styled.div<{ isActive: boolean }>`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: ${({ isActive }) => (isActive ? '#ecf6f9' : '#f9fcfd')};
+  background: ${({ isActive }) => (isActive ? '#d6eff7' : '#f9fcfd')};
   padding: 10px 20px;
   border-radius: 15px;
   margin: 30px 0px;
@@ -300,19 +300,19 @@ const InfoItem = styled.div<{ isActive: boolean }>`
   }
 `;
 
-const TripsIcon = styled(IoEarthOutline)`
-  font-size: 14px;
-  color: #0f3e4a;
-`;
-
-const ArticlesIcon = styled(PiArticleNyTimes)`
-  font-size: 14px;
-  color: #0f3e4a;
-`;
-
-const InfoText = styled.span`
+const TripsIcon = styled(IoEarthSharp)<{ isActive: boolean }>`
   font-size: 16px;
-  color: #333;
+  color: ${({ isActive }) => (isActive ? '#0f3e4a' : '#888')};
+`;
+
+const ArticlesIcon = styled(PiArticleNyTimesBold)<{ isActive: boolean }>`
+  font-size: 16px;
+  color: ${({ isActive }) => (isActive ? '#0f3e4a' : '#888')};
+`;
+
+const InfoText = styled.div<{ isActive: boolean }>`
+  font-size: 16px;
+  color: ${({ isActive }) => (isActive ? '#333' : '#888')};
   flex-grow: 1;
   margin-left: 20px;
   font-weight: 700;
@@ -322,23 +322,27 @@ const LogoutWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 100%;
   margin-top: auto;
   margin-bottom: 15px;
+  padding: 10px 20px;
+  border-radius: 15px;
+  width: 180px;
+  &:hover {
+    background-color: #ecf6f9;
+  }
 `;
 
 const LogoutButton = styled.button`
-  width: 80px;
   font-weight: 700;
   font-size: 16px;
-  padding: 5px 10px;
-  cursor: pointer;
   color: #0f3e4a;
-  background-color: #f9fcfd;
   border: none;
+  background-color: transparent;
+  cursor: pointer;
 `;
 
 const LogoutIcon = styled(TbLogout2)`
   font-size: 14px;
   color: #0f3e4a;
+  margin-right: 10px;
 `;

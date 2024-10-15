@@ -1,13 +1,15 @@
 'use client';
 
 // import { useQuery } from '@tanstack/react-query';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useState, useTransition } from 'react';
 import { MdArrowOutward } from 'react-icons/md';
 import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
-import CountrySelect from './CountrySelect';
+
+const CountrySelect = dynamic(() => import('./CountrySelect'), { ssr: false });
 
 interface Article {
   id: string;

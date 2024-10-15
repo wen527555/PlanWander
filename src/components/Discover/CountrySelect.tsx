@@ -109,6 +109,7 @@ export default function CountrySelect({ onChange }: { onChange: (selectedOption:
   );
   return (
     <StyledSelect
+      key={Math.random()}
       options={countries}
       getOptionLabel={(option: Country) => option.name}
       getOptionValue={(option: Country) => option.code}

@@ -76,12 +76,10 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
     setViewState(evt.viewState);
   };
 
-  //   console.log('visiblePlace', visiblePlace);
   useEffect(() => {
     if (visiblePlace && isMapLoaded && mapRef.current) {
       const place = places.find((p) => p.id === visiblePlace);
       if (place) {
-        // console.log('place', place);
         mapRef.current.flyTo({
           center: [place.lng, place.lat],
           zoom: 14,

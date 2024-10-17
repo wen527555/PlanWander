@@ -16,7 +16,7 @@ const MapComponent = dynamic(() => import('./Map'), {
 });
 
 const ArticlesPage = () => {
-  const { articleId } = useParams<{ articleId: string }>();
+  const { articleId } = useParams<{ articleId: string }>() ?? {};
   const [visiblePlace, setVisiblePlace] = useState<string | null>(null);
   const [manualScroll, setManualScroll] = useState(false);
   const [isMapVisible, setIsMapVisible] = useState(false);

@@ -1,10 +1,10 @@
 'use client';
 
+import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
 import { Libraries, LoadScript } from '@react-google-maps/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
 import Flatpickr from 'react-flatpickr';
 import { FaGripVertical, FaMapMarker } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
@@ -16,7 +16,6 @@ import 'flatpickr/dist/flatpickr.min.css';
 import { getColorForDate } from '@/lib/colors';
 import { usePlaceStore } from '@/lib/store';
 import { updateDepartureTime, updatePlaceStayTime } from '../../../lib/firebaseApi';
-// import usePlaceStore from '@/lib/store';
 import LocationSearch from './LocationSearch';
 import TimePicker from './TimePicker';
 import TransportModeSelector from './TransportSelector';

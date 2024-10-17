@@ -1,4 +1,5 @@
 import dynamic from 'next/dynamic';
+// import { cookies } from 'next/headers';
 import Image from 'next/image';
 
 import styles from '@/app/styles/HomePage.module.css';
@@ -66,7 +67,6 @@ const HomePage = () => {
           <ClientAction />
         </div>
       </div>
-      {/* <LandingPageContent /> */}
     </>
   );
 };

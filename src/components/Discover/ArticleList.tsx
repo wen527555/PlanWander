@@ -1,6 +1,5 @@
 'use client';
 
-// import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
@@ -67,10 +66,6 @@ export default function ArticleList({ initialArticles }: ArticleListProps) {
     <>
       {isPending && <LoadingAnimation />}
       <Container>
-        {/* <SearchContainer>
-          <SearchTitle>Discover Your Next Adventure</SearchTitle>
-          <SearchSub>Get inspired, plan your trips, and explore new destinations all in one place.</SearchSub>
-        </SearchContainer> */}
         <MainContent>
           <SidebarContainer>
             <CountrySelect onChange={handleCountryChange} />
@@ -238,27 +233,6 @@ const Container = styled.div`
   margin-top: 40px;
   width: 100%;
 `;
-
-// const SearchContainer = styled.div`
-//   display: flex;
-//   width: 100%;
-//   margin: 90px 0px 20px 0px;
-//   flex-direction: column;
-//   align-items: center;
-// `;
-
-// const SearchTitle = styled.h1`
-//   font-size: 30px;
-//   font-weight: 600;
-//   margin-bottom: 10px;
-//   color: #333;
-// `;
-
-// const SearchSub = styled.h3`
-//   font-size: 14px;
-//   font-weight: 600;
-//   color: #6c757d;
-// `;
 
 const PublishUserWrapper = styled.div`
   display: flex;

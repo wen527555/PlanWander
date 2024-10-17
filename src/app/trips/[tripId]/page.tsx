@@ -292,7 +292,6 @@ const TripPage: React.FC = () => {
         await updatePlaceRoute(tripId, dayId, nextPlace.id, null, 'driving');
       } else if (prevPlace && nextPlace) {
         const newRoute = await getRoute(prevPlace, nextPlace, 'driving');
-        console.log('newRoute', newRoute);
         await updatePlaceRoute(tripId, dayId, nextPlace.id, newRoute, 'driving');
       }
     },

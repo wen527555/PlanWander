@@ -15,7 +15,6 @@ const Carousel = <T,>({ item, renderItem, currentIndex, onChange }: CarouselProp
 
   const handleTouchStart = (e: React.TouchEvent) => {
     setStartX(e.touches[0].clientX);
-    console.log('Touch Start at', e.touches[0].clientX);
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {

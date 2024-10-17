@@ -1,12 +1,9 @@
 'use client';
 
-import { onAuthStateChanged } from 'firebase/auth';
 import dynamic from 'next/dynamic';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import styled from 'styled-components';
 
-import { auth } from '../../lib/firebaseConfig';
 import ArticlesContainer from './Articles';
 import TripsContainer from './Trips';
 
@@ -14,15 +11,6 @@ const Sidebar = dynamic(() => import('./Sidebar'), { ssr: false });
 
 const ProfilePage = () => {
   const [currentTab, setCurrentTab] = useState<'trips' | 'articles'>('trips');
-  const router = useRouter();
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        router.push('/');
-      }
-    });
-    return () => unsubscribe();
-  }, []);
 
   return (
     <Container>

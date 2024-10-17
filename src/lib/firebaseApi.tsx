@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from 'firebase/auth';
 import {
   addDoc,
   arrayUnion,
@@ -17,16 +17,9 @@ import {
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
+import { auth } from '@/lib/firebaseConfig';
 import { fetchCountryImage } from '@/lib/mapApi';
 import { db, storage } from '../lib/firebaseConfig';
-import { useUserStore } from './store';
-
-interface UserInfo {
-  uid: string;
-  displayName?: string | null;
-  email: string;
-  photoURL?: string | null;
-}
 
 interface Day {
   date: string;
@@ -67,48 +60,12 @@ interface UpdateTripParams {
   originalTripData?: TripData;
 }
 
-const auth = getAuth();
-
 interface UserData {
+  uid: string;
+  email: string;
   photoURL: string;
   userName: string;
-  [key: string]: any;
 }
-
-export const saveUserData = async (userInfo: UserInfo | null): Promise<void> => {
-  if (!userInfo || !userInfo.uid) {
-    console.error('User info is invalid:', userInfo);
-    return;
-  }
-  const userData = {
-    uid: userInfo.uid,
-    userName: userInfo.displayName ?? '',
-    email: userInfo.email,
-    photoURL: userInfo.photoURL ?? '',
-    createAt: new Date(),
-  };
-
-  try {
-    await setDoc(doc(db, 'users', userInfo.uid), userData, { merge: true });
-  } catch (error) {
-    console.log('error', error);
-  }
-};
-
-export const fetchUserData = async () => {
-  const user = auth.currentUser;
-  if (user) {
-    const uid = user.uid;
-    const userDocRef = doc(db, 'users', uid);
-    const userDocSnap = await getDoc(userDocRef);
-    if (userDocSnap.exists()) {
-      const userData = userDocSnap.data() as UserData;
-      useUserStore.getState().setUserData(userData);
-    } else {
-      console.log('No such document!');
-    }
-  }
-};
 
 export const createNewTrip = async (
   tripTitle: string,
@@ -165,7 +122,6 @@ export const createNewTrip = async (
     }
 
     await batch.commit();
-    console.log('Trip created and days added to FireStore successfully');
     return tripId;
   } catch (error) {
     console.error('Error creating trip: ', error);
@@ -264,7 +220,6 @@ export const updatePlacesForDay = async (tripId: string, dayId: string, updatePl
     await updateDoc(dayDocRef, {
       places: updatePlaces,
     });
-    console.log('updatePlacesForDay successfully');
   } catch (error) {
     console.error('Error updating places', error);
   }
@@ -307,8 +262,6 @@ export const updatePlaceRoute = async (
     await updateDoc(dayDocRef, {
       places: updatedPlaces,
     });
-
-    console.log('update successfully');
   } catch (error) {
     console.error('Error updating Routes', error);
   }
@@ -332,7 +285,6 @@ export const deletePlace = async (
     await updateDoc(dayDocRef, {
       places: updatedPlaces,
     });
-    console.log('Place removed successfully');
   } catch (error) {
     console.error('Error removing place:', error);
   }
@@ -358,7 +310,6 @@ export const updatePlaceStayTime = async (tripId: string, dayId: string, placeId
     await updateDoc(dayDocRef, {
       places: updatedPlaces,
     });
-    console.log('Place stayTime update successfully');
   } catch (error) {
     console.error('Error removing place:', error);
   }
@@ -376,39 +327,6 @@ export const getPlaceForDay = async (tripId: string, dayId: string) => {
   } catch (error) {
     console.error('Error getting places ', error);
   }
-};
-
-export const fetchUserAllTrips = async () => {
-  return new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userId = user.uid;
-          const tripRef = collection(db, 'trips');
-          const q = query(tripRef, where('uid', '==', userId));
-          const querySnapshot = await getDocs(q);
-
-          const userTrips = await Promise.all(
-            querySnapshot.docs.map(async (doc) => {
-              const tripData = doc.data();
-              return {
-                id: doc.id,
-                ...tripData,
-              };
-            })
-          );
-
-          resolve(userTrips);
-        } catch (error) {
-          console.error('Error fetching user trips:', error);
-          reject([]);
-        }
-      } else {
-        console.log('No user is logged in');
-        resolve([]);
-      }
-    });
-  });
 };
 
 export const createArticleFromTrip = async (tripId: string) => {
@@ -516,7 +434,6 @@ export const saveArticle = async (
 ) => {
   try {
     const articleRef = doc(db, `articles/${articleId}`);
-    console.log('photoURL', photoURL);
     await updateDoc(articleRef, {
       title: articleTitle,
       description: articleDescription,
@@ -541,51 +458,10 @@ export const saveArticle = async (
         places,
       });
     }
-
-    console.log('Article and places saved successfully!');
   } catch (error) {
     console.error('Error saving article and places:', error);
     throw new Error('Failed to save article and places');
   }
-};
-
-export const fetchUserAllArticles = async () => {
-  return new Promise((resolve, reject) => {
-    onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userId = user.uid;
-          const tripRef = collection(db, 'articles');
-          const q = query(tripRef, where('uid', '==', userId));
-          const querySnapshot = await getDocs(q);
-          const userArticles = querySnapshot.docs.map((doc) => {
-            const data = doc.data();
-            const createdAtTimestamp = data.createdAt;
-            const formattedCreatedAt = createdAtTimestamp
-              ? new Date(createdAtTimestamp.seconds * 1000).toLocaleDateString('en-US', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                })
-              : null;
-            return {
-              id: doc.id,
-              ...data,
-              createdAt: formattedCreatedAt,
-            };
-          });
-
-          resolve(userArticles);
-        } catch (error) {
-          console.error('Error fetching user Articles:', error);
-          reject([]);
-        }
-      } else {
-        console.log('No user is logged in');
-        resolve([]);
-      }
-    });
-  });
 };
 
 export const fetchAllPublishedArticles = async (): Promise<Article[]> => {
@@ -745,7 +621,6 @@ export const uploadProfileImage = async (userId: string, file: File) => {
     const imageRef = ref(storage, `users/${userId}/${file.name}`);
     const uploadResult = await uploadBytes(imageRef, file);
     const downloadURL = await getDownloadURL(uploadResult.ref);
-    console.log('Image uploaded successfully:', downloadURL);
     return downloadURL;
   } catch (error) {
     console.error('Error uploading image:', error);
@@ -768,10 +643,26 @@ export const updateUserProfile = async (userId: string, userName: string | null,
     try {
       const userDocRef = doc(db, 'users', userId);
       await updateDoc(userDocRef, updates);
-      console.log('User profile updated successfully!');
     } catch (error) {
       console.error('Error updating user profile:', error);
       throw new Error('Failed to update user profile');
     }
+  }
+};
+
+export const fetchUserData = async (userId: string): Promise<UserData | null> => {
+  const userDocRef = doc(db, 'users', userId);
+  const userDoc = await getDoc(userDocRef);
+  // return userDoc.exists() ? userDoc.data() : null;
+  if (userDoc.exists()) {
+    const data = userDoc.data();
+    return {
+      uid: data.uid || '',
+      email: data.email || '',
+      photoURL: data.photoURL || '',
+      userName: data.userName || '',
+    };
+  } else {
+    return null;
   }
 };

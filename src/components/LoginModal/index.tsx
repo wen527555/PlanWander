@@ -4,8 +4,9 @@ import { FormEvent, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import styled from 'styled-components';
 
-import { saveUserData } from '@/lib/firebaseApi';
 import useAlert from '@/lib/hooks/useAlertMessage';
+import { useUserStore } from '@/lib/store';
+import { fetchGeneralLogin, fetchGoogleLogin, fetchSignUp } from '@/services/api';
 import {
   auth,
   createUserWithEmailAndPassword,
@@ -13,6 +14,7 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from '../../lib/firebaseConfig';
+import AuthForm from './AuthForm';
 
 interface LoginModalProps {
   onLoginSuccess: () => void;
@@ -32,20 +34,56 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
 
   const handleGoogleLogin = async () => {
     try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const userInfo = {
-        uid: user.uid,
-        displayName: user.displayName ?? '',
-        email: user.email || '',
-        photoURL: user.photoURL ?? '',
-      };
-      await saveUserData(userInfo);
+      const userCredential = await signInWithPopup(auth, provider);
+      const idToken = await userCredential.user.getIdToken();
+      const data = await fetchGoogleLogin(idToken);
+      useUserStore.getState().setUserData(data.userData);
       onLoginSuccess();
       onClose();
     } catch (error) {
       addAlert('Error Login. Please try again');
       console.error('Error during Google sign in', error);
+    }
+  };
+
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
+      const data = await fetchGeneralLogin(idToken);
+      useUserStore.getState().setUserData(data.userData);
+      onLoginSuccess();
+      onClose();
+    } catch (error) {
+      handleAuthError(error, 'login');
+    }
+  };
+
+  const handleSignUp = async (email: string, password: string) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const idToken = await userCredential.user.getIdToken();
+      const data = await fetchSignUp(idToken);
+      useUserStore.getState().setUserData(data.userData);
+      onLoginSuccess();
+      onClose();
+      addAlert('Sign up successfully.');
+    } catch (error) {
+      handleAuthError(error, 'signUp');
+    }
+  };
+
+  const handleAuthError = (error: any, action: 'login' | 'signUp') => {
+    if (error.code === 'auth/invalid-email') {
+      addAlert('Please enter a valid email address.');
+    } else if (error.code === 'auth/weak-password') {
+      addAlert('Password should be at least 6 characters.');
+    } else if (error.code === 'auth/email-already-in-use') {
+      addAlert('This email is already registered. Please log in.');
+    } else if (error.message === 'User not found') {
+      addAlert('User not found. Please register.');
+    } else {
+      addAlert(`Error during ${action}. Please try again.`);
     }
   };
   const handleFormSubmit = async (e: FormEvent) => {
@@ -55,34 +93,9 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
       return;
     }
     if (isLogIn) {
-      try {
-        await signInWithEmailAndPassword(auth, email, password);
-        onLoginSuccess();
-        onClose();
-      } catch (error) {
-        addAlert('Error Login. Please try again');
-        console.error('Error during login', error);
-      }
+      await handleLogin(email, password);
     } else {
-      try {
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
-
-        const userInfo = {
-          uid: user.uid,
-          displayName: user.displayName ?? '',
-          email: user.email || '',
-          photoURL: user.photoURL ?? '',
-        };
-        await saveUserData(userInfo);
-        addAlert('Sign up successful! Please login');
-        setIsLogIn(true);
-        setEmail('');
-        setPassword('');
-      } catch (error) {
-        addAlert('Error sign up. Please try again');
-        console.error('Error during login', error);
-      }
+      await handleSignUp(email, password);
     }
   };
 
@@ -94,36 +107,22 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
         </CloseBtnWrapper>
         <Container>
           <Title>{isLogIn ? 'Login to PlanWander' : 'Sign up to PlanWander'}</Title>
-          {isLogIn ? (
+          {isLogIn && (
             <>
-              <GoogleButton onClick={handleGoogleLogin}>Log in With Google</GoogleButton>
-              <form onSubmit={handleFormSubmit}>
-                <Divider>
-                  <span>or</span>
-                </Divider>
-                <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <Input
-                  type="password"
-                  value={password}
-                  placeholder="Password"
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <LoginButton type="submit">Log in</LoginButton>
-              </form>
-            </>
-          ) : (
-            <>
-              <GoogleButton onClick={handleGoogleLogin}>Sign up With Google</GoogleButton>
-              <form onSubmit={handleFormSubmit}>
-                <Divider>
-                  <span>or</span>
-                </Divider>
-                <Input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-                <Input placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-                <LoginButton type="submit">Sign up</LoginButton>
-              </form>
+              <GoogleButton onClick={handleGoogleLogin}>LogIn With Google</GoogleButton>
+              <Divider>
+                <span>or</span>
+              </Divider>
             </>
           )}
+          <AuthForm
+            isLogIn={isLogIn}
+            email={email}
+            password={password}
+            onEmailChange={(e) => setEmail(e.target.value)}
+            onPasswordChange={(e) => setPassword(e.target.value)}
+            onSubmit={handleFormSubmit}
+          />
           <ToggleLink onClick={handleToggleForm}>
             {isLogIn ? "Don't have an account? Sign Up" : 'Already have an account? Log In'}
           </ToggleLink>
@@ -177,8 +176,8 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   height: 100%;
-  margin: 20px 30px;
   padding: 20px 20px;
 `;
 

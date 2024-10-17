@@ -10,11 +10,12 @@ import styled from 'styled-components';
 import LoadingAnimation from '@/components/Loading';
 // import Loading from '@/app/loading';
 import TripModal from '@/components/TripModal';
-import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
+import { createNewTrip } from '@/lib/firebaseApi';
 import { useModalStore, useUserStore } from '@/lib/store';
-// import { BsPersonCircle } from 'react-icons/bs';
 import Logo from '@/public/PlanwanderLogo.png';
-import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
+// import { BsPersonCircle } from 'react-icons/bs';
+import { fetchUserData } from '@/services/api';
+import { auth } from '../../lib/firebaseConfig';
 import LoginModal from '../LoginModal';
 
 interface SelectedOption {
@@ -24,24 +25,24 @@ interface SelectedOption {
 
 const Header = () => {
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
-  const { userData } = useUserStore();
+  const { userData, setUserData } = useUserStore();
+
   const router = useRouter();
   const pathname = usePathname();
   const isProfileActive = pathname === '/profile';
   const isDiscoverActive = pathname === '/discover';
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      if (user) {
-        fetchUserData();
-      } else {
-        router.push('/');
-      }
-    });
 
-    return () => unsubscribe();
-  }, [router]);
+  useEffect(() => {
+    const loadUserData = async () => {
+      const userData = await fetchUserData();
+      if (userData) {
+        setUserData(userData);
+      }
+    };
+    loadUserData();
+  }, [setUserData]);
 
   const handleToProfile = () => {
     startTransition(() => {
@@ -101,6 +102,7 @@ const Header = () => {
             </IconWrapper>
             <ButtonWrapper>
               <Button onClick={() => openModal('trip')}>+ Plan</Button>
+              {/* <Button onClick={handleLogout}>LogOut</Button> */}
             </ButtonWrapper>
           </>
         ) : (

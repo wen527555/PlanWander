@@ -13,8 +13,9 @@ import styled from 'styled-components';
 import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
-import { createArticleFromTrip, createNewTrip, fetchDeleteTrip, fetchUserAllTrips } from '@/lib/firebaseApi';
+import { createArticleFromTrip, createNewTrip, fetchDeleteTrip } from '@/lib/firebaseApi';
 import { useConfirmModalStore, useModalStore } from '@/lib/store';
+import { fetchUserTrips } from '@/services/api';
 import Carousel from './Carousel';
 
 interface Trip {
@@ -33,7 +34,7 @@ interface SelectedOption {
 const TripsContainer = () => {
   const { data: trips = [], isLoading: loadingTrips } = useQuery<any>({
     queryKey: ['userTrips'],
-    queryFn: fetchUserAllTrips,
+    queryFn: fetchUserTrips,
   });
   const today = dayjs();
   const [isPending, startTransition] = useTransition();

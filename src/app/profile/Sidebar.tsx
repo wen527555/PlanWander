@@ -8,7 +8,7 @@ import { PiArticleNyTimesBold } from 'react-icons/pi';
 import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
-import { updateUserProfile, uploadProfileImage } from '@/lib/firebaseApi';
+import { fetchUserData, updateUserProfile, uploadProfileImage } from '@/lib/firebaseApi';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { useUserStore } from '@/lib/store';
 import { auth } from '../../lib/firebaseConfig';
@@ -31,6 +31,9 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
   const handleLogout = async () => {
     try {
       await auth.signOut();
+      await fetch('api/logout', {
+        method: 'POST',
+      });
       setUserData(null);
       router.push('/');
     } catch (error) {
@@ -61,6 +64,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
       try {
         const uploadImageUrl = await uploadProfileImage(userData.uid, file);
         await updateUserProfile(userData.uid, null, uploadImageUrl);
+        const updateUserData = await fetchUserData(userData.uid);
+        useUserStore.getState().setUserData(updateUserData);
         addAlert('Profile image uploaded successfully!');
       } catch {
         addAlert('Failed to upload image. Please try again.');
@@ -103,7 +108,7 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
 
   useEffect(() => {
     let isMounted = true;
-    const tabParam = searchParams.get('tab');
+    const tabParam = searchParams?.get('tab');
     if (isMounted) {
       if (tabParam === 'articles') {
         setActiveTab('articles');

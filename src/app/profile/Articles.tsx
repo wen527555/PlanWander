@@ -9,8 +9,9 @@ import styled from 'styled-components';
 
 import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
-import { fetchDeleteArticle, fetchUserAllArticles } from '@/lib/firebaseApi';
+import { fetchDeleteArticle } from '@/lib/firebaseApi';
 import { useConfirmModalStore } from '@/lib/store';
+import { fetchUserArticles } from '@/services/api';
 
 type Article = {
   id: string;
@@ -24,7 +25,7 @@ type Article = {
 const ArticlesContainer = () => {
   const { data: articles = [], isLoading: loadingArticles } = useQuery<any>({
     queryKey: ['userArticles'],
-    queryFn: fetchUserAllArticles,
+    queryFn: fetchUserArticles,
   });
   const router = useRouter();
   const [openMenuArticleId, setOpenArticleId] = useState<string | null>(null);

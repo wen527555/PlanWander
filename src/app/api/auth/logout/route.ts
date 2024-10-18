@@ -7,6 +7,7 @@ export async function GET() {
     cookieStore.delete('token');
     return NextResponse.redirect('/');
   } catch (error) {
+    console.log('error', error);
     return NextResponse.json({ message: 'Logout failed' }, { status: 500 });
   }
 }

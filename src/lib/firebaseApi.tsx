@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import { onAuthStateChanged } from 'firebase/auth';
 import {
   addDoc,
   arrayUnion,
@@ -12,7 +11,6 @@ import {
   query,
   setDoc,
   updateDoc,
-  where,
   writeBatch,
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';

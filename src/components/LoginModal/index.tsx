@@ -187,26 +187,6 @@ const Title = styled.h1`
   margin-bottom: 25px;
 `;
 
-const Input = styled.input`
-  margin: 10px 0px;
-  padding: 5px 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  width: 100%;
-  height: 50px;
-  box-sizing: border-box;
-  &:hover {
-    border-color: #94c3d2;
-  }
-
-  &:focus {
-    box-shadow:
-      inset 0 1px 1px rgba(0, 0, 0, 0.075),
-      0 0 0 0.2rem rgba(58, 202, 234, 0.25);
-    outline: none;
-  }
-`;
-
 const GoogleButton = styled.button`
   margin-top: 10px;
   padding: 5px 10px;
@@ -223,26 +203,6 @@ const GoogleButton = styled.button`
     background-color: white;
     color: #78b7cc;
     border: 2px solid #78b7cc;
-  }
-`;
-
-const LoginButton = styled.button`
-  width: 100%;
-  border-radius: 25px;
-  padding: 10px;
-  text-align: center;
-  font-size: 14px;
-  font-weight: 500;
-  background-color: #78b7cc;
-  font-size: 14px;
-  font-weight: 600;
-  color: white;
-  cursor: pointer;
-  border: 2px solid transparent;
-  &:hover {
-    background-color: white;
-    color: #78b7cc;
-    border-color: #78b7cc;
   }
 `;
 

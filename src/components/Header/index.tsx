@@ -15,7 +15,6 @@ import { useModalStore, useUserStore } from '@/lib/store';
 import Logo from '@/public/PlanwanderLogo.png';
 // import { BsPersonCircle } from 'react-icons/bs';
 import { fetchUserData } from '@/services/api';
-import { auth } from '../../lib/firebaseConfig';
 import LoginModal from '../LoginModal';
 
 interface SelectedOption {

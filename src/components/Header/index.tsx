@@ -11,10 +11,11 @@ import LoadingAnimation from '@/components/Loading';
 // import Loading from '@/app/loading';
 import TripModal from '@/components/TripModal';
 import { createNewTrip } from '@/lib/firebaseApi';
+import { auth } from '@/lib/firebaseConfig';
 import { useModalStore, useUserStore } from '@/lib/store';
 import Logo from '@/public/PlanwanderLogo.png';
 // import { BsPersonCircle } from 'react-icons/bs';
-import { fetchUserData } from '@/services/api';
+import { fetchUserData, refreshAuthToken } from '@/services/api';
 import LoginModal from '../LoginModal';
 
 interface SelectedOption {
@@ -35,6 +36,7 @@ const Header = () => {
 
   useEffect(() => {
     const loadUserData = async () => {
+      await refreshAuthToken();
       const userData = await fetchUserData();
       if (userData) {
         setUserData(userData);

@@ -1,4 +1,6 @@
 // import { useState } from 'react';
+'use client';
+
 import { useRef, useState } from 'react';
 import styled from 'styled-components';
 

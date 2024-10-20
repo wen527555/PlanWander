@@ -1,7 +1,7 @@
 'use client';
 
-import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useRef, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import React, { useRef, useState } from 'react';
 import { FaPencilAlt } from 'react-icons/fa';
 import { IoEarthSharp } from 'react-icons/io5';
 import { PiArticleNyTimesBold } from 'react-icons/pi';
@@ -9,25 +9,25 @@ import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
 import { fetchUserData, updateUserProfile, uploadProfileImage } from '@/lib/firebaseApi';
+import { auth } from '@/lib/firebaseConfig';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { useUserStore } from '@/lib/store';
-import { auth } from '../../lib/firebaseConfig';
 
 interface SidebarProps {
-  setCurrentTab: (tab: 'trips' | 'articles') => void;
+  tabs: Array<{ name: string; path: string }>;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
+const Sidebar: React.FC<SidebarProps> = ({ tabs }) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const { userData, setUserData } = useUserStore();
-  const [activeTab, setActiveTab] = useState<'trips' | 'articles' | null>(null);
   const [isEditingName, setIsEditingName] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const { addAlert, AlertMessage } = useAlert();
   const allowImgFormats = ['image/jpeg', 'image/png', 'image/jpg'];
   const maxImgSize = 5 * 1024 * 1024;
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const router = useRouter();
-  const searchParams = useSearchParams();
+
   const handleLogout = async () => {
     try {
       await auth.signOut();
@@ -80,7 +80,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
       addAlert('No user data available. Please log in.');
       return;
     }
-
     try {
       await updateUserProfile(userData.uid, userData.userName, null);
       setIsEditingName(false);
@@ -91,13 +90,8 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
     }
   };
 
-  const handleTabClick = (tab: 'trips' | 'articles') => {
-    setActiveTab(tab);
-    setCurrentTab(tab);
-
-    const newSearchParams = new URLSearchParams(searchParams?.toString());
-    newSearchParams.set('tab', tab);
-    router.push(`/profile?${newSearchParams.toString()}`);
+  const handleTabClick = (path: string) => {
+    router.push(path);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,23 +99,6 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
       setUserData({ ...userData, userName: e.target.value });
     }
   };
-
-  useEffect(() => {
-    let isMounted = true;
-    const tabParam = searchParams?.get('tab');
-    if (isMounted) {
-      if (tabParam === 'articles') {
-        setActiveTab('articles');
-        setCurrentTab('articles');
-      } else {
-        setActiveTab('trips');
-        setCurrentTab('trips');
-      }
-      return () => {
-        isMounted = false;
-      };
-    }
-  }, [searchParams, setCurrentTab]);
 
   return (
     <>
@@ -156,14 +133,16 @@ const Sidebar: React.FC<SidebarProps> = ({ setCurrentTab }) => {
           <UserName onClick={() => setIsEditingName(true)}>{userData?.userName || 'No name set'}</UserName>
         )}
         <InfoSection>
-          <InfoItem onClick={() => handleTabClick('trips')} isActive={activeTab === 'trips'}>
-            <TripsIcon isActive={activeTab === 'trips'} />
-            <InfoText isActive={activeTab === 'trips'}>Trips</InfoText>
-          </InfoItem>
-          <InfoItem onClick={() => handleTabClick('articles')} isActive={activeTab === 'articles'}>
-            <ArticlesIcon isActive={activeTab === 'articles'} />
-            <InfoText isActive={activeTab === 'articles'}>Articles</InfoText>
-          </InfoItem>
+          {tabs.map((tab) => (
+            <InfoItem key={tab.name} onClick={() => handleTabClick(tab.path)} isActive={pathname.startsWith(tab.path)}>
+              {tab.name === 'Trips' ? (
+                <TripsIcon isActive={pathname.startsWith(tab.path)} />
+              ) : (
+                <ArticlesIcon isActive={pathname.startsWith(tab.path)} />
+              )}
+              <InfoText isActive={pathname.startsWith(tab.path)}>{tab.name}</InfoText>
+            </InfoItem>
+          ))}
         </InfoSection>
         <LogoutWrapper>
           <LogoutIcon />

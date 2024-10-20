@@ -1,4 +1,4 @@
-import ArticleList from '@/components/Discover/ArticleList';
+import ArticleList from '@/app/discover/components/ArticleList';
 import { fetchAllPublishedArticles } from '@/lib/firebaseApi';
 
 export const metadata = {

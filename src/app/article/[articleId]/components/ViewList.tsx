@@ -1,10 +1,13 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { FaMapMarker } from 'react-icons/fa';
 import { MdOutlineLibraryBooks } from 'react-icons/md';
 import styled from 'styled-components';
 
+import { HomeIcon, ListHeader } from '@/components/ListWithMap/Header';
+import LoadingAnimation from '@/components/Loading';
 import { getColorForDate } from '@/lib/colors';
 import defaultCoverImg from '@/public/travel.jpg';
 
@@ -36,10 +39,18 @@ const ViewList: React.FC<ListProps> = ({
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const placeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
+  const [isPending, startTransition] = useTransition();
+  const router = useRouter();
   const handleScroll = (placeId: string) => {
     if (!manualScroll) {
       onPlaceVisible(placeId);
     }
+  };
+
+  const handleBackDiscover = () => {
+    startTransition(() => {
+      router.push('/discover');
+    });
   };
 
   useEffect(() => {
@@ -100,7 +111,11 @@ const ViewList: React.FC<ListProps> = ({
 
   return (
     <>
+      {isPending && <LoadingAnimation />}
       <Container>
+        <ListHeader>
+          <HomeIcon onClick={handleBackDiscover} />
+        </ListHeader>
         <CoverImageWrapper>
           <CoverImage src={coverImage || defaultCoverImg.src} />
           <ArticleTitle>{articleTitle}</ArticleTitle>
@@ -152,8 +167,6 @@ const ViewList: React.FC<ListProps> = ({
 export default ViewList;
 
 const Container = styled.div`
-  /* margin: 10px; */
-  /* border-bottom: 1px solid #ccc; */
   padding-bottom: 10px;
   margin-top: 54px;
 `;
@@ -226,8 +239,6 @@ const PlaceItem = styled.div<{ visible: boolean }>`
   position: relative;
   margin: 20px 0px;
   padding: 10px 12px;
-  /* transition: background-color 0.3s ease; */
-  /* min-height: 450px; */
   ${({ visible }) =>
     visible
       ? `
@@ -263,7 +274,6 @@ const ItemName = styled.h3`
 `;
 
 const ImageUploadWrapper = styled.div`
-  /* background-color: #f3f3f3; */
   height: 250px;
   margin-bottom: 10px;
   border-radius: 8px;
@@ -271,7 +281,6 @@ const ImageUploadWrapper = styled.div`
   justify-content: center;
   align-items: center;
   border: none;
-  /* border: 2px dashed #ccc; */
 `;
 
 const Image = styled.img`
@@ -304,7 +313,6 @@ const MarkerContainer = styled.div`
 const MarkerIcon = styled(FaMapMarker)`
   width: 100%;
   height: 100%;
-  /* border: 1px solid #ffff; */
   color: ${(props) => props.color};
 `;
 

@@ -2,12 +2,12 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { FaMapMarker, FaPencilAlt } from 'react-icons/fa';
-import { IoArrowBackCircleOutline } from 'react-icons/io5';
-// import { MdPlace } from 'react-icons/md';
 import styled from 'styled-components';
 
+import { HomeIcon, ListHeader } from '@/components/ListWithMap/Header';
+import LoadingAnimation from '@/components/Loading';
 import { getColorForDate } from '@/lib/colors';
 import { saveArticle, saveImageToStorage } from '@/lib/firebaseApi';
 import useAlert from '@/lib/hooks/useAlertMessage';
@@ -33,6 +33,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const { userData } = useUserStore();
   const coverImageInputRef = useRef<HTMLInputElement>(null);
+  const [isPending, startTransition] = useTransition();
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const allowImgFormats = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
   const maxImgSize = 5 * 1024 * 1024;
@@ -173,7 +174,9 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   });
   const router = useRouter();
   const handleBackProfile = () => {
-    router.push('/profile?tab=articles');
+    startTransition(() => {
+      router.push('/profile/articles');
+    });
   };
 
   const handleSaveArticle = async () => {
@@ -192,97 +195,100 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
     }
   };
   return (
-    <Container>
-      <AlertMessage />
-      <ListHeader>
-        <HomeIcon onClick={handleBackProfile} />
-        <SaveWrapper>
-          <Button onClick={handleSaveArticle}>Save</Button>
-        </SaveWrapper>
-      </ListHeader>
-      <EditWrapper>
-        <ImageUploadWrapper>
-          {coverImage ? <Image src={coverImage} alt="Cover Image" /> : <div>No image has been uploaded.</div>}
-          <input
-            ref={coverImageInputRef}
-            type="file"
-            style={{ display: 'none' }}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) {
-                handleCoverImageUpload(file);
-              }
-            }}
+    <>
+      {isPending && <LoadingAnimation />}
+      <Container>
+        <AlertMessage />
+        <ListHeader>
+          <HomeIcon onClick={handleBackProfile} />
+          <SaveWrapper>
+            <Button onClick={handleSaveArticle}>Save</Button>
+          </SaveWrapper>
+        </ListHeader>
+        <EditWrapper>
+          <ImageUploadWrapper>
+            {coverImage ? <Image src={coverImage} alt="Cover Image" /> : <div>No image has been uploaded.</div>}
+            <input
+              ref={coverImageInputRef}
+              type="file"
+              style={{ display: 'none' }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  handleCoverImageUpload(file);
+                }
+              }}
+            />
+            <EditButton
+              onClick={() => {
+                coverImageInputRef.current?.click();
+              }}
+            >
+              <EditIcon />
+            </EditButton>
+          </ImageUploadWrapper>
+          <ArticleTitleInput value={articleTitle} onChange={handleTitleChange} placeholder="Enter article title..." />
+          <DescriptionInput
+            value={articleDescription}
+            onChange={handleArticleDescChange}
+            placeholder="Enter article description..."
           />
-          <EditButton
-            onClick={() => {
-              coverImageInputRef.current?.click();
-            }}
-          >
-            <EditIcon />
-          </EditButton>
-        </ImageUploadWrapper>
-        <ArticleTitleInput value={articleTitle} onChange={handleTitleChange} placeholder="Enter article title..." />
-        <DescriptionInput
-          value={articleDescription}
-          onChange={handleArticleDescChange}
-          placeholder="Enter article description..."
-        />
-      </EditWrapper>
-      {articleData.days?.length > 0 ? (
-        articleData.days.map((day: any, dateIndex: number) => (
-          <ItemContainer key={dateIndex}>
-            <ItemTitle>DAY {dateIndex + 1}</ItemTitle>
-            {Array.isArray(day.places) &&
-              day.places.map((place: any, index: string) => (
-                <div key={index} data-place-id={place.id} className="place-item">
-                  <ItemHeader>
-                    <MarkerContainer>
-                      <MarkerIcon color={getColorForDate(dateIndex)} />
-                      <MarkerNumber>{index + 1}</MarkerNumber>
-                    </MarkerContainer>
-                    <ItemName>{place.name}</ItemName>
-                  </ItemHeader>
-                  <ImageUploadWrapper>
-                    {images[place.id] ? (
-                      <Image src={`${images[place.id]}`} alt={place.name} />
-                    ) : (
-                      <div>No image has been uploaded.</div>
-                    )}
-                    <input
-                      ref={(el) => {
-                        fileInputRefs.current[place.id] = el;
-                      }}
-                      type="file"
-                      style={{ display: 'none' }}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          handleImageUpload(place.id, file);
-                        }
-                      }}
+        </EditWrapper>
+        {articleData.days?.length > 0 ? (
+          articleData.days.map((day: any, dateIndex: number) => (
+            <ItemContainer key={dateIndex}>
+              <ItemTitle>DAY {dateIndex + 1}</ItemTitle>
+              {Array.isArray(day.places) &&
+                day.places.map((place: any, index: string) => (
+                  <div key={index} data-place-id={place.id} className="place-item">
+                    <ItemHeader>
+                      <MarkerContainer>
+                        <MarkerIcon color={getColorForDate(dateIndex)} />
+                        <MarkerNumber>{index + 1}</MarkerNumber>
+                      </MarkerContainer>
+                      <ItemName>{place.name}</ItemName>
+                    </ItemHeader>
+                    <ImageUploadWrapper>
+                      {images[place.id] ? (
+                        <Image src={`${images[place.id]}`} alt={place.name} />
+                      ) : (
+                        <div>No image has been uploaded.</div>
+                      )}
+                      <input
+                        ref={(el) => {
+                          fileInputRefs.current[place.id] = el;
+                        }}
+                        type="file"
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            handleImageUpload(place.id, file);
+                          }
+                        }}
+                      />
+                      <EditButton
+                        onClick={() => {
+                          fileInputRefs.current[place.id]?.click();
+                        }}
+                      >
+                        <EditIcon />
+                      </EditButton>
+                    </ImageUploadWrapper>
+                    <Description
+                      value={descriptions[place.id] || ''}
+                      placeholder="Enter a description..."
+                      onChange={(e) => handleDescriptionChange(place.id, e.target.value)}
                     />
-                    <EditButton
-                      onClick={() => {
-                        fileInputRefs.current[place.id]?.click();
-                      }}
-                    >
-                      <EditIcon />
-                    </EditButton>
-                  </ImageUploadWrapper>
-                  <Description
-                    value={descriptions[place.id] || ''}
-                    placeholder="Enter a description..."
-                    onChange={(e) => handleDescriptionChange(place.id, e.target.value)}
-                  />
-                </div>
-              ))}
-          </ItemContainer>
-        ))
-      ) : (
-        <div></div>
-      )}
-    </Container>
+                  </div>
+                ))}
+            </ItemContainer>
+          ))
+        ) : (
+          <div></div>
+        )}
+      </Container>
+    </>
   );
 };
 
@@ -290,33 +296,7 @@ export default EditList;
 
 const Container = styled.div`
   margin: 10px;
-  /* border-bottom: 1px solid #ccc; */
   padding-bottom: 10px;
-`;
-
-const ListHeader = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  border-bottom: 1px solid #e9ecef;
-  height: 54px;
-  width: 48%;
-  background-color: white;
-  padding: 5px 10px;
-  margin: 0px 10px;
-  z-index: 2;
-  @media (max-width: 768px) {
-    width: 100%;
-    padding: 5px 25px;
-  }
-`;
-
-const HomeIcon = styled(IoArrowBackCircleOutline)`
-  cursor: pointer;
-  font-size: 30px;
 `;
 
 const SaveWrapper = styled.div`
@@ -348,7 +328,6 @@ const EditButton = styled.button`
   border-radius: 50%;
   padding: 10px;
   cursor: pointer;
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
 
   display: flex;
   align-items: center;
@@ -409,10 +388,6 @@ const ItemHeader = styled.div`
   gap: 10px;
 `;
 
-// const MarkerIcon = styled(MdPlace)`
-//   font-size: 20px;
-// `;
-
 const ItemTitle = styled.h3`
   width: 100px;
   font-size: 18px;
@@ -471,7 +446,6 @@ const MarkerContainer = styled.div`
 const MarkerIcon = styled(FaMapMarker)`
   width: 100%;
   height: 100%;
-  /* border: 1px solid #ffff; */
   color: ${(props) => props.color};
 `;
 

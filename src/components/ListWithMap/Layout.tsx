@@ -3,10 +3,12 @@
 import { useState } from 'react';
 import styled from 'styled-components';
 
+import { ListHeader } from './Header';
+
 interface MapToggleProps {
   listContent: React.ReactNode;
   mapContent: React.ReactNode;
-  headerContent: React.ReactNode;
+  headerContent?: React.ReactNode;
 }
 
 const ListMapLayout: React.FC<MapToggleProps> = ({ listContent, mapContent, headerContent }) => {
@@ -59,24 +61,6 @@ const MapContainer = styled.div<{ isMapVisible: boolean }>`
   @media (max-width: 768px) {
     width: 100%;
     display: ${(props) => (props.isMapVisible ? 'block' : 'none')};
-  }
-`;
-
-const ListHeader = styled.div`
-  display: flex;
-  align-items: center;
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  border-bottom: 1px solid #e9ecef;
-  height: 54px;
-  width: 50%;
-  background-color: white;
-  padding: 5px 20px;
-  z-index: 2;
-
-  @media (max-width: 768px) {
-    width: 100%;
   }
 `;
 

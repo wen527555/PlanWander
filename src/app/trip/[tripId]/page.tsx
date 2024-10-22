@@ -7,13 +7,12 @@ import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useTransition } from 'react';
 import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
-import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import { RiEdit2Fill } from 'react-icons/ri';
 import styled from 'styled-components';
 
 import ConfirmModal from '@/components/confirmModal';
-import ListMapLayout from '@/components/ListMapLayout';
-// import { Container, HomeIcon, ListContainer, ListHeader, MapContainer, MapToggle } from '@/components/ListMapLayout';
+import { HomeIcon } from '@/components/ListWithMap/Header';
+import ListMapLayout from '@/components/ListWithMap/Layout';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import {
@@ -441,11 +440,6 @@ const TripDate = styled.div`
   color: #6c757d;
   margin-left: 8px;
   cursor: pointer;
-`;
-
-const HomeIcon = styled(IoArrowBackCircleOutline)`
-  cursor: pointer;
-  font-size: 30px;
 `;
 
 const CalendarIcon = styled(FaRegCalendarDays)`

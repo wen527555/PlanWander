@@ -6,10 +6,10 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import styled from 'styled-components';
 
+import ListMapLayout from '@/components/ListWithMap/Layout';
 import LoadingAnimation from '@/components/Loading';
 import { fetchArticleData } from '@/lib/firebaseApi';
 import { processDays } from '@/lib/processDays';
-import EditList from './EditList';
 
 const MapComponent = dynamic(() => import('./Map'), {
   ssr: false,
@@ -17,21 +17,18 @@ const MapComponent = dynamic(() => import('./Map'), {
 
 interface ArticleProps {
   ListComponent: React.ComponentType<any>;
+  isEdit?: boolean;
 }
 
-const ArticlesPage: React.FC<ArticleProps> = ({ ListComponent }) => {
+const ArticlePage: React.FC<ArticleProps> = ({ ListComponent, isEdit }) => {
   const { articleId } = useParams<{ articleId: string }>() ?? {};
   const [visiblePlace, setVisiblePlace] = useState<string | null>(null);
   const [manualScroll, setManualScroll] = useState(false);
-  const [isMapVisible, setIsMapVisible] = useState(false);
   const { data: articleData, isLoading } = useQuery({
     queryKey: ['articleData', articleId],
     queryFn: () => fetchArticleData(articleId as string),
     enabled: !!articleId,
   });
-  const toggleMapListView = () => {
-    setIsMapVisible((prev) => !prev);
-  };
 
   const handlePlaceVisible = (placeId: string) => {
     if (!manualScroll) {
@@ -52,25 +49,35 @@ const ArticlesPage: React.FC<ArticleProps> = ({ ListComponent }) => {
   const { places, route } = processDays(articleData?.days as any);
   return (
     <>
-      <ToggleButton onClick={toggleMapListView}>{isMapVisible ? 'List View' : 'Map View'}</ToggleButton>
-      <Container>
-        <ListContainer isMapVisible={isMapVisible}>
-          <EditList articleData={articleData} articleId={articleId} onPlaceVisible={handlePlaceVisible} />
-        </ListContainer>
-        <MapContainer isMapVisible={isMapVisible}>
+      <ListMapLayout
+        listContent={
+          isEdit ? (
+            <ListComponent articleData={articleData} articleId={articleId} onPlaceVisible={handlePlaceVisible} />
+          ) : (
+            <ListComponent
+              articleData={articleData}
+              articleId={articleId}
+              onPlaceVisible={handlePlaceVisible}
+              visiblePlace={visiblePlace}
+              setManualScroll={setManualScroll}
+              manualScroll={manualScroll}
+            />
+          )
+        }
+        mapContent={
           <MapComponent
             places={places as any}
             routes={route as any}
             visiblePlace={visiblePlace}
             onMarkerClick={handleMarkerClick}
           />
-        </MapContainer>
-      </Container>
+        }
+      />
     </>
   );
 };
 
-export default ArticlesPage;
+export default ArticlePage;
 
 const ToggleButton = styled.button`
   position: absolute;

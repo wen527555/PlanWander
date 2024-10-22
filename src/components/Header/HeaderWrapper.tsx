@@ -8,9 +8,9 @@ const HeaderWrapper = () => {
   const pathname = usePathname();
 
   const hideHeader =
-    /^\/trips\/[a-zA-Z0-9\-]+$/.test(pathname) ||
-    /^\/articles\/[a-zA-Z0-9\-]+$/.test(pathname) ||
-    /^\/articles\/[a-zA-Z0-9\-]+\/view$/.test(pathname);
+    /^\/trip\/[a-zA-Z0-9\-]+$/.test(pathname) ||
+    /^\/article\/[a-zA-Z0-9\-]+$/.test(pathname) ||
+    /^\/article\/[a-zA-Z0-9\-]+\/edit$/.test(pathname);
 
   if (hideHeader) {
     return null;

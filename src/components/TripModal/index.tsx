@@ -87,9 +87,7 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
     }
     try {
       await onSubmit(tripTitle, startDate, endDate, selectedCountries);
-
       addAlert('Creation successful');
-
       onClose();
     } catch (error) {
       console.error('Error', error);

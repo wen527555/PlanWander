@@ -4,15 +4,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useRef, useTransition } from 'react';
 import { FaGlobe, FaPhoneAlt, FaStar } from 'react-icons/fa';
 import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
 import { IoArrowBackCircleOutline } from 'react-icons/io5';
 import { RiEdit2Fill } from 'react-icons/ri';
-// import { PiPencilLine } from 'react-icons/pi';
 import styled from 'styled-components';
 
 import ConfirmModal from '@/components/confirmModal';
+import ListMapLayout from '@/components/ListMapLayout';
+// import { Container, HomeIcon, ListContainer, ListHeader, MapContainer, MapToggle } from '@/components/ListMapLayout';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import {
@@ -26,6 +27,7 @@ import {
   updatePlacesForDay,
 } from '@/lib/firebaseApi';
 import useAlert from '@/lib/hooks/useAlertMessage';
+// import { useToggleMapView } from '@/lib/hooks/useToggleMapView';
 import { getRoute } from '@/lib/mapApi';
 import { processDays } from '@/lib/processDays';
 import { useConfirmModalStore, useModalStore, usePlaceStore } from '@/lib/store';
@@ -103,16 +105,13 @@ const TripPage: React.FC = () => {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const { isModalOpen, openModal, closeModal } = useModalStore();
   const [isPending, startTransition] = useTransition();
+  // const { isMapVisible, toggleMapListView } = useToggleMapView();
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
     staleTime: 5000,
   });
-  const [isMapVisible, setIsMapVisible] = useState(false);
   const openConfirmModal = useConfirmModalStore((state) => state.openModal);
-  const toggleMapListView = () => {
-    setIsMapVisible((prev) => !prev);
-  };
   const { addAlert, AlertMessage } = useAlert();
   const formattedStartDate = dayjs(tripData?.startDate).format('M/D');
   const formattedEndDate = dayjs(tripData?.endDate).format('M/D');
@@ -325,10 +324,9 @@ const TripPage: React.FC = () => {
       {isPending && <LoadingAnimation />}
       <ConfirmModal />
       <AlertMessage />
-      <Container>
-        <ToggleButton onClick={toggleMapListView}>{isMapVisible ? 'List View' : 'Map View'}</ToggleButton>
-        <ListContainer isMapVisible={isMapVisible}>
-          <ListHeader>
+      <ListMapLayout
+        headerContent={
+          <>
             <HomeIcon onClick={handleBackProfile} />
             <TripName>{tripData.tripTitle}</TripName>
             <TripDate>
@@ -336,7 +334,9 @@ const TripPage: React.FC = () => {
               {formattedStartDate}-{formattedEndDate}
             </TripDate>
             <EditIcon onClick={() => openModal('trip')} />
-          </ListHeader>
+          </>
+        }
+        listContent={
           <List
             days={tripData.days as any}
             onPlaceAdded={handleAddPlace}
@@ -345,123 +345,87 @@ const TripPage: React.FC = () => {
             onPlaceDelete={handlePlaceDelete}
             tripId={tripId}
           />
-        </ListContainer>
-        <MapContainer isMapVisible={isMapVisible}>
-          <MapComponent places={places as any} routes={route as any} />
-          {selectedPlace && (
-            <PlaceInfoModal ref={modalRef}>
-              <ModalHeader>
-                <PlaceName>{selectedPlace.name}</PlaceName>
-              </ModalHeader>
+        }
+        mapContent={
+          <>
+            <MapComponent places={places as any} routes={route as any} />
+            {selectedPlace && (
+              <PlaceInfoModal ref={modalRef}>
+                <ModalHeader>
+                  <PlaceName>{selectedPlace.name}</PlaceName>
+                </ModalHeader>
 
-              {selectedPlace?.rating && (
-                <RatingWrapper>
-                  <RatingIcon />
-                  <Rating>{selectedPlace.rating}</Rating>
-                </RatingWrapper>
-              )}
+                {selectedPlace?.rating && (
+                  <RatingWrapper>
+                    <RatingIcon />
+                    <Rating>{selectedPlace.rating}</Rating>
+                  </RatingWrapper>
+                )}
 
-              {selectedPlace?.address && (
-                <Wrapper>
-                  <AddressIcon />
-                  <PlaceAddress>{selectedPlace.address}</PlaceAddress>
-                </Wrapper>
-              )}
+                {selectedPlace?.address && (
+                  <Wrapper>
+                    <AddressIcon />
+                    <PlaceAddress>{selectedPlace.address}</PlaceAddress>
+                  </Wrapper>
+                )}
 
-              {formattedOpeningHours?.length > 0 && (
-                <OpeningHoursWrapper>
-                  <ClockIcon />
-                  <OpeningHoursList>
-                    {formattedOpeningHours.map((time, index) => (
-                      <OpeningHourItem key={index}>
-                        <DayCircle>{time.day}</DayCircle>
-                        <HoursLabel>{time.hours}</HoursLabel>
-                      </OpeningHourItem>
-                    ))}
-                  </OpeningHoursList>
-                </OpeningHoursWrapper>
-              )}
+                {formattedOpeningHours?.length > 0 && (
+                  <OpeningHoursWrapper>
+                    <ClockIcon />
+                    <OpeningHoursList>
+                      {formattedOpeningHours.map((time, index) => (
+                        <OpeningHourItem key={index}>
+                          <DayCircle>{time.day}</DayCircle>
+                          <HoursLabel>{time.hours}</HoursLabel>
+                        </OpeningHourItem>
+                      ))}
+                    </OpeningHoursList>
+                  </OpeningHoursWrapper>
+                )}
 
-              {selectedPlace.phone && (
-                <Wrapper>
-                  <PhoneIcon />
-                  {selectedPlace.phone}
-                </Wrapper>
-              )}
+                {selectedPlace.phone && (
+                  <Wrapper>
+                    <PhoneIcon />
+                    {selectedPlace.phone}
+                  </Wrapper>
+                )}
 
-              {selectedPlace.website && (
-                <Wrapper>
-                  <WebsiteIcon />
-                  <a href={selectedPlace.website} target="_blank" rel="noopener noreferrer">
-                    {selectedPlace.website}
-                  </a>
-                </Wrapper>
-              )}
-            </PlaceInfoModal>
-          )}
-        </MapContainer>
-        {isModalOpen && (
-          <TripModal onClose={closeModal} isEditing={true} initialData={tripData} onSubmit={handleUpdateTrip} />
-        )}
-      </Container>
+                {selectedPlace.website && (
+                  <Wrapper>
+                    <WebsiteIcon />
+                    <a href={selectedPlace.website} target="_blank" rel="noopener noreferrer">
+                      {selectedPlace.website}
+                    </a>
+                  </Wrapper>
+                )}
+              </PlaceInfoModal>
+            )}
+          </>
+        }
+      />
+      {isModalOpen && (
+        <TripModal onClose={closeModal} isEditing={true} initialData={tripData} onSubmit={handleUpdateTrip} />
+      )}
     </>
   );
 };
 
+{
+  /* <Container>
+        <MapToggle onClick={toggleMapListView} isMapVisible={isMapVisible} />
+        <ListContainer isMapVisible={isMapVisible}>
+          <ListHeader>
+      
+          </ListHeader>
+     
+        </ListContainer>
+        <MapContainer isMapVisible={isMapVisible}>
+
+        </MapContainer> 
+   
+      </Container>*/
+}
 export default TripPage;
-
-const ToggleButton = styled.button`
-  position: absolute;
-  bottom: 20px;
-  padding: 10px 20px;
-  background-color: #212529;
-  color: white;
-  border: none;
-  border-radius: 20px;
-  cursor: pointer;
-  z-index: 3;
-  font-weight: 600;
-  font-size: 14px;
-
-  left: 50%;
-  transform: translateX(-50%);
-  @media (min-width: 769px) {
-    display: none;
-  }
-`;
-
-const Container = styled.div`
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-  }
-`;
-
-const ListHeader = styled.div`
-  display: flex;
-  align-items: center;
-  position: fixed !important;
-  top: 0;
-  left: 0;
-  border-bottom: 1px solid #e9ecef;
-  height: 54px;
-  width: 45%;
-  background-color: white;
-  padding: 5px 20px;
-  z-index: 2;
-
-  @media (max-width: 768px) {
-    width: 100%;
-  }
-`;
-
-const HomeIcon = styled(IoArrowBackCircleOutline)`
-  cursor: pointer;
-  font-size: 30px;
-`;
 
 const TripName = styled.h1`
   margin: 10px 20px;
@@ -479,6 +443,11 @@ const TripDate = styled.div`
   cursor: pointer;
 `;
 
+const HomeIcon = styled(IoArrowBackCircleOutline)`
+  cursor: pointer;
+  font-size: 30px;
+`;
+
 const CalendarIcon = styled(FaRegCalendarDays)`
   font-size: 15px;
   margin-right: 8px;
@@ -493,29 +462,6 @@ const EditIcon = styled(RiEdit2Fill)`
   cursor: pointer;
   &:hover {
     color: #495057;
-  }
-`;
-
-const ListContainer = styled.div<{ isMapVisible: boolean }>`
-  width: 45%;
-  overflow-y: auto;
-  box-shadow: 2px 0px 5px rgba(0, 0, 0, 0.1);
-
-  @media (max-width: 768px) {
-    width: 100%;
-    display: ${(props) => (props.isMapVisible ? 'none' : 'block')};
-  }
-`;
-
-const MapContainer = styled.div<{ isMapVisible: boolean }>`
-  width: 55%;
-  height: 100vh;
-  position: sticky;
-  top: 0;
-
-  @media (max-width: 768px) {
-    width: 100%;
-    display: ${(props) => (props.isMapVisible ? 'block' : 'none')};
   }
 `;
 

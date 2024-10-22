@@ -2,7 +2,6 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { BsFilterLeft } from 'react-icons/bs';
-// import { useState } from 'react';
 import Select, { components } from 'react-select';
 import styled from 'styled-components';
 
@@ -22,7 +21,6 @@ const StyledSelect = styled(Select<Country>)`
     box-shadow: none;
     text-align: start;
     &:hover {
-      /* border-color: #94c3d2; */
       border: 2px solid rgba(63, 82, 227, 0.25);
     }
   }

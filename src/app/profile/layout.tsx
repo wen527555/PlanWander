@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import styled from 'styled-components';
 
 import Sidebar from './components/Sidebar';
@@ -9,6 +10,10 @@ const ProfileLayout = ({ children }: { children: React.ReactNode }) => {
     { name: 'Trips', path: '/profile/trips' },
     { name: 'Articles', path: '/profile/articles' },
   ];
+  const pathname = usePathname();
+  if (pathname.startsWith('/profile/trips/') && pathname.split('/').length > 4) {
+    return <>{children}</>;
+  }
 
   return (
     <Container>

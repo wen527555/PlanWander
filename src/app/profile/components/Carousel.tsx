@@ -1,38 +1,16 @@
-// import { useState } from 'react';
 'use client';
 
-import { useRef, useState } from 'react';
 import styled from 'styled-components';
 
 interface CarouselProp<T> {
   item: T[];
   renderItem: (item: T) => React.ReactNode;
-  currentIndex: number;
-  onChange: (index: number) => void;
 }
 
-const Carousel = <T,>({ item, renderItem, currentIndex, onChange }: CarouselProp<T>): React.ReactElement => {
-  const [startX, setStartX] = useState(0);
-  const carouselRef = useRef<HTMLDivElement>(null);
-
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setStartX(e.touches[0].clientX);
-  };
-
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    const endX = e.changedTouches[0].clientX;
-    const diffX = startX - endX;
-
-    if (diffX > 30 && currentIndex < item.length - 1) {
-      onChange(currentIndex + 1);
-    } else if (diffX < -30 && currentIndex > 0) {
-      onChange(currentIndex - 1);
-    }
-  };
-
+const Carousel = <T,>({ item, renderItem }: CarouselProp<T>): React.ReactElement => {
   return (
     <>
-      <CarouselContainer ref={carouselRef} onTouchStart={handleTouchStart} onTouchEnd={handleTouchEnd}>
+      <CarouselContainer>
         {item.map((item, index) => (
           <CarouselItem key={index}>{renderItem(item)}</CarouselItem>
         ))}
@@ -46,11 +24,9 @@ const CarouselContainer = styled.div`
   position: relative;
   display: flex;
   overflow-x: auto;
-  /* gap: 16px; */
-  /* padding: 20px 30px; */
   max-width: 1000px;
   scroll-behavior: smooth;
-  /* scroll-snap-type: x mandatory; */
+  scroll-snap-type: x mandatory;
 
   &::-webkit-scrollbar {
     display: none;
@@ -58,7 +34,7 @@ const CarouselContainer = styled.div`
 `;
 
 const CarouselItem = styled.div`
-  /* scroll-snap-align: start; */
+  scroll-snap-align: start;
   border-radius: 10px;
   position: relative;
   flex-shrink: 0;

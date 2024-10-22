@@ -23,11 +23,11 @@ interface Article {
   countries?: { name: string; code: string }[];
 }
 
-interface ArticleListProps {
+interface ArticleBlogProps {
   initialArticles: Article[];
 }
 
-export default function ArticleList({ initialArticles }: ArticleListProps) {
+export default function ArticleBlog({ initialArticles }: ArticleBlogProps) {
   const [articles, setArticles] = useState(initialArticles);
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -54,7 +54,7 @@ export default function ArticleList({ initialArticles }: ArticleListProps) {
 
   const handleArticleClick = (articleId: string) => {
     startTransition(() => {
-      router.push(`articles/${articleId}/view`);
+      router.push(`article/${articleId}`);
     });
   };
 
@@ -148,7 +148,6 @@ const LatestPostsTitle = styled.h3`
   font-size: 16px;
   font-weight: bold;
   margin: 20px 0px;
-  /* text-transform: uppercase; */
 
   @media (max-width: 945px) {
     display: none;

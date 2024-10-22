@@ -34,7 +34,7 @@ const ArticlesContainer = () => {
   const openConfirmModal = useConfirmModalStore((state) => state.openModal);
   const handleArticleClick = (articleId: string) => {
     startTransition(() => {
-      router.push(`articles/${articleId}`);
+      router.push(`/article/${articleId}/edit`);
     });
   };
   const handleArticleOptionClick = (ArticleId: string) => {
@@ -148,7 +148,6 @@ const CardWrapper = styled.div`
   border-radius: 15px;
   overflow: hidden;
   margin-bottom: 20px;
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
 
   &:hover {
     opacity: 1;

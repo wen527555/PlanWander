@@ -37,14 +37,17 @@ const TripsContainer = () => {
     queryFn: fetchUserTrips,
   });
   const today = dayjs();
+  const router = useRouter();
+  const queryClient = useQueryClient();
   const [isPending, startTransition] = useTransition();
   const [openMenuTripId, setOpenTripId] = useState<string | null>(null);
+  const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
+  const openConfirmModal = useConfirmModalStore((state) => state.openModal);
   const sortTrips = trips?.sort((a: Trip, b: Trip) => {
     const diffA = Math.abs(dayjs(a.startDate).diff(today));
     const diffB = Math.abs(dayjs(b.startDate).diff(today));
     return diffA - diffB;
   });
-  const openConfirmModal = useConfirmModalStore((state) => state.openModal);
   const upcomingTrips = sortTrips?.filter((trip: Trip) => dayjs(trip.startDate).isAfter(today));
   const pastTrips = sortTrips?.filter((trip: Trip) => dayjs(trip.endDate).isBefore(today));
   const pastTripsByYear = pastTrips.reduce((acc: { [key: string]: Trip[] }, trip: Trip) => {
@@ -53,18 +56,12 @@ const TripsContainer = () => {
     acc[year].push(trip);
     return acc;
   }, {});
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const router = useRouter();
 
   const daysUntilNextTrip = (tripDate: string | Date) => {
-    const today = dayjs();
     const tripStartDate = dayjs(tripDate);
     return tripStartDate.diff(today, 'day');
   };
-  const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
-  const handleSlideChange = (newIndex: number) => {
-    setCurrentIndex(newIndex);
-  };
+
   const handlePublishClick = async (tripId: string) => {
     try {
       await createArticleFromTrip(tripId);
@@ -92,17 +89,16 @@ const TripsContainer = () => {
   ) => {
     const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
     startTransition(() => {
-      router.push(`/trips/${tripId}`);
+      router.push(`/trip/${tripId}`);
     });
   };
 
   const handleTripClick = (tripId: string) => {
     startTransition(() => {
-      router.push(`trips/${tripId}`);
+      router.push(`/trip/${tripId}`);
     });
   };
 
-  const queryClient = useQueryClient();
   const deleteTripMutation = useMutation({
     mutationFn: fetchDeleteTrip,
     onSuccess: () => {
@@ -139,8 +135,6 @@ const TripsContainer = () => {
             <CarouselWrapper>
               <Carousel<Trip>
                 item={upcomingTrips}
-                currentIndex={currentIndex}
-                onChange={handleSlideChange}
                 renderItem={(trip) => {
                   const formattedStartDate = dayjs(trip.startDate).format('DD MMM YYYY');
                   const formattedEndDate = dayjs(trip.endDate).format('DD MMM YYYY');
@@ -171,7 +165,6 @@ const TripsContainer = () => {
                           </CountdownWrapper>
                           <TripImg src={trip.imageUrl} />
                         </ImageContainer>
-                        {/* <TripImg src={trip.imageUrl} /> */}
                         <CardDetails>
                           <TripName>{trip.tripTitle}</TripName>
                           <TripDate>
@@ -298,12 +291,6 @@ const UpcomingTripsInfo = styled.div`
   margin-bottom: 10px;
 `;
 
-// const TripsCount = styled.div`
-//   font-size: 20px;
-//   font-weight: bold;
-//   color: #6c757d;
-// `;
-
 const NextTripInfo = styled.div`
   background-color: #78b7cc;
   color: white;
@@ -367,7 +354,6 @@ const CardWrapper = styled.div`
   cursor: pointer;
   border-radius: 15px;
   overflow: hidden;
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
 `;
 
 const CardDetails = styled.div`

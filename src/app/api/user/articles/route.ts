@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -20,10 +21,15 @@ export async function GET() {
     const articleRef = db.collection('articles').where('uid', '==', uid);
     const articlesSnapShot = await articleRef.get();
 
-    const articles = articlesSnapShot.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
+    const articles = articlesSnapShot.docs.map((doc) => {
+      const data = doc.data();
+      console.log('data', data);
+      return {
+        id: doc.id,
+        ...doc.data(),
+        createdAt: data.createdAt ? dayjs(data.createdAt.toDate()).format('YYYY-MM-DD') : null,
+      };
+    });
 
     return NextResponse.json(articles);
   } catch (error) {

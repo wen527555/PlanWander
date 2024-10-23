@@ -1,3 +1,5 @@
+import { auth } from '@/lib/firebaseConfig';
+
 export const fetchGeneralLogin = async (idToken: string) => {
   const response = await fetch('/api/auth/login', {
     method: 'POST',
@@ -87,8 +89,33 @@ export const fetchUserData = async () => {
     if (response.ok) {
       const data = await response.json();
       return data.userData;
+    } else {
+      console.error('Failed to fetch user data');
+      return null;
     }
   } catch (error) {
     console.error('Failed to verifyToken', error);
+  }
+};
+
+export const refreshAuthToken = async (): Promise<void> => {
+  const user = auth.currentUser;
+  if (user) {
+    try {
+      const idToken: string = await user.getIdToken(true);
+      const response = await fetch('/api/auth/updateToken', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken }),
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update token');
+      }
+    } catch (error) {
+      console.error('Failed to refresh token', error);
+    }
+  } else {
+    console.error('No user is logged in');
   }
 };

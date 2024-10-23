@@ -1,6 +1,6 @@
 import React from 'react';
 
-import BaseMap from '@/components/BaseMap';
+import BaseMap from '@/components/CommonMap';
 
 interface Place {
   id: string;

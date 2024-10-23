@@ -6,7 +6,7 @@ import { useEffect, useRef, useState, useTransition } from 'react';
 import { FaMapMarker, FaPencilAlt } from 'react-icons/fa';
 import styled from 'styled-components';
 
-import { HomeIcon, ListHeader } from '@/components/ListWithMap/Header';
+import { HomeIcon, ListHeader } from '@/app/styles/commonStyles';
 import LoadingAnimation from '@/components/Loading';
 import { getColorForDate } from '@/lib/colors';
 import { saveArticle, saveImageToStorage } from '@/lib/firebaseApi';

@@ -6,7 +6,7 @@ import { FaMapMarker } from 'react-icons/fa';
 import { MdOutlineLibraryBooks } from 'react-icons/md';
 import styled from 'styled-components';
 
-import { HomeIcon, ListHeader } from '@/components/ListWithMap/Header';
+import { HomeIcon, ListHeader } from '@/app/styles/commonStyles';
 import LoadingAnimation from '@/components/Loading';
 import { getColorForDate } from '@/lib/colors';
 import defaultCoverImg from '@/public/travel.jpg';

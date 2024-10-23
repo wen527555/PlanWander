@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import styled from 'styled-components';
 
-import ListMapLayout from '@/components/ListWithMap/Layout';
+import ListMapLayout from '@/components/ListWithMapLayout';
 import LoadingAnimation from '@/components/Loading';
 import { fetchArticleData } from '@/lib/firebaseApi';
 import { processDays } from '@/lib/processDays';

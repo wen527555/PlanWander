@@ -10,9 +10,9 @@ import { FaClock, FaMapPin, FaRegCalendarDays } from 'react-icons/fa6';
 import { RiEdit2Fill } from 'react-icons/ri';
 import styled from 'styled-components';
 
-import ConfirmModal from '@/components/confirmModal';
-import { HomeIcon } from '@/components/ListWithMap/Header';
-import ListMapLayout from '@/components/ListWithMap/Layout';
+import { HomeIcon } from '@/app/styles/commonStyles';
+import ConfirmModal from '@/components/ConfirmModal';
+import ListMapLayout from '@/components/ListWithMapLayout';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import {
@@ -103,7 +103,6 @@ const TripPage: React.FC = () => {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const { isModalOpen, openModal, closeModal } = useModalStore();
   const [isPending, startTransition] = useTransition();
-  // const { isMapVisible, toggleMapListView } = useToggleMapView();
   const { data: tripData, isLoading } = useQuery({
     queryKey: ['tripData', tripId],
     queryFn: () => fetchTripData(tripId as string),
@@ -408,21 +407,6 @@ const TripPage: React.FC = () => {
   );
 };
 
-{
-  /* <Container>
-        <MapToggle onClick={toggleMapListView} isMapVisible={isMapVisible} />
-        <ListContainer isMapVisible={isMapVisible}>
-          <ListHeader>
-      
-          </ListHeader>
-     
-        </ListContainer>
-        <MapContainer isMapVisible={isMapVisible}>
-
-        </MapContainer> 
-   
-      </Container>*/
-}
 export default TripPage;
 
 const TripName = styled.h1`

@@ -1,4 +1,4 @@
-import BaseMap from '@/components/BaseMap';
+import BaseMap from '@/components/CommonMap';
 import { usePlaceStore } from '@/lib/store';
 
 interface Place {

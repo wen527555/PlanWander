@@ -77,7 +77,6 @@ export const createNewTrip = async (
     if (!userId) {
       throw new Error('No authenticated user found');
     }
-
     if (!startDate || !endDate || !tripTitle || !userId || selectedCountries.length === 0) {
       throw new Error('Missing required trip data');
     }

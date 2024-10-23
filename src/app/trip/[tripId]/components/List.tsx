@@ -1,7 +1,7 @@
 'use client';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-import { Libraries, LoadScript } from '@react-google-maps/api';
+// import { Libraries, LoadScript } from '@react-google-maps/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -10,6 +10,8 @@ import { FaGripVertical, FaMapMarker } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import { VscTrash } from 'react-icons/vsc';
 import styled from 'styled-components';
+
+// import { useGoogleApiStore } from '@/lib/store';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -20,7 +22,7 @@ import LocationSearch from './LocationSearch';
 import TimePicker from './TimePicker';
 import TransportModeSelector from './TransportSelector';
 
-const libraries: Libraries = ['places'];
+// const libraries: Libraries = ['places'];
 interface Place {
   id: string;
   name: string;
@@ -63,6 +65,7 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
     days.reduce((acc, day) => ({ ...acc, [day.date]: true }), {})
   );
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
+  // const { isGoogleApiLoaded, setGoogleApiLoaded } = useGoogleApiStore();
   const handleToggleOpen = (date: string) => {
     setOpenDays((prev) => ({ ...prev, [date]: !prev[date] }));
   };
@@ -154,147 +157,155 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
     updateDepartureTimeMutation.mutate({ tripId, dayId, newDate: formattedTime });
   };
 
+  // useEffect(() => {
+  //   if (!isGoogleApiLoaded) {
+  //     setGoogleApiLoaded(true);
+  //   }
+  // }, [isGoogleApiLoaded]);
+
+  // if (!isGoogleApiLoaded) {
+  //   return (
+  //     <LoadScript
+  //       googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!}
+  //       libraries={libraries}
+  //       onLoad={() => setGoogleApiLoaded(true)}
+  //     ></LoadScript>
+  //   );
+  // }
+
   return (
-    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
-      <ListContainer>
-        <DragDropContext onDragEnd={onDragEnd}>
-          {days.map((day, dateIndex) => {
-            let lastPlaceEndTime: dayjs.Dayjs | null = null;
-            return (
-              <Droppable droppableId={`${day.date}`} key={`${day.date}-${dateIndex}`}>
-                {(provided) => (
-                  <ItemContainer ref={provided.innerRef} {...provided.droppableProps}>
-                    <ItemHeader onClick={() => handleToggleOpen(day.date)}>
-                      {openDays[day.date] ? <IoIosArrowDown /> : <IoIosArrowForward />}
-                      <ItemDate>
-                        {new Date(day.date).toLocaleDateString('en-US', {
-                          weekday: 'long',
-                          month: 'long',
-                          day: 'numeric',
-                        })}
-                      </ItemDate>
-                    </ItemHeader>
-                    {openDays[day.date] && (
-                      <>
-                        <ItemContent>
-                          <DepartureWrapper>
-                            <DepartureTitle>Departure Time:</DepartureTitle>
-                            <DepartureTime>
-                              <Flatpickr
-                                id="departure-time-picker"
-                                value={
-                                  day.departureTime && !isNaN(new Date(day.departureTime).getTime())
-                                    ? dayjs(day.departureTime).toDate()
-                                    : dayjs().hour(8).minute(0).toDate()
-                                }
-                                options={{
-                                  enableTime: true,
-                                  noCalendar: true,
-                                  dateFormat: 'H:i',
-                                  time_24hr: true,
-                                  allowInput: true,
-                                }}
-                                onChange={([selectedTime]: Date[]) => handleUpdateDepartureTime(day.date, selectedTime)}
-                              />
-                            </DepartureTime>
-                          </DepartureWrapper>
-                          {day.places?.map((place, index) => {
-                            let currentPlaceStartTime: dayjs.Dayjs | null = null;
-                            let currentPlaceEndTime: dayjs.Dayjs | null = null;
-                            const stayDuration = place.stayDuration || 3600;
-                            if (index === 0) {
-                              currentPlaceStartTime = day.departureTime
-                                ? dayjs(day.departureTime)
-                                : dayjs().hour(8).minute(0);
-                            } else {
-                              const travelDuration = day.places[index]?.route?.duration || 0;
-                              currentPlaceStartTime = lastPlaceEndTime
-                                ? lastPlaceEndTime.add(travelDuration, 'second')
-                                : dayjs();
-                            }
-                            currentPlaceEndTime = currentPlaceStartTime.add(stayDuration, 'second');
-                            lastPlaceEndTime = currentPlaceEndTime;
-                            return (
-                              <Draggable
-                                key={`${place.id}-${index}`}
-                                draggableId={`${place.id}-${index}`}
-                                index={index}
-                              >
-                                {(provided) => (
-                                  <div
-                                    ref={provided.innerRef}
-                                    {...provided.draggableProps}
-                                    {...provided.dragHandleProps}
-                                  >
-                                    {index > 0 && day.places[index]?.route && (
-                                      <RouteInfo>
-                                        <TransportModeSelector
-                                          onModeUpdate={onModeUpdate}
-                                          start={{ lat: day.places[index - 1].lat, lng: day.places[index - 1].lng }}
-                                          end={{ lat: place.lat, lng: place.lng }}
-                                          dayId={day.date}
-                                          placeId={place.id}
-                                          route={day.places[index].route}
-                                        />
-                                      </RouteInfo>
-                                    )}
-                                    <PlaceContainer onClick={() => handlePlaceClick(place)}>
-                                      <MarkerContainer>
-                                        <MarkerIcon color={getColorForDate(dateIndex)} />
-                                        <MarkerNumber>{index + 1}</MarkerNumber>
-                                      </MarkerContainer>
-                                      <BlockWrapper isActive={selectedPlace?.id === place.id}>
-                                        <PlaceBlock>
-                                          <PlaceName>{place.name}</PlaceName>
-                                        </PlaceBlock>
-                                        <PlaceBlock>
-                                          <TimeDisplayCard
-                                            onClick={(e) => {
-                                              e.stopPropagation();
-                                              handleTimeCardClick(place.id);
-                                            }}
-                                          >
-                                            <TimeLabel>
-                                              {`${currentPlaceStartTime.format('HH:mm')} - ${currentPlaceEndTime.format('HH:mm')}`}
-                                            </TimeLabel>
-                                          </TimeDisplayCard>
-                                          {openTimePick === place.id && (
-                                            <TimePicker
-                                              place={place}
-                                              dayId={day.date}
-                                              initialStayDuration={place.stayDuration || 3600}
-                                              onSave={handleSaveTimePicker}
-                                              onClose={handleCloseTimePicker}
-                                            />
-                                          )}
-                                        </PlaceBlock>
-                                      </BlockWrapper>
-                                      <DragIcon />
-                                      <DeleteIcon
-                                        onClick={(e) => {
-                                          e.stopPropagation();
-                                          onPlaceDelete(day.date, place.id);
-                                        }}
+    // <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
+    <ListContainer>
+      <DragDropContext onDragEnd={onDragEnd}>
+        {days.map((day, dateIndex) => {
+          let lastPlaceEndTime: dayjs.Dayjs | null = null;
+          return (
+            <Droppable droppableId={`${day.date}`} key={`${day.date}-${dateIndex}`}>
+              {(provided) => (
+                <ItemContainer ref={provided.innerRef} {...provided.droppableProps}>
+                  <ItemHeader onClick={() => handleToggleOpen(day.date)}>
+                    {openDays[day.date] ? <IoIosArrowDown /> : <IoIosArrowForward />}
+                    <ItemDate>
+                      {new Date(day.date).toLocaleDateString('en-US', {
+                        weekday: 'long',
+                        month: 'long',
+                        day: 'numeric',
+                      })}
+                    </ItemDate>
+                  </ItemHeader>
+                  {openDays[day.date] && (
+                    <>
+                      <ItemContent>
+                        <DepartureWrapper>
+                          <DepartureTitle>Departure Time:</DepartureTitle>
+                          <DepartureTime>
+                            <Flatpickr
+                              id="departure-time-picker"
+                              value={
+                                day.departureTime && !isNaN(new Date(day.departureTime).getTime())
+                                  ? dayjs(day.departureTime).toDate()
+                                  : dayjs().hour(8).minute(0).toDate()
+                              }
+                              options={{
+                                enableTime: true,
+                                noCalendar: true,
+                                dateFormat: 'H:i',
+                                time_24hr: true,
+                                allowInput: true,
+                              }}
+                              onChange={([selectedTime]: Date[]) => handleUpdateDepartureTime(day.date, selectedTime)}
+                            />
+                          </DepartureTime>
+                        </DepartureWrapper>
+                        {day.places?.map((place, index) => {
+                          let currentPlaceStartTime: dayjs.Dayjs | null = null;
+                          let currentPlaceEndTime: dayjs.Dayjs | null = null;
+                          const stayDuration = place.stayDuration || 3600;
+                          if (index === 0) {
+                            currentPlaceStartTime = day.departureTime
+                              ? dayjs(day.departureTime)
+                              : dayjs().hour(8).minute(0);
+                          } else {
+                            const travelDuration = day.places[index]?.route?.duration || 0;
+                            currentPlaceStartTime = lastPlaceEndTime
+                              ? lastPlaceEndTime.add(travelDuration, 'second')
+                              : dayjs();
+                          }
+                          currentPlaceEndTime = currentPlaceStartTime.add(stayDuration, 'second');
+                          lastPlaceEndTime = currentPlaceEndTime;
+                          return (
+                            <Draggable key={`${place.id}-${index}`} draggableId={`${place.id}-${index}`} index={index}>
+                              {(provided) => (
+                                <div ref={provided.innerRef} {...provided.draggableProps} {...provided.dragHandleProps}>
+                                  {index > 0 && day.places[index]?.route && (
+                                    <RouteInfo>
+                                      <TransportModeSelector
+                                        onModeUpdate={onModeUpdate}
+                                        start={{ lat: day.places[index - 1].lat, lng: day.places[index - 1].lng }}
+                                        end={{ lat: place.lat, lng: place.lng }}
+                                        dayId={day.date}
+                                        placeId={place.id}
+                                        route={day.places[index].route}
                                       />
-                                    </PlaceContainer>
-                                  </div>
-                                )}
-                              </Draggable>
-                            );
-                          })}
-                          {provided.placeholder}
-                        </ItemContent>
-                        <LocationSearch onPlaceAdded={onPlaceAdded} dayId={day.date} />
-                      </>
-                    )}
-                  </ItemContainer>
-                )}
-              </Droppable>
-            );
-          })}
-        </DragDropContext>
-      </ListContainer>
-    </LoadScript>
+                                    </RouteInfo>
+                                  )}
+                                  <PlaceContainer onClick={() => handlePlaceClick(place)}>
+                                    <MarkerContainer>
+                                      <MarkerIcon color={getColorForDate(dateIndex)} />
+                                      <MarkerNumber>{index + 1}</MarkerNumber>
+                                    </MarkerContainer>
+                                    <BlockWrapper isActive={selectedPlace?.id === place.id}>
+                                      <PlaceBlock>
+                                        <PlaceName>{place.name}</PlaceName>
+                                      </PlaceBlock>
+                                      <PlaceBlock>
+                                        <TimeDisplayCard
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleTimeCardClick(place.id);
+                                          }}
+                                        >
+                                          <TimeLabel>
+                                            {`${currentPlaceStartTime.format('HH:mm')} - ${currentPlaceEndTime.format('HH:mm')}`}
+                                          </TimeLabel>
+                                        </TimeDisplayCard>
+                                        {openTimePick === place.id && (
+                                          <TimePicker
+                                            place={place}
+                                            dayId={day.date}
+                                            initialStayDuration={place.stayDuration || 3600}
+                                            onSave={handleSaveTimePicker}
+                                            onClose={handleCloseTimePicker}
+                                          />
+                                        )}
+                                      </PlaceBlock>
+                                    </BlockWrapper>
+                                    <DragIcon />
+                                    <DeleteIcon
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        onPlaceDelete(day.date, place.id);
+                                      }}
+                                    />
+                                  </PlaceContainer>
+                                </div>
+                              )}
+                            </Draggable>
+                          );
+                        })}
+                        {provided.placeholder}
+                      </ItemContent>
+                      <LocationSearch onPlaceAdded={onPlaceAdded} dayId={day.date} />
+                    </>
+                  )}
+                </ItemContainer>
+              )}
+            </Droppable>
+          );
+        })}
+      </DragDropContext>
+    </ListContainer>
+    // </LoadScript>
   );
 };
 

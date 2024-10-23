@@ -295,7 +295,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
 export default EditList;
 
 const Container = styled.div`
-  margin: 10px;
+  margin: 10px 20px;
   padding-bottom: 10px;
 `;
 

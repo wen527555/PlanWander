@@ -65,9 +65,10 @@ export const ListHeader = styled.div`
   height: 54px;
   width: 50%;
   background-color: white;
-  padding: 5px 20px;
-  z-index: 2;
+  padding: 5px 40px 5px 20px;
 
+  z-index: 2;
+  justify-content: space-between;
   @media (max-width: 768px) {
     width: 100%;
   }

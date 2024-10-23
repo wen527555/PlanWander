@@ -11,7 +11,6 @@ import { RiEdit2Fill } from 'react-icons/ri';
 import styled from 'styled-components';
 
 import { HomeIcon } from '@/app/styles/commonStyles';
-import ConfirmModal from '@/components/ConfirmModal';
 import ListMapLayout from '@/components/ListWithMapLayout';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
@@ -29,6 +28,7 @@ import useAlert from '@/lib/hooks/useAlertMessage';
 import { getRoute } from '@/lib/mapApi';
 import { processDays } from '@/lib/processDays';
 import { useConfirmModalStore, useModalStore, usePlaceStore } from '@/lib/store';
+import ConfirmModal from '../../../components/ConfirmModal';
 import List from './components/List';
 
 interface Place {

@@ -10,12 +10,12 @@ import { PiClockCountdown } from 'react-icons/pi';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
-import ConfirmModal from '@/components/ConfirmModal';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
 import { createArticleFromTrip, createNewTrip, fetchDeleteTrip } from '@/lib/firebaseApi';
 import { useConfirmModalStore, useModalStore } from '@/lib/store';
 import { fetchUserTrips } from '@/services/api';
+import ConfirmModal from '../../../components/ConfirmModal';
 import Carousel from '../components/Carousel';
 
 interface Trip {

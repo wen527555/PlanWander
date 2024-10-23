@@ -1,20 +1,18 @@
 'use client';
 
 import Image from 'next/image';
-// import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useState, useTransition } from 'react';
 import { RiCompassDiscoverLine } from 'react-icons/ri';
 import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
-// import Loading from '@/app/loading';
 import TripModal from '@/components/TripModal';
-import { createNewTrip, fetchUserData } from '@/lib/firebaseApi';
+import { createNewTrip } from '@/lib/firebaseApi';
+import { auth } from '@/lib/firebaseConfig';
 import { useModalStore, useUserStore } from '@/lib/store';
-// import { BsPersonCircle } from 'react-icons/bs';
 import Logo from '@/public/PlanwanderLogo.png';
-import { auth, onAuthStateChanged } from '../../lib/firebaseConfig';
+import { fetchUserData, refreshAuthToken } from '@/services/api';
 import LoginModal from '../LoginModal';
 
 interface SelectedOption {
@@ -24,28 +22,37 @@ interface SelectedOption {
 
 const Header = () => {
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
-  const { userData } = useUserStore();
+  const { userData, setUserData } = useUserStore();
+
   const router = useRouter();
   const pathname = usePathname();
   const isProfileActive = pathname === '/profile';
   const isDiscoverActive = pathname === '/discover';
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(false);
+
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const unsubscribe = auth.onIdTokenChanged(async (user) => {
       if (user) {
-        fetchUserData();
+        try {
+          await refreshAuthToken();
+          const userData = await fetchUserData();
+          if (userData) {
+            setUserData(userData);
+          }
+        } catch (error) {
+          console.error('Error refreshing token or loading user data:', error);
+        }
       } else {
-        router.push('/');
+        setUserData(null);
       }
     });
-
     return () => unsubscribe();
-  }, [router]);
+  }, [setUserData]);
 
   const handleToProfile = () => {
     startTransition(() => {
-      router.push('/profile');
+      router.push('/profile/trips');
     });
   };
 
@@ -130,16 +137,11 @@ export default Header;
 const LogoLink = styled.a`
   cursor: pointer;
   display: inline-block;
-
-  /* @media (max-width: 768px) {
-    display: none;
-  } */
 `;
 
 const Container = styled.div`
   width: 100%;
   height: 60px;
-  /* border-bottom: 1px solid #e9ecef; */
   border-bottom: 1px solid #dde9ed;
   display: flex;
   justify-content: space-between;
@@ -220,11 +222,8 @@ const ProfileWrapper = styled.div<{ isActive: boolean }>`
 `;
 
 const IconText = styled.span`
-  /* font-size: 16px;
-  color: #fdfeff; */
   font-size: 14px;
   font-weight: 600;
-  /* color: #0f3e4a; */
   color: #658c96;
   cursor: pointer;
   transition: 0.2s;

@@ -45,6 +45,11 @@ interface ModalConfirmStore {
   closeModal: () => void;
 }
 
+interface GoogleApiStore {
+  isGoogleApiLoaded: boolean;
+  setGoogleApiLoaded: (loaded: boolean) => void;
+}
+
 export const usePlaceStore = create<PlaceStore>((set) => ({
   selectedPlace: null,
   placeDetail: null,
@@ -71,4 +76,9 @@ export const useConfirmModalStore = create<ModalConfirmStore>((set) => ({
 
   openModal: (message: string, onConfirm: () => void) => set({ isModalOpen: true, message, onConfirm }),
   closeModal: () => set({ isModalOpen: false, message: '', onConfirm: () => {} }),
+}));
+
+export const useGoogleApiStore = create<GoogleApiStore>((set) => ({
+  isGoogleApiLoaded: false,
+  setGoogleApiLoaded: (loaded) => set({ isGoogleApiLoaded: loaded }),
 }));

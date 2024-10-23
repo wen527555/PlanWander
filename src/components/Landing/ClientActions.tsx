@@ -11,7 +11,7 @@ const ClientActions = () => {
   const router = useRouter();
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
   const handleToProfile = () => {
-    router.push('/profile');
+    router.push('/profile/trips');
   };
 
   return (

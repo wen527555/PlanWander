@@ -1,15 +1,20 @@
+const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const nextConfig = {
   reactStrictMode: true,
   compiler: {
     styledComponents: true,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/here/:path*',
-        destination: 'https://places.ls.hereapi.com/:path*',
-      },
-    ];
+  webpack: (config) => {
+    config.experiments = {
+      ...config.experiments,
+      asyncWebAssembly: true,
+    };
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      stream: require.resolve('stream-browserify'),
+    };
+    config.plugins.push(new NodePolyfillPlugin());
+    return config;
   },
 };
 

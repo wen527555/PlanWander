@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query';
 import { addDays } from 'date-fns';
-// import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { RangeKeyDict } from 'react-date-range';
 import Select from 'react-select';
 import styled from 'styled-components';
 
-import { Button, ButtonWrapper, CloseBtn, CloseBtnWrapper, Modal, Overlay } from '@/app/styles/commonStyles';
+import { Button, ButtonWrapper, CloseBtn, CloseBtnWrapper } from '@/app/styles/commonStyles';
+import Overlay from '@/components/Overlay';
 import DateRangePicker from '@/components/TripModal/DateRangePicker';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { fetchCountries } from '@/lib/mapApi';
@@ -87,9 +87,7 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
     }
     try {
       await onSubmit(tripTitle, startDate, endDate, selectedCountries);
-
       addAlert('Creation successful');
-
       onClose();
     } catch (error) {
       console.error('Error', error);
@@ -103,7 +101,7 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
 
   return (
     <Overlay>
-      <Modal>
+      <ModalContainer>
         <CloseBtnWrapper onClick={onClose}>
           <CloseBtn />
         </CloseBtnWrapper>
@@ -132,13 +130,21 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
         <ButtonWrapper>
           <Button onClick={handleSubmit}>{isEditing ? 'Update Settings' : 'Start Planning'}</Button>
         </ButtonWrapper>
-      </Modal>
+      </ModalContainer>
       <AlertMessage />
     </Overlay>
   );
 };
 
 export default TripModal;
+
+const ModalContainer = styled.div`
+  background-color: white;
+  padding: 50px 48px 40px 48px;
+  border-radius: 25px;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+`;
 
 const Title = styled.h2`
   font-size: 16px;

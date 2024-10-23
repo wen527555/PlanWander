@@ -133,7 +133,10 @@ const BaseMap: React.FC<MapProps> = ({ places = [], routes = [], onMarkerClick, 
               latitude={place.lat}
               onClick={() => onMarkerClick(isArticle ? place.id : place)}
             >
-              <MarkerWrapper color={place.color} isActive={selectedPlace?.id === place.id}>
+              <MarkerWrapper
+                color={place.color}
+                isActive={isArticle ? selectedPlace === place.id : selectedPlace?.id === place.id}
+              >
                 {place.number}
               </MarkerWrapper>
             </Marker>

@@ -66,7 +66,7 @@ const TripsContainer = () => {
     try {
       await createArticleFromTrip(tripId);
       startTransition(() => {
-        router.push(`/articles/${tripId}`);
+        router.push(`/article/${tripId}/edit`);
       });
     } catch (error) {
       console.error('Error publishing article:', error);

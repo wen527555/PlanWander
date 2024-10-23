@@ -20,14 +20,15 @@ interface Route {
   coordinates: [number, number][];
 }
 
-interface MapComponentProps {
+interface MapProps {
   places: Place[];
   routes: Route[];
-  visiblePlace: string | null;
-  onMarkerClick: (place: string) => void;
+  onMarkerClick: (place: any) => void;
+  selectedPlace?: any | null;
+  isArticle: boolean;
 }
 
-const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], visiblePlace, onMarkerClick }) => {
+const BaseMap: React.FC<MapProps> = ({ places = [], routes = [], onMarkerClick, selectedPlace, isArticle }) => {
   const mapRef = useRef<any>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const [viewState, setViewState] = useState({
@@ -72,13 +73,32 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
     }
   }, [places, isMapLoaded]);
 
-  const handleViewStateChange = (evt: ViewStateChangeEvent) => {
-    setViewState(evt.viewState);
-  };
+  useEffect(() => {
+    if (!isArticle && mapRef.current && isMapLoaded && places.length > 0 && !selectedPlace) {
+      const bounds = new LngLatBounds();
+      places.forEach((place) => bounds.extend([place.lng, place.lat]));
+      mapRef.current.fitBounds(bounds, {
+        padding: 50,
+        maxZoom: 15,
+      });
+    }
+  }, [places, isMapLoaded]);
 
   useEffect(() => {
-    if (visiblePlace && isMapLoaded && mapRef.current) {
-      const place = places.find((p) => p.id === visiblePlace);
+    if (!isArticle && selectedPlace && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [selectedPlace.lng, selectedPlace.lat],
+        zoom: 14,
+        speed: 1.2,
+        curve: 1,
+        essential: false,
+      });
+    }
+  }, [selectedPlace]);
+
+  useEffect(() => {
+    if (isArticle && selectedPlace && isMapLoaded && mapRef.current) {
+      const place = places.find((p) => p.id === selectedPlace);
       if (place) {
         mapRef.current.flyTo({
           center: [place.lng, place.lat],
@@ -88,7 +108,11 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
         });
       }
     }
-  }, [visiblePlace, places, isMapLoaded]);
+  }, [selectedPlace, places, isMapLoaded]);
+
+  const handleViewStateChange = (evt: ViewStateChangeEvent) => {
+    setViewState(evt.viewState);
+  };
 
   return (
     <div style={{ width: '100%', height: '100vh' }}>
@@ -97,18 +121,24 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
         onMove={handleViewStateChange}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_API_KEY}
         style={{ width: '100%', height: '100%' }}
-        mapStyle="mapbox://styles/wen527555/cm1em7bjb03te01rbf9st4jza"
+        mapStyle="mapbox://styles/wen527555/cm14ozgao042001pqbf590bfy"
         onLoad={handleMapLoad}
         ref={mapRef}
       >
         {isMapLoaded &&
           places?.map((place, index) => (
-            <Marker key={index} longitude={place.lng} latitude={place.lat} onClick={() => onMarkerClick(place.id)}>
-              <MarkerWrapper color={place.color} isActive={visiblePlace === place.id}>
+            <Marker
+              key={index}
+              longitude={place.lng}
+              latitude={place.lat}
+              onClick={() => onMarkerClick(isArticle ? place.id : place)}
+            >
+              <MarkerWrapper color={place.color} isActive={selectedPlace?.id === place.id}>
                 {place.number}
               </MarkerWrapper>
             </Marker>
           ))}
+
         {isMapLoaded &&
           routes?.map((route, index) => (
             <Source
@@ -139,7 +169,7 @@ const MapComponent: React.FC<MapComponentProps> = ({ places = [], routes = [], v
   );
 };
 
-export default MapComponent;
+export default BaseMap;
 
 const framesColor = (color: string) => keyframes`
   0% {
@@ -173,8 +203,8 @@ const MarkerWrapper = styled.div<{ color: string; isActive: boolean }>`
   font-weight: bold;
   font-size: 15px;
   cursor: pointer;
-  z-index: ${({ isActive }) => (isActive ? 100 : 1)};
   position: relative;
+  z-index: ${({ isActive }) => (isActive ? 100 : 1)};
   &:hover {
     ${({ color }) => css`
       animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
@@ -194,8 +224,8 @@ const MarkerWrapper = styled.div<{ color: string; isActive: boolean }>`
     css`
       animation: ${framesColor(hexToRgb(color))} 1s ease infinite;
       border: 2px solid ${color};
-      width: 40px;
-      height: 40px;
-      font-size: 18px;
+      width: 36px;
+      height: 36px;
+      font-size: 16px;
     `}
 `;

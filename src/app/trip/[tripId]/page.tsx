@@ -26,7 +26,6 @@ import {
   updatePlacesForDay,
 } from '@/lib/firebaseApi';
 import useAlert from '@/lib/hooks/useAlertMessage';
-// import { useToggleMapView } from '@/lib/hooks/useToggleMapView';
 import { getRoute } from '@/lib/mapApi';
 import { processDays } from '@/lib/processDays';
 import { useConfirmModalStore, useModalStore, usePlaceStore } from '@/lib/store';
@@ -94,7 +93,7 @@ const daysMap = {
 
 type TransportMode = 'driving' | 'walking' | 'cycling';
 
-const MapComponent = dynamic(() => import('@/components/Map'), {
+const MapComponent = dynamic(() => import('./components/TripMap'), {
   ssr: false,
 });
 

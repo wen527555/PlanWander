@@ -11,7 +11,7 @@ import LoadingAnimation from '@/components/Loading';
 import { fetchArticleData } from '@/lib/firebaseApi';
 import { processDays } from '@/lib/processDays';
 
-const MapComponent = dynamic(() => import('./Map'), {
+const MapComponent = dynamic(() => import('./ArticleMap'), {
   ssr: false,
 });
 

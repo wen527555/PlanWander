@@ -7,11 +7,11 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
+import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
 import { fetchDeleteArticle } from '@/lib/firebaseApi';
 import { useConfirmModalStore } from '@/lib/store';
 import { fetchUserArticles } from '@/services/api';
-import ConfirmModal from '../../../components/ConfirmModal';
 
 type Article = {
   id: string;

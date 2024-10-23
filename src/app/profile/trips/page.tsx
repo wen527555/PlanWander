@@ -15,7 +15,7 @@ import TripModal from '@/components/TripModal';
 import { createArticleFromTrip, createNewTrip, fetchDeleteTrip } from '@/lib/firebaseApi';
 import { useConfirmModalStore, useModalStore } from '@/lib/store';
 import { fetchUserTrips } from '@/services/api';
-import ConfirmModal from '../../../components/ConfirmModal';
+import ConfirmModal from '../../../components/confirmModal';
 import Carousel from '../components/Carousel';
 
 interface Trip {

@@ -28,7 +28,7 @@ import useAlert from '@/lib/hooks/useAlertMessage';
 import { getRoute } from '@/lib/mapApi';
 import { processDays } from '@/lib/processDays';
 import { useConfirmModalStore, useModalStore, usePlaceStore } from '@/lib/store';
-import ConfirmModal from '../../../components/ConfirmModal';
+import ConfirmModal from '../../../components/confirmModal';
 import List from './components/List';
 
 interface Place {

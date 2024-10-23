@@ -4,6 +4,7 @@ import { FormEvent, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import styled from 'styled-components';
 
+import Overlay from '@/components/Overlay';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { useUserStore } from '@/lib/store';
 import { fetchGeneralLogin, fetchGoogleLogin, fetchSignUp } from '@/services/api';
@@ -101,7 +102,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
 
   return (
     <Overlay>
-      <Content>
+      <AlertMessage />
+      <ModalContainer>
         <CloseBtnWrapper onClick={onClose}>
           <CloseBtn />
         </CloseBtnWrapper>
@@ -127,36 +129,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
             {isLogIn ? "Don't have an account? Sign Up" : 'Already have an account? Log In'}
           </ToggleLink>
         </Container>
-      </Content>
-      <AlertMessage />
+        <AlertMessage />
+      </ModalContainer>
     </Overlay>
   );
 };
 
 export default LoginModal;
-
-const Overlay = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 10;
-`;
-
-const Content = styled.div`
-  background-color: white;
-  padding: 10px;
-  border-radius: 25px;
-  width: 450px;
-  position: relative;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  height: 450px;
-`;
 
 const CloseBtnWrapper = styled.button`
   cursor: pointer;
@@ -170,6 +149,16 @@ const CloseBtnWrapper = styled.button`
 
 const CloseBtn = styled(IoMdClose)`
   font-size: 24px;
+`;
+
+const ModalContainer = styled.div`
+  background-color: white;
+  padding: 10px;
+  border-radius: 25px;
+  width: 450px;
+  position: relative;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  height: 450px;
 `;
 
 const Container = styled.div`

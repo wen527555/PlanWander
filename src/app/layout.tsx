@@ -13,7 +13,7 @@ export const metadata = {
   description: 'PlanWander 是一個免費的旅行規劃網站，讓您輕鬆安排並規劃旅程。',
 };
 
-const HeaderWrapper = dynamic(() => import('../components/Header/HeaderWrapper'), { ssr: false });
+const HeaderWrapper = dynamic(() => import('@/components/Header/HeaderWrapper'), { ssr: false });
 const inter = Inter({ subsets: ['latin'] });
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <HeaderWrapper />
             {children}
             <ReactQueryDevtools initialIsOpen={false} />
-            <div id="modal-root"></div>
+            <div id="modal-root" />
           </StyledComponentsRegistry>
         </body>
       </html>

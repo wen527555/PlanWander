@@ -4,7 +4,7 @@ import { FormEvent, useState } from 'react';
 import { IoMdClose } from 'react-icons/io';
 import styled from 'styled-components';
 
-import { Overlay } from '@/app/styles/commonStyles';
+import Overlay from '@/components/Overlay';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { useUserStore } from '@/lib/store';
 import { fetchGeneralLogin, fetchGoogleLogin, fetchSignUp } from '@/services/api';

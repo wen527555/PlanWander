@@ -116,7 +116,6 @@ video {
   font: inherit;
   vertical-align: baseline;
 }
-/* HTML5 display-role reset for older browsers */
 article,
 aside,
 details,
@@ -160,9 +159,6 @@ table {
   font-size: 30px;
   clip-path: inset(0 3ch 0 0);
   animation: l4 1s steps(4) infinite;
-}
-.loader:before {
-  content: 'Loading...';
 }
 
 @keyframes l4 {

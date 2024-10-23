@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-import Overlay from '@/components/Overlay';
+import { Overlay } from '@/app/styles/commonStyles';
 import { useConfirmModalStore } from '@/lib/store';
 
 const ConfirmModal = () => {

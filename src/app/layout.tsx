@@ -18,8 +18,8 @@ const HeaderWrapper = dynamic(() => import('@/components/Header/HeaderWrapper'),
 const inter = Inter({ subsets: ['latin'] });
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <QueryProvider>
-      <GoogleApiProvider>
+    <GoogleApiProvider>
+      <QueryProvider>
         <html lang="en">
           <head>
             <link rel="icon" href="/planWanderIcon.png" sizes="any" />
@@ -30,11 +30,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <HeaderWrapper />
               {children}
               <ReactQueryDevtools initialIsOpen={false} />
-              <div id="modal-root" />
             </StyledComponentsRegistry>
           </body>
         </html>
-      </GoogleApiProvider>
-    </QueryProvider>
+      </QueryProvider>
+    </GoogleApiProvider>
   );
 }

@@ -34,13 +34,14 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ date, showCalendar, s
       {showCalendar && (
         <CalendarPopup>
           <DateRange
+            // editableDateInputs={true}
+            // moveRangeOnFirstSelection={false}
             onChange={handleSelect}
             ranges={date}
             months={2}
             direction="horizontal"
             rangeColors={['#94C3D2']}
             autoFocus={false}
-            // moveRangeOnFirstSelection={false}
           />
         </CalendarPopup>
       )}
@@ -81,6 +82,7 @@ const DateBox = styled.div`
   font-size: 14px;
   color: #333;
   text-align: center;
+  width: 180px;
 `;
 
 const Arrow = styled.div`

@@ -5,8 +5,7 @@ import { RangeKeyDict } from 'react-date-range';
 import Select from 'react-select';
 import styled from 'styled-components';
 
-import { Button, ButtonWrapper, CloseBtn, CloseBtnWrapper } from '@/app/styles/commonStyles';
-import Overlay from '@/components/Overlay';
+import { Button, ButtonWrapper, CloseBtn, CloseBtnWrapper, Overlay } from '@/app/styles/commonStyles';
 import DateRangePicker from '@/components/TripModal/DateRangePicker';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { fetchCountries } from '@/lib/mapApi';
@@ -79,13 +78,14 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
   };
 
   const handleSubmit = async () => {
-    const startDate = date[0].startDate;
-    const endDate = date[0].endDate;
+    const startDate = date[0].startDate || new Date();
+    const endDate = date[0].endDate || addDays(new Date(), 2);
     if (!startDate || !endDate || !tripTitle || selectedCountries.length === 0) {
       addAlert('Please fill in all fields');
       return;
     }
     try {
+      console.log('startDate', 'endDate');
       await onSubmit(tripTitle, startDate, endDate, selectedCountries);
       addAlert('Creation successful');
       onClose();

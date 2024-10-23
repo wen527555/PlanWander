@@ -7,7 +7,7 @@ import { AiOutlineDelete } from 'react-icons/ai';
 import { SlOptions } from 'react-icons/sl';
 import styled from 'styled-components';
 
-import ConfirmModal from '@/components/confirmModal';
+import ConfirmModal from '@/components/ConfirmModal';
 import LoadingAnimation from '@/components/Loading';
 import { fetchDeleteArticle } from '@/lib/firebaseApi';
 import { useConfirmModalStore } from '@/lib/store';

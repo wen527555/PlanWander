@@ -1,7 +1,6 @@
 'use client';
 
 import { DragDropContext, Draggable, Droppable } from '@hello-pangea/dnd';
-// import { Libraries, LoadScript } from '@react-google-maps/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -10,8 +9,6 @@ import { FaGripVertical, FaMapMarker } from 'react-icons/fa';
 import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import { VscTrash } from 'react-icons/vsc';
 import styled from 'styled-components';
-
-// import { useGoogleApiStore } from '@/lib/store';
 
 import 'flatpickr/dist/flatpickr.min.css';
 
@@ -22,7 +19,6 @@ import LocationSearch from './LocationSearch';
 import TimePicker from './TimePicker';
 import TransportModeSelector from './TransportSelector';
 
-// const libraries: Libraries = ['places'];
 interface Place {
   id: string;
   name: string;
@@ -157,24 +153,7 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
     updateDepartureTimeMutation.mutate({ tripId, dayId, newDate: formattedTime });
   };
 
-  // useEffect(() => {
-  //   if (!isGoogleApiLoaded) {
-  //     setGoogleApiLoaded(true);
-  //   }
-  // }, [isGoogleApiLoaded]);
-
-  // if (!isGoogleApiLoaded) {
-  //   return (
-  //     <LoadScript
-  //       googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!}
-  //       libraries={libraries}
-  //       onLoad={() => setGoogleApiLoaded(true)}
-  //     ></LoadScript>
-  //   );
-  // }
-
   return (
-    // <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
     <ListContainer>
       <DragDropContext onDragEnd={onDragEnd}>
         {days.map((day, dateIndex) => {
@@ -312,7 +291,7 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
 export default List;
 
 const ListContainer = styled.div`
-  margin: 60px 30px 150px 30px;
+  margin: 60px 30px 150px 45px;
 `;
 
 const ItemContainer = styled.div`
@@ -405,16 +384,6 @@ const PlaceContainer = styled.div`
   margin: 5px 30px 0px 20px;
   position: relative;
   overflow: visible;
-  /* background-color: #ecf6f9; */
-  /* &::before {
-    content: '';
-    position: absolute;
-    left: -49px;
-    top: 0;
-    bottom: 0;
-    width: 6px;
-    border-radius: 3px;
-  } */
   &:hover ${DeleteIcon}, &:hover ${DragIcon} {
     opacity: 1;
   }
@@ -425,7 +394,6 @@ const BlockWrapper = styled.div.withConfig({
 })<PlaceContainerProps>`
   width: 100%;
   padding: 10px;
-  /* background-color: #f3f4f5; */
   border-radius: 5px;
   height: auto;
   cursor: pointer;
@@ -478,7 +446,6 @@ const MarkerContainer = styled.div`
 const MarkerIcon = styled(FaMapMarker)`
   width: 100%;
   height: 100%;
-  /* border: 1px solid #ffff; */
   color: ${(props) => props.color};
 `;
 

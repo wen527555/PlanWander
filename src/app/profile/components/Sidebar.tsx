@@ -177,8 +177,6 @@ const EditButton = styled.button`
   border-radius: 50%;
   padding: 10px;
   cursor: pointer;
-  /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); */
-
   display: flex;
   align-items: center;
   justify-content: center;

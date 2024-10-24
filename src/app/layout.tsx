@@ -6,7 +6,6 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import dynamic from 'next/dynamic';
 import { Inter } from 'next/font/google';
 
-// import GoogleApiProvider from '@/lib/GoogleApiProvider';
 import QueryProvider from '../lib/queryProvider';
 
 export const metadata = {
@@ -18,7 +17,6 @@ const HeaderWrapper = dynamic(() => import('@/components/Header/HeaderWrapper'),
 const inter = Inter({ subsets: ['latin'] });
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // <GoogleApiProvider>
     <QueryProvider>
       <html lang="en">
         <head>
@@ -35,6 +33,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </body>
       </html>
     </QueryProvider>
-    // </GoogleApiProvider>
   );
 }

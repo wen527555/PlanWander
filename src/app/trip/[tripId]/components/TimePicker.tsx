@@ -109,7 +109,6 @@ const TimePickerComponent: React.FC<TimePickerProps> = ({
           noCalendar: true,
           dateFormat: 'H:i',
           time_24hr: true,
-          // allowInput: true,
         }}
         onChange={(selectedTime: Date[]) => {
           if (selectedTime.length > 0) {

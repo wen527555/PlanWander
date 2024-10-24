@@ -10,8 +10,6 @@ import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import { VscTrash } from 'react-icons/vsc';
 import styled from 'styled-components';
 
-// import GoogleApiProvider from '@/lib/GoogleApiProvider';
-
 import 'flatpickr/dist/flatpickr.min.css';
 
 import { getColorForDate } from '@/lib/colors';

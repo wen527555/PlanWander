@@ -650,7 +650,6 @@ export const updateUserProfile = async (userId: string, userName: string | null,
 export const fetchUserData = async (userId: string): Promise<UserData | null> => {
   const userDocRef = doc(db, 'users', userId);
   const userDoc = await getDoc(userDocRef);
-  // return userDoc.exists() ? userDoc.data() : null;
   if (userDoc.exists()) {
     const data = userDoc.data();
     return {

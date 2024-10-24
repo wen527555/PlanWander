@@ -15,6 +15,53 @@ interface Country {
   flag: string;
 }
 
+const CountrySelect: React.FC<{ onChange: (selectedOption: { code: string } | null) => void }> = ({ onChange }) => {
+  const { data: countries = [], isLoading } = useQuery<Country[]>({
+    queryKey: ['countries'],
+    queryFn: fetchCountries,
+    staleTime: 60000,
+  });
+  const formatOptionLabel = ({ name, flag }: Country) => (
+    <ImageWrapper>
+      {flag ? <FlagImage src={flag} alt={name} /> : <EarthIcon />}
+      <CountryName>{name}</CountryName>
+    </ImageWrapper>
+  );
+
+  const customControl = useMemo(
+    () => (props: any) => (
+      <components.Control {...props}>
+        <BsFilterLeft style={{ marginLeft: '10px', color: '#929494' }} />
+        {props.children}
+      </components.Control>
+    ),
+    []
+  );
+
+  const optionsWithAll: Country[] = [{ code: 'all', name: 'All Countries', flag: '' }, ...countries];
+
+  return (
+    <StyledSelect
+      options={optionsWithAll}
+      getOptionLabel={(option: Country) => option.name}
+      getOptionValue={(option: Country) => option.code}
+      formatOptionLabel={formatOptionLabel}
+      onChange={onChange}
+      placeholder="Search destination..."
+      isClearable
+      isLoading={isLoading}
+      components={{
+        Control: customControl,
+      }}
+      classNamePrefix="select"
+    />
+  );
+};
+
+CountrySelect.displayName = 'CountrySelect';
+
+export default CountrySelect;
+
 const StyledSelect = styled(Select<Country>)`
   .select__control {
     border: 1px solid #ddd;
@@ -78,50 +125,6 @@ const StyledSelect = styled(Select<Country>)`
     color: #666;
   }
 `;
-
-export default function CountrySelect({ onChange }: { onChange: (selectedOption: { code: string } | null) => void }) {
-  const { data: countries = [], isLoading } = useQuery<Country[]>({
-    queryKey: ['countries'],
-    queryFn: fetchCountries,
-    staleTime: 60000,
-  });
-  const formatOptionLabel = ({ name, flag }: Country) => (
-    <ImageWrapper>
-      {flag ? <FlagImage src={flag} alt={name} /> : <EarthIcon />}
-      <CountryName>{name}</CountryName>
-    </ImageWrapper>
-  );
-
-  const customControl = useMemo(
-    () => (props: any) => (
-      <components.Control {...props}>
-        <BsFilterLeft style={{ marginLeft: '10px', color: '#929494' }} />
-        {props.children}
-      </components.Control>
-    ),
-    []
-  );
-
-  const optionsWithAll: Country[] = [{ code: 'all', name: 'All Countries', flag: '' }, ...countries];
-
-  return (
-    <StyledSelect
-      key={Math.random()}
-      options={optionsWithAll}
-      getOptionLabel={(option: Country) => option.name}
-      getOptionValue={(option: Country) => option.code}
-      formatOptionLabel={formatOptionLabel}
-      onChange={onChange}
-      placeholder="Search destination..."
-      isClearable
-      isLoading={isLoading}
-      components={{
-        Control: customControl,
-      }}
-      classNamePrefix="select"
-    />
-  );
-}
 
 const ImageWrapper = styled.div`
   display: flex;

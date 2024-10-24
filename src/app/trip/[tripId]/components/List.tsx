@@ -291,7 +291,7 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
 export default List;
 
 const ListContainer = styled.div`
-  margin: 60px 30px 150px 45px;
+  margin: 60px 20px 150px 30px;
 `;
 
 const ItemContainer = styled.div`

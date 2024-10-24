@@ -4,7 +4,7 @@ import { IoMdArrowDropdown } from 'react-icons/io';
 import { MdDirectionsBike } from 'react-icons/md';
 import styled from 'styled-components';
 
-import { getRoute } from '@/lib/mapApi';
+import { getRoute } from '@/services/otherApi';
 
 type TransportMode = 'driving' | 'walking' | 'cycling';
 

@@ -13,8 +13,8 @@ import styled from 'styled-components';
 import 'flatpickr/dist/flatpickr.min.css';
 
 import { getColorForDate } from '@/lib/colors';
-import { updateDepartureTime, updatePlaceStayTime } from '@/lib/firebaseApi';
-import { usePlaceStore } from '@/lib/store';
+import { updateDepartureTime, updatePlaceStayTime } from '@/services/firebaseApi';
+import { usePlaceStore } from '@/stores/store';
 import LocationSearch from './LocationSearch';
 import TimePicker from './TimePicker';
 import TransportModeSelector from './TransportSelector';

@@ -8,10 +8,10 @@ import { PiArticleNyTimesBold } from 'react-icons/pi';
 import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
-import { fetchUserData, updateUserProfile, uploadProfileImage } from '@/lib/firebaseApi';
-import { auth } from '@/lib/firebaseConfig';
-import useAlert from '@/lib/hooks/useAlertMessage';
-import { useUserStore } from '@/lib/store';
+import { auth } from '@/config/firebaseConfig';
+import useAlert from '@/hooks/useAlertMessage';
+import { fetchUserData, updateUserProfile, uploadProfileImage } from '@/services/firebaseApi';
+import { useUserStore } from '@/stores/store';
 
 interface SidebarProps {
   tabs: Array<{ name: string; path: string }>;

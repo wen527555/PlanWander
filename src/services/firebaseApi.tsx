@@ -15,9 +15,9 @@ import {
 } from 'firebase/firestore';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 
-import { auth } from '@/lib/firebaseConfig';
-import { fetchCountryImage } from '@/lib/mapApi';
-import { db, storage } from '../lib/firebaseConfig';
+import { auth } from '@/config/firebaseConfig';
+import { fetchCountryImage } from '@/services/otherApi';
+import { db, storage } from '../config/firebaseConfig';
 
 interface Day {
   date: string;

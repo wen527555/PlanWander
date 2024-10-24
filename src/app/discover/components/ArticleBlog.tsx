@@ -7,7 +7,7 @@ import { MdArrowOutward } from 'react-icons/md';
 import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
-import { fetchAllPublishedArticles } from '@/lib/firebaseApi';
+import { fetchAllPublishedArticles } from '@/services/firebaseApi';
 
 const CountrySelect = dynamic(() => import('./CountrySelect'), { ssr: false });
 

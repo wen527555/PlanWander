@@ -12,9 +12,9 @@ import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
-import { createArticleFromTrip, createNewTrip, fetchDeleteTrip } from '@/lib/firebaseApi';
-import { useConfirmModalStore, useModalStore } from '@/lib/store';
 import { fetchUserTrips } from '@/services/api';
+import { createArticleFromTrip, createNewTrip, fetchDeleteTrip } from '@/services/firebaseApi';
+import { useConfirmModalStore, useModalStore } from '@/stores/store';
 import ConfirmModal from '../../../components/confirmModal';
 import Carousel from '../components/Carousel';
 

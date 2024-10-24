@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 
 import Overlay from '@/components/Overlay';
-import { useConfirmModalStore } from '@/lib/store';
+import { useConfirmModalStore } from '@/stores/store';
 
 const ConfirmModal = () => {
   const { isModalOpen, message, onConfirm, closeModal } = useConfirmModalStore();

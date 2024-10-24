@@ -1,4 +1,4 @@
-import { auth } from '@/lib/firebaseConfig';
+import { auth } from '@/config/firebaseConfig';
 
 export const fetchGeneralLogin = async (idToken: string) => {
   const response = await fetch('/api/auth/login', {

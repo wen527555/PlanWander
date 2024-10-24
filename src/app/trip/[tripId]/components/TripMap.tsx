@@ -1,5 +1,5 @@
 import BaseMap from '@/components/CommonMap';
-import { usePlaceStore } from '@/lib/store';
+import { usePlaceStore } from '@/stores/store';
 
 interface Place {
   id: string;

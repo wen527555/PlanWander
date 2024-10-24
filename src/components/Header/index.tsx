@@ -8,11 +8,11 @@ import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
-import { createNewTrip } from '@/lib/firebaseApi';
-import { auth } from '@/lib/firebaseConfig';
-import { useModalStore, useUserStore } from '@/lib/store';
+import { auth } from '@/config/firebaseConfig';
 import Logo from '@/public/PlanwanderLogo.png';
 import { fetchUserData, refreshAuthToken } from '@/services/api';
+import { createNewTrip } from '@/services/firebaseApi';
+import { useModalStore, useUserStore } from '@/stores/store';
 import LoginModal from '../LoginModal';
 
 interface SelectedOption {

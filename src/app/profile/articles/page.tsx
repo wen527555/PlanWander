@@ -9,9 +9,9 @@ import styled from 'styled-components';
 
 import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
-import { fetchDeleteArticle } from '@/lib/firebaseApi';
-import { useConfirmModalStore } from '@/lib/store';
 import { fetchUserArticles } from '@/services/api';
+import { fetchDeleteArticle } from '@/services/firebaseApi';
+import { useConfirmModalStore } from '@/stores/store';
 
 type Article = {
   id: string;

@@ -8,10 +8,10 @@ import styled from 'styled-components';
 
 import { HomeIcon, ListHeader } from '@/app/styles/commonStyles';
 import LoadingAnimation from '@/components/Loading';
+import useAlert from '@/hooks/useAlertMessage';
 import { getColorForDate } from '@/lib/colors';
-import { saveArticle, saveImageToStorage } from '@/lib/firebaseApi';
-import useAlert from '@/lib/hooks/useAlertMessage';
-import { useUserStore } from '@/lib/store';
+import { saveArticle, saveImageToStorage } from '@/services/firebaseApi';
+import { useUserStore } from '@/stores/store';
 
 interface ListProps {
   articleData: {

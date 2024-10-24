@@ -5,7 +5,7 @@ import { BsFilterLeft } from 'react-icons/bs';
 import Select, { components } from 'react-select';
 import styled from 'styled-components';
 
-import { fetchCountries } from '@/lib/mapApi';
+import { fetchCountries } from '@/services/otherApi';
 
 interface Country {
   name: string;

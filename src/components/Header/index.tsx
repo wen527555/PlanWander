@@ -227,6 +227,10 @@ const IconText = styled.span`
   color: #658c96;
   cursor: pointer;
   transition: 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
   &:hover {
     color: #c7c4c4;
   }

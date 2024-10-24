@@ -237,6 +237,10 @@ const ArticleTitle = styled.h2`
   margin-bottom: 15px;
   font-weight: 700;
   letter-spacing: 1.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
 `;
 
 const ArticleDescription = styled.p`

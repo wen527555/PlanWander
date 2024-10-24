@@ -154,8 +154,6 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
   };
 
   return (
-    // <GoogleApiProvider>
-    // <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
     <ListContainer>
       <DragDropContext onDragEnd={onDragEnd}>
         {days.map((day, dateIndex) => {
@@ -286,7 +284,6 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
         })}
       </DragDropContext>
     </ListContainer>
-    // </LoadScript>
   );
 };
 

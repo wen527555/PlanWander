@@ -413,6 +413,10 @@ const TripName = styled.h1`
   margin: 10px 20px;
   font-size: 20px;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 `;
 
 const TripDate = styled.div`

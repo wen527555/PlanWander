@@ -13,8 +13,8 @@ interface AuthFormProps {
 const AuthForm: React.FC<AuthFormProps> = ({ isLogIn, email, password, onEmailChange, onPasswordChange, onSubmit }) => {
   return (
     <form onSubmit={onSubmit}>
-      <Input placeholder="Email" value={email} onChange={onEmailChange} />
-      <Input type="password" value={password} placeholder="Password" onChange={onPasswordChange} />
+      <Input placeholder="Email" value={email || 'test@gmail.com'} onChange={onEmailChange} />
+      <Input type="password" value={password || '123456'} placeholder="Password" onChange={onPasswordChange} />
       <LoginButton type="submit">{isLogIn ? 'Log in' : 'Sign up'}</LoginButton>
     </form>
   );
@@ -45,7 +45,7 @@ const Input = styled.input`
 const LoginButton = styled.button`
   width: 100%;
   border-radius: 25px;
-  padding: 10px;
+  padding: 10px 25px;
   text-align: center;
   font-size: 14px;
   font-weight: 500;

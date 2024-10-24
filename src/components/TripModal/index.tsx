@@ -75,7 +75,6 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
         key: selection.key,
       },
     ]);
-    setShowCalendar(false);
   };
 
   const handleSubmit = async () => {
@@ -86,7 +85,6 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
       return;
     }
     try {
-      console.log('startDate', 'endDate');
       await onSubmit(tripTitle, startDate, endDate, selectedCountries);
       addAlert('Creation successful');
       onClose();

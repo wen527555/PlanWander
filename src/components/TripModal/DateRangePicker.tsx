@@ -34,8 +34,6 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ date, showCalendar, s
       {showCalendar && (
         <CalendarPopup>
           <DateRange
-            // editableDateInputs={true}
-            // moveRangeOnFirstSelection={false}
             onChange={handleSelect}
             ranges={date}
             months={2}

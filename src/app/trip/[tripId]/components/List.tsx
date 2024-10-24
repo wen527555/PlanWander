@@ -10,6 +10,8 @@ import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import { VscTrash } from 'react-icons/vsc';
 import styled from 'styled-components';
 
+// import GoogleApiProvider from '@/lib/GoogleApiProvider';
+
 import 'flatpickr/dist/flatpickr.min.css';
 
 import { getColorForDate } from '@/lib/colors';
@@ -61,7 +63,7 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
     days.reduce((acc, day) => ({ ...acc, [day.date]: true }), {})
   );
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
-  // const { isGoogleApiLoaded, setGoogleApiLoaded } = useGoogleApiStore();
+
   const handleToggleOpen = (date: string) => {
     setOpenDays((prev) => ({ ...prev, [date]: !prev[date] }));
   };
@@ -154,6 +156,8 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
   };
 
   return (
+    // <GoogleApiProvider>
+    // <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
     <ListContainer>
       <DragDropContext onDragEnd={onDragEnd}>
         {days.map((day, dateIndex) => {

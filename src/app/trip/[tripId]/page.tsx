@@ -24,7 +24,6 @@ import {
   updatePlaceRoute,
   updatePlacesForDay,
 } from '@/lib/firebaseApi';
-import GoogleApiProvider from '@/lib/GoogleApiProvider';
 import useAlert from '@/lib/hooks/useAlertMessage';
 import { getRoute } from '@/lib/mapApi';
 import { processDays } from '@/lib/processDays';
@@ -322,87 +321,85 @@ const TripPage: React.FC = () => {
       {isPending && <LoadingAnimation />}
       <ConfirmModal />
       <AlertMessage />
-      <GoogleApiProvider>
-        <ListMapLayout
-          headerContent={
-            <>
-              <HomeIcon onClick={handleBackProfile} />
-              <TripName>{tripData.tripTitle}</TripName>
-              <TripDate>
-                <CalendarIcon />
-                {formattedStartDate}-{formattedEndDate}
-              </TripDate>
-              <EditIcon onClick={() => openModal('trip')} />
-            </>
-          }
-          listContent={
-            <List
-              days={tripData.days as any}
-              onPlaceAdded={handleAddPlace}
-              onDaysUpdate={handleDaysUpdate}
-              onModeUpdate={handleModeChange}
-              onPlaceDelete={handlePlaceDelete}
-              tripId={tripId}
-            />
-          }
-          mapContent={
-            <>
-              <MapComponent places={places as any} routes={route as any} />
-              {selectedPlace && (
-                <PlaceInfoModal ref={modalRef}>
-                  <ModalHeader>
-                    <PlaceName>{selectedPlace.name}</PlaceName>
-                  </ModalHeader>
+      <ListMapLayout
+        headerContent={
+          <>
+            <HomeIcon onClick={handleBackProfile} />
+            <TripName>{tripData.tripTitle}</TripName>
+            <TripDate>
+              <CalendarIcon />
+              {formattedStartDate}-{formattedEndDate}
+            </TripDate>
+            <EditIcon onClick={() => openModal('trip')} />
+          </>
+        }
+        listContent={
+          <List
+            days={tripData.days as any}
+            onPlaceAdded={handleAddPlace}
+            onDaysUpdate={handleDaysUpdate}
+            onModeUpdate={handleModeChange}
+            onPlaceDelete={handlePlaceDelete}
+            tripId={tripId}
+          />
+        }
+        mapContent={
+          <>
+            <MapComponent places={places as any} routes={route as any} />
+            {selectedPlace && (
+              <PlaceInfoModal ref={modalRef}>
+                <ModalHeader>
+                  <PlaceName>{selectedPlace.name}</PlaceName>
+                </ModalHeader>
 
-                  {selectedPlace?.rating && (
-                    <RatingWrapper>
-                      <RatingIcon />
-                      <Rating>{selectedPlace.rating}</Rating>
-                    </RatingWrapper>
-                  )}
+                {selectedPlace?.rating && (
+                  <RatingWrapper>
+                    <RatingIcon />
+                    <Rating>{selectedPlace.rating}</Rating>
+                  </RatingWrapper>
+                )}
 
-                  {selectedPlace?.address && (
-                    <Wrapper>
-                      <AddressIcon />
-                      <PlaceAddress>{selectedPlace.address}</PlaceAddress>
-                    </Wrapper>
-                  )}
+                {selectedPlace?.address && (
+                  <Wrapper>
+                    <AddressIcon />
+                    <PlaceAddress>{selectedPlace.address}</PlaceAddress>
+                  </Wrapper>
+                )}
 
-                  {formattedOpeningHours?.length > 0 && (
-                    <OpeningHoursWrapper>
-                      <ClockIcon />
-                      <OpeningHoursList>
-                        {formattedOpeningHours.map((time, index) => (
-                          <OpeningHourItem key={index}>
-                            <DayCircle>{time.day}</DayCircle>
-                            <HoursLabel>{time.hours}</HoursLabel>
-                          </OpeningHourItem>
-                        ))}
-                      </OpeningHoursList>
-                    </OpeningHoursWrapper>
-                  )}
+                {formattedOpeningHours?.length > 0 && (
+                  <OpeningHoursWrapper>
+                    <ClockIcon />
+                    <OpeningHoursList>
+                      {formattedOpeningHours.map((time, index) => (
+                        <OpeningHourItem key={index}>
+                          <DayCircle>{time.day}</DayCircle>
+                          <HoursLabel>{time.hours}</HoursLabel>
+                        </OpeningHourItem>
+                      ))}
+                    </OpeningHoursList>
+                  </OpeningHoursWrapper>
+                )}
 
-                  {selectedPlace.phone && (
-                    <Wrapper>
-                      <PhoneIcon />
-                      {selectedPlace.phone}
-                    </Wrapper>
-                  )}
+                {selectedPlace.phone && (
+                  <Wrapper>
+                    <PhoneIcon />
+                    {selectedPlace.phone}
+                  </Wrapper>
+                )}
 
-                  {selectedPlace.website && (
-                    <Wrapper>
-                      <WebsiteIcon />
-                      <a href={selectedPlace.website} target="_blank" rel="noopener noreferrer">
-                        {selectedPlace.website}
-                      </a>
-                    </Wrapper>
-                  )}
-                </PlaceInfoModal>
-              )}
-            </>
-          }
-        />
-      </GoogleApiProvider>
+                {selectedPlace.website && (
+                  <Wrapper>
+                    <WebsiteIcon />
+                    <a href={selectedPlace.website} target="_blank" rel="noopener noreferrer">
+                      {selectedPlace.website}
+                    </a>
+                  </Wrapper>
+                )}
+              </PlaceInfoModal>
+            )}
+          </>
+        }
+      />
       {isModalOpen && (
         <TripModal onClose={closeModal} isEditing={true} initialData={tripData} onSubmit={handleUpdateTrip} />
       )}
@@ -425,7 +422,6 @@ const TripDate = styled.div`
   font-weight: 600;
   color: #6c757d;
   margin-left: 8px;
-  cursor: pointer;
 `;
 
 const CalendarIcon = styled(FaRegCalendarDays)`
@@ -440,8 +436,10 @@ const EditIcon = styled(RiEdit2Fill)`
   color: #6c757d;
   margin: 0px 20px 0px auto;
   cursor: pointer;
+  transition: transform 0.2s ease-in-out;
   &:hover {
     color: #495057;
+    transform: scale(1.2);
   }
 `;
 

@@ -77,4 +77,8 @@ export const ListHeader = styled.div`
 export const HomeIcon = styled(IoArrowBackCircleOutline)`
   cursor: pointer;
   font-size: 30px;
+  transition: transform 0.2s ease-in-out;
+  &:hover {
+    transform: scale(1.2);
+  }
 `;

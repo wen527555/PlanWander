@@ -24,8 +24,8 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
   const [isLogIn, setIsLogIn] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('test@gmail.com');
+  const [password, setPassword] = useState('123456');
   const { addAlert, AlertMessage } = useAlert();
   const handleToggleForm = () => {
     setEmail('');

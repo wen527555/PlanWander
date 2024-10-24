@@ -1,6 +1,8 @@
-import { Autocomplete } from '@react-google-maps/api';
+import { Autocomplete, useLoadScript } from '@react-google-maps/api';
 import React, { useCallback, useState } from 'react';
 import styled, { createGlobalStyle } from 'styled-components';
+
+const libraries: 'places'[] = ['places'];
 
 interface Place {
   id: string;
@@ -16,6 +18,11 @@ interface LocationSearchProps {
 const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceAdded, dayId }) => {
   const [inputValue, setInputValue] = useState('');
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY!,
+    libraries: libraries,
+  });
 
   const onLoad = useCallback((autocompleteInstance: google.maps.places.Autocomplete) => {
     setAutocomplete(autocompleteInstance);
@@ -46,6 +53,7 @@ const LocationSearch: React.FC<LocationSearchProps> = ({ onPlaceAdded, dayId }) 
       }
     }
   };
+  if (!isLoaded) return <div>Loading...</div>;
 
   return (
     <>

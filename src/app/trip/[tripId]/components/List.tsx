@@ -61,11 +61,12 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
     days.reduce((acc, day) => ({ ...acc, [day.date]: true }), {})
   );
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
+  const queryClient = useQueryClient();
 
   const handleToggleOpen = (date: string) => {
     setOpenDays((prev) => ({ ...prev, [date]: !prev[date] }));
   };
-  const queryClient = useQueryClient();
+
   const onDragEnd = async (result: any) => {
     const { source, destination } = result;
     if (!destination) return;

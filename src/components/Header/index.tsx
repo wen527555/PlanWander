@@ -26,7 +26,7 @@ const Header = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const isProfileActive = pathname === '/profile';
+  const isProfileActive = pathname === '/profile/trips' || pathname === '/profile/articles';
   const isDiscoverActive = pathname === '/discover';
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(false);
@@ -230,7 +230,7 @@ const IconText = styled.span`
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 150px;
+  max-width: 80px;
   &:hover {
     color: #c7c4c4;
   }

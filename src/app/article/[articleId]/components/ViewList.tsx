@@ -38,9 +38,9 @@ const ViewList: React.FC<ListProps> = ({
   const [images, setImages] = useState<{ [key: string]: string | File }>({});
   const [coverImage, setCoverImage] = useState<string | null>(null);
   const placeRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+
   const handleScroll = (placeId: string) => {
     if (!manualScroll) {
       onPlaceVisible(placeId);

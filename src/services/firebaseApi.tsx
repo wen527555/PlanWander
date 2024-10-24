@@ -534,7 +534,6 @@ export const fetchUpdateTrip = async (updateData: UpdateTripParams): Promise<voi
   await handleDateRangeChange(tripRef, startDate, endDate, originalTripData);
 };
 
-//改成更好的寫法
 const handleDateRangeChange = async (
   tripRef: DocumentReference,
   startDate: Date,

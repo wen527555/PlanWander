@@ -243,6 +243,10 @@ const UserName = styled.h1`
   font-weight: 700;
   font-size: 20px;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
   &:hover {
     text-decoration: underline;
     text-decoration-color: gray;

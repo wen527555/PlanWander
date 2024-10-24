@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
-import styles from '@/app/styles/HomePage.module.css';
+import styles from '@/app/styles/LandingPage.module.css';
 import bgImage from '@/public/travel.jpg';
 
 const ClientAction = dynamic(() => import('@/components/Landing/ClientActions'), { ssr: false });

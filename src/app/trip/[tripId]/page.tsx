@@ -438,7 +438,7 @@ const EditIcon = styled(RiEdit2Fill)`
   font-size: 22px;
   font-weight: 800;
   color: #6c757d;
-  margin: 0px 20px 0px auto;
+  margin: 0px 0px 0px auto;
   cursor: pointer;
   transition: transform 0.2s ease-in-out;
   &:hover {

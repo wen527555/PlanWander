@@ -4,6 +4,9 @@
   width: 100vw;
   position: relative;
   overflow: hidden;
+  @media (max-width: 990px) {
+    flex-direction: column-reverse;
+  }
 }
 
 .contentWrapper {
@@ -13,10 +16,17 @@
   align-items: center;
   padding: 0 50px;
   width: 50%;
+  @media (max-width: 990px) {
+    width: 100%;
+    margin-top: 50px;
+  }
 }
 
 .textSection {
   max-width: 600px;
+  @media (max-width: 990px) {
+    max-width: 900px;
+  }
 }
 
 .heading {
@@ -44,6 +54,9 @@
   width: 50%;
   height: 100vh;
   overflow: hidden;
+  @media (max-width: 1400px) {
+    width: 100%;
+  }
 }
 
 .detailSection {
@@ -66,10 +79,12 @@
   width: 500px;
   position: absolute;
   right: 10%;
-  color: white;
   @media (max-width: 1400px) {
-    bottom: 30px;
+    width: 85%;
+    bottom: 20px;
     right: 0;
+    margin: 0 auto;
+    left: 10%;
   }
 }
 
@@ -79,8 +94,9 @@
   left: 10%;
   color: white;
   @media (max-width: 1400px) {
-    bottom: 30px;
-    left: 0;
+    width: 85%;
+    bottom: 20px;
+    margin: 0 auto;
   }
 }
 

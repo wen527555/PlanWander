@@ -2,7 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useMemo, useState, useTransition } from 'react';
 import { MdArrowOutward } from 'react-icons/md';
 import styled from 'styled-components';
 
@@ -29,27 +29,33 @@ interface ArticleBlogProps {
 
 export default function ArticleBlog({ initialArticles }: ArticleBlogProps) {
   const [articles, setArticles] = useState(initialArticles);
-  const router = useRouter();
   const [isPending, startTransition] = useTransition();
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
-    const fetchArticles = async () => {
-      const data = await fetchAllPublishedArticles();
-      setArticles(data);
-    };
-    fetchArticles();
-  }, []);
+    if (!initialArticles || initialArticles.length === 0) {
+      const fetchArticles = async () => {
+        const data = await fetchAllPublishedArticles();
+        setArticles(data);
+      };
+      fetchArticles();
+    }
+  }, [initialArticles]);
 
-  const filteredArticles = selectedCountry
-    ? articles.filter(
-        (article) =>
-          Array.isArray(article.countries) && article.countries.some((country) => country.code === selectedCountry)
-      )
-    : articles;
+  const filteredArticles = useMemo(
+    () =>
+      selectedCountry && selectedCountry !== 'all'
+        ? articles.filter(
+            (article) =>
+              Array.isArray(article.countries) && article.countries.some((country) => country.code === selectedCountry)
+          )
+        : articles,
+    [selectedCountry, articles]
+  );
 
   const handleCountryChange = (selectedOption: { code: string } | null) => {
-    setSelectedCountry(selectedOption ? selectedOption.code : null);
+    setSelectedCountry(selectedOption ? selectedOption.code : 'all');
   };
 
   const handleArticleClick = (articleId: string) => {
@@ -304,6 +310,10 @@ const ArticleTitle = styled.h2`
   letter-spacing: 1.2px;
   margin-bottom: 30px;
   line-height: 1.5;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
 `;
 
 const ArticleDescription = styled.p`

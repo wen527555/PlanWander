@@ -1,7 +1,9 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { useMemo } from 'react';
 import { BsFilterLeft } from 'react-icons/bs';
+import { IoEarth } from 'react-icons/io5';
 import Select, { components } from 'react-select';
 import styled from 'styled-components';
 
@@ -20,6 +22,7 @@ const StyledSelect = styled(Select<Country>)`
     padding: 8px 15px;
     box-shadow: none;
     text-align: start;
+    cursor: pointer;
     &:hover {
       border: 2px solid rgba(63, 82, 227, 0.25);
     }
@@ -83,32 +86,28 @@ export default function CountrySelect({ onChange }: { onChange: (selectedOption:
     staleTime: 60000,
   });
   const formatOptionLabel = ({ name, flag }: Country) => (
-    <div style={{ display: 'flex', alignItems: 'center' }}>
-      <img
-        src={flag}
-        alt={name}
-        style={{
-          width: '24px',
-          height: '24px',
-          borderRadius: '50%',
-          marginRight: '10px',
-          objectFit: 'cover',
-        }}
-      />
-      <span>{name}</span>
-    </div>
+    <ImageWrapper>
+      {flag ? <FlagImage src={flag} alt={name} /> : <EarthIcon />}
+      <CountryName>{name}</CountryName>
+    </ImageWrapper>
   );
 
-  const customControl = (props: any) => (
-    <components.Control {...props}>
-      <BsFilterLeft style={{ marginLeft: '10px', color: '#929494' }} />
-      {props.children}
-    </components.Control>
+  const customControl = useMemo(
+    () => (props: any) => (
+      <components.Control {...props}>
+        <BsFilterLeft style={{ marginLeft: '10px', color: '#929494' }} />
+        {props.children}
+      </components.Control>
+    ),
+    []
   );
+
+  const optionsWithAll: Country[] = [{ code: 'all', name: 'All Countries', flag: '' }, ...countries];
+
   return (
     <StyledSelect
       key={Math.random()}
-      options={countries}
+      options={optionsWithAll}
       getOptionLabel={(option: Country) => option.name}
       getOptionValue={(option: Country) => option.code}
       formatOptionLabel={formatOptionLabel}
@@ -123,3 +122,26 @@ export default function CountrySelect({ onChange }: { onChange: (selectedOption:
     />
   );
 }
+
+const ImageWrapper = styled.div`
+  display: flex;
+  align-items: center;
+`;
+
+const FlagImage = styled.img`
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  margin-right: 10px;
+  object-fit: cover;
+`;
+
+const EarthIcon = styled(IoEarth)`
+  margin-right: 10px;
+  font-size: 25px;
+`;
+
+const CountryName = styled.span`
+  font-size: 14px;
+  color: #333;
+`;

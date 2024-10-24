@@ -304,11 +304,11 @@ const Button = styled.button`
   background-color: #78b7cc;
   color: white;
   border: none;
-  border-radius: 20px;
   padding: 8px 16px;
   font-size: 16px;
   cursor: pointer;
   font-weight: 700;
+  border-radius: 20px;
   &:hover {
     background-color: #e0e7ea;
   }

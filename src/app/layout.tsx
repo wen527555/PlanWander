@@ -20,7 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <QueryProvider>
       <html lang="en">
         <head>
-          <link rel="icon" href="/favicon.ico" sizes="any" />
+          <link rel="icon" href="/icon.png" sizes="any" />
           <meta name="description" content="PlanWander 是一個免費的旅行規劃網站，讓您輕鬆安排並規劃旅程。" />
           <meta name="keywords" content="旅行規劃, 免費, 旅遊, 旅行計畫, 規劃旅程, 旅行工具, 行程分享, PlanWander" />
           <meta name="author" content="Frontend Developer" />

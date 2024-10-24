@@ -20,9 +20,17 @@ A travel planning platform that enables users to seamlessly plan and share itine
 - Vercel
 - Firebase
   - Firestore Database
-  - Authentication
+  - Firebase-admin SDK
   - Storage
 - styled-components
+- Third-party Library
+  - hello-pangea/dnd
+  - Mapbox Map API
+  - Mapbox Directions API
+  - Google Autocomplete API
+  -  Restcountries API
+  -  Unsplash API
+
 
 ## Main Feature
 

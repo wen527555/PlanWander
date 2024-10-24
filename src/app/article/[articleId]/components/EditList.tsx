@@ -8,10 +8,10 @@ import styled from 'styled-components';
 
 import { HomeIcon, ListHeader } from '@/app/styles/commonStyles';
 import LoadingAnimation from '@/components/Loading';
+import useAlert from '@/hooks/useAlertMessage';
 import { getColorForDate } from '@/lib/colors';
-import { saveArticle, saveImageToStorage } from '@/lib/firebaseApi';
-import useAlert from '@/lib/hooks/useAlertMessage';
-import { useUserStore } from '@/lib/store';
+import { saveArticle, saveImageToStorage } from '@/services/firebaseApi';
+import { useUserStore } from '@/stores/store';
 
 interface ListProps {
   articleData: {
@@ -31,13 +31,16 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
   const [descriptions, setDescriptions] = useState<{ [key: string]: string }>({});
   const [images, setImages] = useState<{ [key: string]: any }>({});
   const [coverImage, setCoverImage] = useState<string | null>(null);
-  const { userData } = useUserStore();
-  const coverImageInputRef = useRef<HTMLInputElement>(null);
   const [isPending, startTransition] = useTransition();
+  const { userData } = useUserStore();
+  const { addAlert, AlertMessage } = useAlert();
+  const coverImageInputRef = useRef<HTMLInputElement>(null);
   const fileInputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
   const allowImgFormats = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
   const maxImgSize = 5 * 1024 * 1024;
-  const { addAlert, AlertMessage } = useAlert();
+  const queryClient = useQueryClient();
+  const router = useRouter();
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
@@ -61,39 +64,6 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
     };
   }, [articleData, onPlaceVisible]);
 
-  const handleCoverImageUpload = async (file: File) => {
-    if (!allowImgFormats.includes(file.type)) {
-      addAlert('Please upload an image in JPG or PNG format.');
-      return;
-    }
-
-    if (file.size > maxImgSize) {
-      addAlert('The image size should not exceed 5MB.');
-      return;
-    }
-    const localCoverImageUrl = URL.createObjectURL(file);
-    setCoverImage(localCoverImageUrl);
-    URL.revokeObjectURL(localCoverImageUrl);
-    try {
-      const imageUrl = await saveImageToStorage('cover', file);
-      setCoverImage(imageUrl);
-    } catch (error) {
-      console.error('Error uploading cover image:', error);
-      addAlert('Image upload failed, please try again.');
-    }
-  };
-
-  const handleDescriptionChange = (placeId: string, value: string) => {
-    setDescriptions((prev) => ({
-      ...prev,
-      [placeId]: value,
-    }));
-  };
-
-  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setArticleTitle(e.target.value);
-  };
-
   useEffect(() => {
     if (articleData) {
       setArticleTitle(articleData.title);
@@ -115,6 +85,28 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       setImages(initialImages);
     }
   }, [articleData]);
+
+  const handleCoverImageUpload = async (file: File) => {
+    if (!allowImgFormats.includes(file.type)) {
+      addAlert('Please upload an image in JPG or PNG format.');
+      return;
+    }
+
+    if (file.size > maxImgSize) {
+      addAlert('The image size should not exceed 5MB.');
+      return;
+    }
+    const localCoverImageUrl = URL.createObjectURL(file);
+    setCoverImage(localCoverImageUrl);
+    URL.revokeObjectURL(localCoverImageUrl);
+    try {
+      const imageUrl = await saveImageToStorage('cover', file);
+      setCoverImage(imageUrl);
+    } catch (error) {
+      console.error('Error uploading cover image:', error);
+      addAlert('Image upload failed, please try again.');
+    }
+  };
 
   const handleImageUpload = async (placeId: string, file: File) => {
     if (!allowImgFormats.includes(file.type)) {
@@ -143,11 +135,20 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
     }
   };
 
+  const handleDescriptionChange = (placeId: string, value: string) => {
+    setDescriptions((prev) => ({
+      ...prev,
+      [placeId]: value,
+    }));
+  };
+
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setArticleTitle(e.target.value);
+  };
+
   const handleArticleDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setArticleDescription(e.target.value);
   };
-
-  const queryClient = useQueryClient();
 
   const saveArticleMutation = useMutation({
     mutationFn: async () => {
@@ -172,7 +173,7 @@ const EditList: React.FC<ListProps> = ({ articleData, articleId, onPlaceVisible 
       addAlert('Error saving article. Please try again');
     },
   });
-  const router = useRouter();
+
   const handleBackProfile = () => {
     startTransition(() => {
       router.push('/profile/articles');

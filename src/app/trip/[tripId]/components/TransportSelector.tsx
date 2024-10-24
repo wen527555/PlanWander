@@ -1,11 +1,10 @@
-// import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { FaCar, FaWalking } from 'react-icons/fa';
 import { IoMdArrowDropdown } from 'react-icons/io';
 import { MdDirectionsBike } from 'react-icons/md';
 import styled from 'styled-components';
 
-import { getRoute } from '@/lib/mapApi';
+import { getRoute } from '@/services/otherApi';
 
 type TransportMode = 'driving' | 'walking' | 'cycling';
 

@@ -8,8 +8,8 @@ import styled from 'styled-components';
 import { Button, ButtonWrapper, CloseBtn, CloseBtnWrapper } from '@/app/styles/commonStyles';
 import Overlay from '@/components/Overlay';
 import DateRangePicker from '@/components/TripModal/DateRangePicker';
-import useAlert from '@/lib/hooks/useAlertMessage';
-import { fetchCountries } from '@/lib/mapApi';
+import useAlert from '@/hooks/useAlertMessage';
+import { fetchCountries } from '@/services/otherApi';
 
 interface Country {
   code: string;
@@ -75,7 +75,6 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
         key: selection.key,
       },
     ]);
-    setShowCalendar(false);
   };
 
   const handleSubmit = async () => {
@@ -86,7 +85,6 @@ const TripModal: React.FC<TripModalProps> = ({ onClose, isEditing = false, initi
       return;
     }
     try {
-      console.log('startDate', 'endDate');
       await onSubmit(tripTitle, startDate, endDate, selectedCountries);
       addAlert('Creation successful');
       onClose();

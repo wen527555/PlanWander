@@ -8,10 +8,10 @@ import { PiArticleNyTimesBold } from 'react-icons/pi';
 import { TbLogout2 } from 'react-icons/tb';
 import styled from 'styled-components';
 
-import { fetchUserData, updateUserProfile, uploadProfileImage } from '@/lib/firebaseApi';
-import { auth } from '@/lib/firebaseConfig';
-import useAlert from '@/lib/hooks/useAlertMessage';
-import { useUserStore } from '@/lib/store';
+import { auth } from '@/config/firebaseConfig';
+import useAlert from '@/hooks/useAlertMessage';
+import { fetchUserData, updateUserProfile, uploadProfileImage } from '@/services/firebaseApi';
+import { useUserStore } from '@/stores/store';
 
 interface SidebarProps {
   tabs: Array<{ name: string; path: string }>;
@@ -243,6 +243,10 @@ const UserName = styled.h1`
   font-weight: 700;
   font-size: 20px;
   cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 150px;
   &:hover {
     text-decoration: underline;
     text-decoration-color: gray;

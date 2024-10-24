@@ -17,6 +17,61 @@ interface TimePickerProps {
   onClose: () => void;
 }
 
+const TimePickerComponent: React.FC<TimePickerProps> = ({
+  place,
+  initialStayDuration = 3600,
+  dayId,
+  onSave,
+  onClose,
+}) => {
+  const [stayDuration, setStayDuration] = useState<number>(initialStayDuration);
+  const hours = Math.floor(stayDuration / 3600);
+  const minutes = Math.floor((stayDuration % 3600) / 60);
+  const initialTime = new Date();
+  initialTime.setHours(hours);
+  initialTime.setMinutes(minutes);
+
+  const handleSave = () => {
+    onSave(place.id, dayId, stayDuration);
+  };
+
+  const handleTimeChange = (selectedTime: Date[]) => {
+    if (selectedTime.length > 0) {
+      const selectedDate = selectedTime[0];
+      const selectedHours = selectedDate.getHours();
+      const selectedMinutes = selectedDate.getMinutes();
+      setStayDuration(selectedHours * 3600 + selectedMinutes * 60);
+    }
+  };
+
+  return (
+    <TimePickerWrapper onClick={(e) => e.stopPropagation()}>
+      <Label>Stay Duration</Label>
+      <Flatpickr
+        id="start-time-picker"
+        value={initialTime}
+        options={{
+          enableTime: true,
+          noCalendar: true,
+          dateFormat: 'H:i',
+          time_24hr: true,
+        }}
+        onChange={handleTimeChange}
+      />
+      <ButtonGroup>
+        <Button variant="clear" onClick={onClose}>
+          Close
+        </Button>
+        <Button variant="save" onClick={handleSave}>
+          Save
+        </Button>
+      </ButtonGroup>
+    </TimePickerWrapper>
+  );
+};
+
+export default TimePickerComponent;
+
 const TimePickerWrapper = styled.div`
   position: absolute;
   max-width: 250px;
@@ -79,57 +134,3 @@ const Button = styled.button<ButtonProps>`
       color: white;
     `}
 `;
-
-const TimePickerComponent: React.FC<TimePickerProps> = ({
-  place,
-  initialStayDuration = 3600,
-  dayId,
-  onSave,
-  onClose,
-}) => {
-  const [stayDuration, setStayDuration] = useState<number>(initialStayDuration);
-
-  const hours = Math.floor(stayDuration / 3600);
-  const minutes = Math.floor((stayDuration % 3600) / 60);
-  const initialTime = new Date();
-  initialTime.setHours(hours);
-  initialTime.setMinutes(minutes);
-  const handleSave = () => {
-    onSave(place.id, dayId, stayDuration);
-  };
-
-  return (
-    <TimePickerWrapper onClick={(e) => e.stopPropagation()}>
-      <Label>Stay Duration</Label>
-      <Flatpickr
-        id="start-time-picker"
-        value={initialTime}
-        options={{
-          enableTime: true,
-          noCalendar: true,
-          dateFormat: 'H:i',
-          time_24hr: true,
-          // allowInput: true,
-        }}
-        onChange={(selectedTime: Date[]) => {
-          if (selectedTime.length > 0) {
-            const selectedDate = selectedTime[0];
-            const selectedHours = selectedDate.getHours();
-            const selectedMinutes = selectedDate.getMinutes();
-            setStayDuration(selectedHours * 3600 + selectedMinutes * 60);
-          }
-        }}
-      />
-      <ButtonGroup>
-        <Button variant="clear" onClick={onClose}>
-          Close
-        </Button>
-        <Button variant="save" onClick={handleSave}>
-          Save
-        </Button>
-      </ButtonGroup>
-    </TimePickerWrapper>
-  );
-};
-
-export default TimePickerComponent;

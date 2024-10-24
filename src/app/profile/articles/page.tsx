@@ -9,9 +9,9 @@ import styled from 'styled-components';
 
 import ConfirmModal from '@/components/confirmModal';
 import LoadingAnimation from '@/components/Loading';
-import { fetchDeleteArticle } from '@/lib/firebaseApi';
-import { useConfirmModalStore } from '@/lib/store';
 import { fetchUserArticles } from '@/services/api';
+import { fetchDeleteArticle } from '@/services/firebaseApi';
+import { useConfirmModalStore } from '@/stores/store';
 
 type Article = {
   id: string;
@@ -237,6 +237,10 @@ const ArticleTitle = styled.h2`
   margin-bottom: 15px;
   font-weight: 700;
   letter-spacing: 1.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 400px;
 `;
 
 const ArticleDescription = styled.p`

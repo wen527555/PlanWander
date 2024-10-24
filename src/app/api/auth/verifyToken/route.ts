@@ -2,7 +2,7 @@ import { getFirestore } from 'firebase-admin/firestore';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
-import { adminAuth } from '@/lib/firebaseAdmin';
+import { adminAuth } from '@/config/firebaseAdmin';
 
 const db = getFirestore();
 

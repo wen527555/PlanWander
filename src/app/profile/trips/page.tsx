@@ -12,9 +12,9 @@ import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
-import { createArticleFromTrip, createNewTrip, fetchDeleteTrip } from '@/lib/firebaseApi';
-import { useConfirmModalStore, useModalStore } from '@/lib/store';
 import { fetchUserTrips } from '@/services/api';
+import { createArticleFromTrip, createNewTrip, fetchDeleteTrip } from '@/services/firebaseApi';
+import { useConfirmModalStore, useModalStore } from '@/stores/store';
 import ConfirmModal from '../../../components/confirmModal';
 import Carousel from '../components/Carousel';
 
@@ -304,11 +304,11 @@ const Button = styled.button`
   background-color: #78b7cc;
   color: white;
   border: none;
-  border-radius: 20px;
   padding: 8px 16px;
   font-size: 16px;
   cursor: pointer;
   font-weight: 700;
+  border-radius: 20px;
   &:hover {
     background-color: #e0e7ea;
   }
@@ -379,6 +379,10 @@ const TripName = styled.h3`
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 450px;
 `;
 
 const TripDate = styled.div`

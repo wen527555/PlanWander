@@ -10,13 +10,11 @@ import { IoIosArrowDown, IoIosArrowForward } from 'react-icons/io';
 import { VscTrash } from 'react-icons/vsc';
 import styled from 'styled-components';
 
-// import GoogleApiProvider from '@/lib/GoogleApiProvider';
-
 import 'flatpickr/dist/flatpickr.min.css';
 
 import { getColorForDate } from '@/lib/colors';
-import { updateDepartureTime, updatePlaceStayTime } from '@/lib/firebaseApi';
-import { usePlaceStore } from '@/lib/store';
+import { updateDepartureTime, updatePlaceStayTime } from '@/services/firebaseApi';
+import { usePlaceStore } from '@/stores/store';
 import LocationSearch from './LocationSearch';
 import TimePicker from './TimePicker';
 import TransportModeSelector from './TransportSelector';
@@ -63,11 +61,12 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
     days.reduce((acc, day) => ({ ...acc, [day.date]: true }), {})
   );
   const { selectedPlace, setSelectedPlace } = usePlaceStore();
+  const queryClient = useQueryClient();
 
   const handleToggleOpen = (date: string) => {
     setOpenDays((prev) => ({ ...prev, [date]: !prev[date] }));
   };
-  const queryClient = useQueryClient();
+
   const onDragEnd = async (result: any) => {
     const { source, destination } = result;
     if (!destination) return;
@@ -156,8 +155,6 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
   };
 
   return (
-    // <GoogleApiProvider>
-    // <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY!} libraries={libraries}>
     <ListContainer>
       <DragDropContext onDragEnd={onDragEnd}>
         {days.map((day, dateIndex) => {
@@ -288,7 +285,6 @@ const List: React.FC<ListProps> = ({ tripId, days, onPlaceAdded, onDaysUpdate, o
         })}
       </DragDropContext>
     </ListContainer>
-    // </LoadScript>
   );
 };
 

@@ -1,23 +1,57 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useTransition } from 'react';
 import styled from 'styled-components';
 
+import LoadingAnimation from '@/components/Loading';
 import LoginModal from '@/components/LoginModal';
-import { useModalStore } from '@/lib/store';
+import TripModal from '@/components/TripModal';
+import { createNewTrip } from '@/services/firebaseApi';
+import { useModalStore, useUserStore } from '@/stores/store';
+
+interface SelectedOption {
+  value: string;
+  label: string;
+}
 
 const ClientActions = () => {
   const router = useRouter();
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
+  const { userData } = useUserStore();
+  const [isPending, startTransition] = useTransition();
   const handleToProfile = () => {
     router.push('/profile/trips');
   };
 
+  const handleStartPlanning = () => {
+    if (userData) {
+      openModal('trip');
+    } else {
+      openModal('login');
+    }
+  };
+
+  const handleCreateTrip = async (
+    tripTitle: string,
+    startDate: Date,
+    endDate: Date,
+    selectedCountries: SelectedOption[]
+  ) => {
+    const tripId = await createNewTrip(tripTitle, startDate, endDate, selectedCountries);
+    startTransition(() => {
+      router.push(`/trip/${tripId}`);
+    });
+  };
+
   return (
     <>
-      <StartButton onClick={() => openModal('login')}>Start planning</StartButton>
+      {isPending && <LoadingAnimation />}
+      <StartButton onClick={handleStartPlanning}>Start planning</StartButton>
       {isModalOpen && modalType === 'login' && <LoginModal onClose={closeModal} onLoginSuccess={handleToProfile} />}
+      {isModalOpen && modalType === 'trip' && (
+        <TripModal onClose={closeModal} isEditing={false} onSubmit={handleCreateTrip} />
+      )}
     </>
   );
 };

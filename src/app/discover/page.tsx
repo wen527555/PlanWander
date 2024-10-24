@@ -1,5 +1,5 @@
 import ArticleBlog from '@/app/discover/components/ArticleBlog';
-import { fetchAllPublishedArticles } from '@/lib/firebaseApi';
+import { fetchAllPublishedArticles } from '@/services/firebaseApi';
 
 export const metadata = {
   title: 'Discover Your Next Adventure',

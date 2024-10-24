@@ -8,11 +8,11 @@ import styled from 'styled-components';
 
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
-import { createNewTrip } from '@/lib/firebaseApi';
-import { auth } from '@/lib/firebaseConfig';
-import { useModalStore, useUserStore } from '@/lib/store';
+import { auth } from '@/config/firebaseConfig';
 import Logo from '@/public/PlanwanderLogo.png';
 import { fetchUserData, refreshAuthToken } from '@/services/api';
+import { createNewTrip } from '@/services/firebaseApi';
+import { useModalStore, useUserStore } from '@/stores/store';
 import LoginModal from '../LoginModal';
 
 interface SelectedOption {
@@ -26,7 +26,7 @@ const Header = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-  const isProfileActive = pathname === '/profile';
+  const isProfileActive = pathname === '/profile/trips' || pathname === '/profile/articles';
   const isDiscoverActive = pathname === '/discover';
   const [isPending, startTransition] = useTransition();
   const [loading, setLoading] = useState(false);
@@ -227,6 +227,10 @@ const IconText = styled.span`
   color: #658c96;
   cursor: pointer;
   transition: 0.2s;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 80px;
   &:hover {
     color: #c7c4c4;
   }

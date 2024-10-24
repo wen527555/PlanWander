@@ -14,6 +14,8 @@ import { HomeIcon } from '@/app/styles/commonStyles';
 import ListMapLayout from '@/components/ListWithMapLayout';
 import LoadingAnimation from '@/components/Loading';
 import TripModal from '@/components/TripModal';
+import useAlert from '@/hooks/useAlertMessage';
+import { processDays } from '@/lib/processDays';
 import {
   addPlaceToDay,
   deletePlace,
@@ -23,11 +25,9 @@ import {
   getPlaceForDay,
   updatePlaceRoute,
   updatePlacesForDay,
-} from '@/lib/firebaseApi';
-import useAlert from '@/lib/hooks/useAlertMessage';
-import { getRoute } from '@/lib/mapApi';
-import { processDays } from '@/lib/processDays';
-import { useConfirmModalStore, useModalStore, usePlaceStore } from '@/lib/store';
+} from '@/services/firebaseApi';
+import { getRoute } from '@/services/otherApi';
+import { useConfirmModalStore, useModalStore, usePlaceStore } from '@/stores/store';
 import ConfirmModal from '../../../components/confirmModal';
 import List from './components/List';
 
@@ -413,6 +413,10 @@ const TripName = styled.h1`
   margin: 10px 20px;
   font-size: 20px;
   font-weight: 700;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
 `;
 
 const TripDate = styled.div`

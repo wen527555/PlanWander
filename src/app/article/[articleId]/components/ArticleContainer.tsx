@@ -7,8 +7,8 @@ import { useState } from 'react';
 
 import ListMapLayout from '@/components/ListWithMapLayout';
 import LoadingAnimation from '@/components/Loading';
-import { fetchArticleData } from '@/lib/firebaseApi';
 import { processDays } from '@/lib/processDays';
+import { fetchArticleData } from '@/services/firebaseApi';
 
 const MapComponent = dynamic(() => import('./ArticleMap'), {
   ssr: false,

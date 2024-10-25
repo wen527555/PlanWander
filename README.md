@@ -15,7 +15,8 @@
 ## **Technique Overview**
 
 ### Front-End
-- **Framework:**  Next.js,React(Hook)
+- **Framework:** Next.js
+- **Library:** React (Hooks)
 - **Language:** TypeScript
 - **Styling:** styled-components, CSS
 - **State Management:** Zustand

@@ -33,11 +33,8 @@ A travel planning platform that enables users to seamlessly plan and share itine
 - Restcountries API
 - Unsplash API
 
-### Back-End
-
-**Firebase (backend-as-a-service)**
-
-- **Database:** Firestore Database
+### Firebase
+- **Database:** Firestore
 - **Authentication:** Firebase Admin SDK
 - **Image Storage:** Firebase Storage
 

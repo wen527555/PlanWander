@@ -1,11 +1,9 @@
 # PlanWander
 
+![article](/images/landing.png)
 
 A travel planning platform that enables users to seamlessly plan and share itineraries. 
 Users can organize trips using maps without switching between tools. The platform also allows for viewing travel articles alongside maps, providing a smoother and more immersive browsing experience.
-
-
-![article](/images/landing.png)
 
 ### Website URL : https://plan-wander.vercel.app/
 

@@ -1,9 +1,8 @@
 # PlanWander
 
-![article](/images/landing.png)
+- A travel planning platform that enables users to seamlessly plan and share itineraries. Users can organize trips using maps without switching between tools. The platform also allows for viewing travel articles alongside maps, providing a smoother and more immersive browsing experience.
 
-A travel planning platform that enables users to seamlessly plan and share itineraries. 
-Users can organize trips using maps without switching between tools. The platform also allows for viewing travel articles alongside maps, providing a smoother and more immersive browsing experience.
+![article](/images/landing.png)
 
 ### Website URL : https://plan-wander.vercel.app/
 
@@ -15,24 +14,28 @@ Users can organize trips using maps without switching between tools. The platfor
 
 ## **Technique Overview**
 
-- React
-- Next.js
-- TypeScript
-- React-Query
-- Zustand
-- Vercel
-- Firebase
-  - Firestore Database
-  - Firebase-admin SDK
-  - Storage
-- styled-components
-- Third-party Library
-  - hello-pangea/dnd
-  - Mapbox Map API
+### Front-End
+- **Framework:**  Next.js,React(Hook)
+- **Language:** TypeScript
+- **Styling:** styled-components, CSS
+- **State Management:** Zustand
+- **Data Fetching:** React-Query
+- **Code Formatter:** ESLint, Prettier
+
+### Third-Party Library
+- **Drag-and-Drop:** hello-pangea/dnd
+- **Maps and Directions:**
+  - Mapbox API
   - Mapbox Directions API
-  - Google Autocomplete API
-  - Restcountries API
-  - Unsplash API
+- **Autocomplete Search:** Google Autocomplete API
+- **Country Information:** Restcountries API
+- **Images:** Unsplash API
+
+### Back-End
+- **Service:** Firebase (backend-as-a-service)
+  - **Database:** Firestore Database
+  - **Authentication:** Firebase Admin SDK
+  - **Storage:** Firebase Storage
 
 ## **Architecture**
 

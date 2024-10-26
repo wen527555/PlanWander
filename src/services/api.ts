@@ -16,6 +16,21 @@ export const fetchGeneralLogin = async (idToken: string) => {
   return response.json();
 };
 
+export const fetchLogout = async () => {
+  try {
+    const res = await fetch('/api/auth/logout', {
+      method: 'POST',
+    });
+    if (!res.ok) {
+      throw new Error('Failed to logout');
+    }
+    return res;
+  } catch (error) {
+    console.error('Error during logout API call: ', error);
+    throw error;
+  }
+};
+
 export const fetchGoogleLogin = async (idToken: string) => {
   const response = await fetch('/api/auth/googleLogin', {
     method: 'POST',

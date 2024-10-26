@@ -8,4 +8,4 @@ export async function middleware(request: NextRequest) {
   }
   return NextResponse.next();
 }
-export const config = { matcher: ['/trips/:path*', '/profile'] };
+export const config = { matcher: ['/trips/:path*', '/profile/:path*'] };

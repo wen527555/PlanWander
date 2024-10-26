@@ -24,8 +24,8 @@ interface LoginModalProps {
 
 const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
   const [isLogIn, setIsLogIn] = useState(true);
-  const [email, setEmail] = useState('test@gmail.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const { addAlert, AlertMessage } = useAlert();
   const handleToggleForm = () => {
     setEmail('');
@@ -124,6 +124,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ onLoginSuccess, onClose }) => {
             onEmailChange={(e) => setEmail(e.target.value)}
             onPasswordChange={(e) => setPassword(e.target.value)}
             onSubmit={handleFormSubmit}
+            setEmail={setEmail}
+            setPassword={setPassword}
           />
           <ToggleLink onClick={handleToggleForm}>
             {isLogIn ? "Don't have an account? Sign Up" : 'Already have an account? Log In'}

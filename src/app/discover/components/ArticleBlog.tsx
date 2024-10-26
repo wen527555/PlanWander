@@ -1,8 +1,9 @@
 'use client';
 
+import { useQuery } from '@tanstack/react-query';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState, useTransition } from 'react';
+import { useMemo, useState, useTransition } from 'react';
 import { MdArrowOutward } from 'react-icons/md';
 import styled from 'styled-components';
 
@@ -11,47 +12,25 @@ import { fetchAllPublishedArticles } from '@/services/firebaseApi';
 
 const CountrySelect = dynamic(() => import('./CountrySelect'), { ssr: false });
 
-interface Article {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: Date;
-  coverImage?: string;
-  photoURL?: string;
-  userName?: string;
-  imageUrl: string;
-  countries?: { name: string; code: string }[];
-}
-
-interface ArticleBlogProps {
-  initialArticles: Article[];
-}
-
-export default function ArticleBlog({ initialArticles }: ArticleBlogProps) {
-  const [articles, setArticles] = useState(initialArticles);
+export default function ArticleBlog() {
   const [isPending, startTransition] = useTransition();
   const [selectedCountry, setSelectedCountry] = useState<string | null>(null);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!initialArticles || initialArticles.length === 0) {
-      const fetchArticles = async () => {
-        const data = await fetchAllPublishedArticles();
-        setArticles(data);
-      };
-      fetchArticles();
-    }
-  }, [initialArticles]);
+  const { data: allArticles = [], isLoading } = useQuery({
+    queryKey: ['allArticles'],
+    queryFn: fetchAllPublishedArticles,
+  });
 
   const filteredArticles = useMemo(
     () =>
       selectedCountry && selectedCountry !== 'all'
-        ? articles.filter(
+        ? allArticles.filter(
             (article) =>
               Array.isArray(article.countries) && article.countries.some((country) => country.code === selectedCountry)
           )
-        : articles,
-    [selectedCountry, articles]
+        : allArticles,
+    [selectedCountry, allArticles]
   );
 
   const handleCountryChange = (selectedOption: { code: string } | null) => {
@@ -64,9 +43,11 @@ export default function ArticleBlog({ initialArticles }: ArticleBlogProps) {
     });
   };
 
-  const sortedArticles = articles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  const sortedArticles = allArticles.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const latestArticles = sortedArticles.slice(-3);
+
+  if (isLoading) return <LoadingAnimation />;
 
   return (
     <>

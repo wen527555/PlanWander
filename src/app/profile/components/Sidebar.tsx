@@ -10,6 +10,7 @@ import styled from 'styled-components';
 
 import { auth } from '@/config/firebaseConfig';
 import useAlert from '@/hooks/useAlertMessage';
+import { fetchLogout } from '@/services/api';
 import { fetchUserData, updateUserProfile, uploadProfileImage } from '@/services/firebaseApi';
 import { useUserStore } from '@/stores/store';
 
@@ -31,9 +32,7 @@ const Sidebar: React.FC<SidebarProps> = ({ tabs }) => {
   const handleLogout = async () => {
     try {
       await auth.signOut();
-      await fetch('api/logout', {
-        method: 'POST',
-      });
+      await fetchLogout();
       setUserData(null);
       router.push('/');
     } catch (error) {

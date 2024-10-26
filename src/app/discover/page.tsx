@@ -1,5 +1,4 @@
 import ArticleBlog from '@/app/discover/components/ArticleBlog';
-import { fetchAllPublishedArticles } from '@/services/firebaseApi';
 
 export const metadata = {
   title: 'Discover Your Next Adventure',
@@ -7,6 +6,5 @@ export const metadata = {
 };
 
 export default async function DisCoverPage() {
-  const initialArticles = await fetchAllPublishedArticles();
-  return <ArticleBlog initialArticles={initialArticles} />;
+  return <ArticleBlog />;
 }

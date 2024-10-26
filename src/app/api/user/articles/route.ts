@@ -23,7 +23,6 @@ export async function GET() {
 
     const articles = articlesSnapShot.docs.map((doc) => {
       const data = doc.data();
-      console.log('data', data);
       return {
         id: doc.id,
         ...doc.data(),

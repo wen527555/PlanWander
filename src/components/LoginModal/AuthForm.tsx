@@ -5,22 +5,49 @@ interface AuthFormProps {
   isLogIn: boolean;
   email: string;
   password: string;
+  setEmail: React.Dispatch<React.SetStateAction<string>>;
+  setPassword: React.Dispatch<React.SetStateAction<string>>;
   onEmailChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onPasswordChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onSubmit: (e: React.FormEvent) => void;
 }
 
-const AuthForm: React.FC<AuthFormProps> = ({ isLogIn, email, password, onEmailChange, onPasswordChange, onSubmit }) => {
+const AuthForm: React.FC<AuthFormProps> = ({
+  isLogIn,
+  email,
+  setEmail,
+  password,
+  setPassword,
+  onEmailChange,
+  onPasswordChange,
+  onSubmit,
+}) => {
   return (
-    <form onSubmit={onSubmit}>
-      <Input placeholder="Email" value={email || 'test@gmail.com'} onChange={onEmailChange} />
-      <Input type="password" value={password || '123456'} placeholder="Password" onChange={onPasswordChange} />
+    <Form onSubmit={onSubmit}>
+      <Input placeholder="Email" value={email} onChange={onEmailChange} />
+      <Input type="password" value={password} placeholder="Password" onChange={onPasswordChange} />
+      <GuestButton
+        type="button"
+        onClick={() => {
+          setEmail('test@gmail.com');
+          setPassword('123456');
+        }}
+      >
+        Guest Login
+      </GuestButton>
       <LoginButton type="submit">{isLogIn ? 'Log in' : 'Sign up'}</LoginButton>
-    </form>
+    </Form>
   );
 };
 
 export default AuthForm;
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+`;
 
 const Input = styled.input`
   margin: 10px 0px;
@@ -59,5 +86,23 @@ const LoginButton = styled.button`
     background-color: white;
     color: #78b7cc;
     border-color: #78b7cc;
+  }
+`;
+
+const GuestButton = styled.button`
+  width: 30%;
+  border-radius: 25px;
+  padding: 5px 0px;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  background-color: #fff;
+  color: #ccc;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+  &:hover {
+    color: white;
+    background-color: #ccc;
   }
 `;

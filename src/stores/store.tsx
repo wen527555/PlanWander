@@ -8,7 +8,9 @@ interface UserData {
 
 interface UserStore {
   userData: UserData | null;
+  userLoading: boolean;
   setUserData: (userData: UserData | null) => void;
+  setUserLoading: (loading: boolean) => void;
 }
 
 interface Place {
@@ -59,7 +61,9 @@ export const usePlaceStore = create<PlaceStore>((set) => ({
 
 export const useUserStore = create<UserStore>((set) => ({
   userData: null,
-  setUserData: (userData: UserData | null) => set({ userData }),
+  userLoading: true,
+  setUserData: (userData: UserData | null) => set({ userData, userLoading: false }),
+  setUserLoading: (userLoading) => set({ userLoading }),
 }));
 
 export const useModalStore = create<ModalStore>((set) => ({

@@ -22,7 +22,7 @@ interface SelectedOption {
 
 const Header = () => {
   const { isModalOpen, openModal, closeModal, modalType } = useModalStore();
-  const { userData, setUserData } = useUserStore();
+  const { userData, setUserData, setUserLoading, userLoading } = useUserStore();
 
   const router = useRouter();
   const pathname = usePathname();
@@ -33,6 +33,7 @@ const Header = () => {
 
   useEffect(() => {
     const unsubscribe = auth.onIdTokenChanged(async (user) => {
+      setUserLoading(true);
       if (user) {
         try {
           await refreshAuthToken();
@@ -46,6 +47,7 @@ const Header = () => {
       } else {
         setUserData(null);
       }
+      setUserLoading(false);
     });
     return () => unsubscribe();
   }, [setUserData]);
@@ -94,7 +96,9 @@ const Header = () => {
         <LogoLink href="/" onClick={handleLogoClick}>
           <Image src={Logo} alt="Logo" width={180} height={22} style={{ cursor: 'pointer' }} />
         </LogoLink>
-        {userData ? (
+        {userLoading ? (
+          <></>
+        ) : userData ? (
           <>
             <IconWrapper>
               <DiscoverWrapper isActive={isDiscoverActive} onClick={handleToDiscover}>

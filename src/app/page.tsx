@@ -1,10 +1,8 @@
-import dynamic from 'next/dynamic';
 import Image from 'next/image';
 
 import styles from '@/app/styles/LandingPage.module.css';
+import ClientAction from '@/components/Landing/ClientActions';
 import bgImage from '@/public/travel.jpg';
-
-const ClientAction = dynamic(() => import('@/components/Landing/ClientActions'), { ssr: false });
 
 export const metadata = {
   title: 'PlanWander',

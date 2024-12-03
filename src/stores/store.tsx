@@ -3,6 +3,7 @@ import { create } from 'zustand';
 interface UserData {
   photoURL: string;
   userName: string;
+  uid: string;
 }
 
 interface UserStore {

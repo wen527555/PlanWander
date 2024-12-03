@@ -92,7 +92,6 @@ const TripsContainer = () => {
       router.push(`/trip/${tripId}`);
     });
   };
-
   const handleTripClick = (tripId: string) => {
     startTransition(() => {
       router.push(`/trip/${tripId}`);

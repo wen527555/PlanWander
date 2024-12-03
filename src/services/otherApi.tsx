@@ -16,7 +16,12 @@ interface Country {
   flag: string;
 }
 
-export const getRoute = async (start: any, end: any, mode: string = 'driving') => {
+interface Coordinates {
+  lat: number;
+  lng: number;
+}
+
+export const getRoute = async (start: Coordinates, end: Coordinates, mode: string = 'driving') => {
   const accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
   const url = `https://api.mapbox.com/directions/v5/mapbox/${mode}/${start.lng},${start.lat};${end.lng},${end.lat}?geometries=geojson&access_token=${accessToken}`;
   try {

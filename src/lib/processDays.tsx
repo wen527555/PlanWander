@@ -6,12 +6,15 @@ interface Place {
   longitude: number;
   color: string;
   number: number;
-  route?: Route;
+  route?: {
+    type: 'LineString';
+    coordinates: { lat: number; lng: number }[];
+  };
 }
 
 interface Route {
   type: string;
-  coordinates: any;
+  coordinates: [number, number][];
   color?: string;
 }
 

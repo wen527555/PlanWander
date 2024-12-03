@@ -3,7 +3,6 @@ import { create } from 'zustand';
 interface UserData {
   photoURL: string;
   userName: string;
-  [key: string]: any;
 }
 
 interface UserStore {
@@ -14,8 +13,8 @@ interface UserStore {
 }
 
 interface Place {
-  website?: any;
-  phone?: any;
+  website?: string;
+  phone?: string;
   openTime?: string[];
   id: string;
   name: string;

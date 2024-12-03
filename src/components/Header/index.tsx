@@ -64,7 +64,7 @@ const Header = () => {
     });
   };
 
-  const handleLogoClick = (e: any) => {
+  const handleLogoClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     startTransition(() => {
       router.push('/');
